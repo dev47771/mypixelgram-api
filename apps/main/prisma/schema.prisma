@@ -14,26 +14,26 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  login String @db.VarChar(100)
-  email String @db.VarChar(100)
+  id           Int       @id @default(autoincrement())
+  login        String    @db.VarChar(100)
+  email        String    @db.VarChar(100)
   passwordHash String
-  createdAt DateTime @db.Timestamptz() @default(now())
-  updatedAt DateTime @db.Timestamptz() @updatedAt
-  deletedAt DateTime? @db.Timestamptz()
+  createdAt    DateTime  @default(now()) @db.Timestamptz()
+  updatedAt    DateTime  @updatedAt @db.Timestamptz()
+  deletedAt    DateTime? @db.Timestamptz()
 
-  confirmationInfo UserConfirmation?
+  confirmationInfo     UserConfirmation?
   passwordRecoveryInfo PasswordRecovery?
-  providers UserProvider[]
+  providers            UserProvider[]
 
   @@map("users")
 }
 
 model UserConfirmation {
   confirmationCode String?
-  expirationDate DateTime? @db.Timestamptz()
-  isConfirmed Boolean
-  userId Int @id
+  expirationDate   DateTime? @db.Timestamptz()
+  isConfirmed      Boolean
+  userId           Int       @id
 
   user User @relation(fields: [userId], references: [id])
 
@@ -42,8 +42,8 @@ model UserConfirmation {
 
 model PasswordRecovery {
   recoveryCodeHash String
-  expirationDate DateTime @db.Timestamptz()
-  userId Int @id
+  expirationDate   DateTime @db.Timestamptz()
+  userId           Int      @id
 
   user User @relation(fields: [userId], references: [id])
 
@@ -51,11 +51,11 @@ model PasswordRecovery {
 }
 
 model UserProvider {
-  id Int @id @default(autoincrement())
-  provider String
+  id             Int    @id @default(autoincrement())
+  provider       String
   providerUserId String
-  profile Json?
-  userId Int
+  profile        Json?
+  userId         Int
 
   user User @relation(fields: [userId], references: [id])
 
