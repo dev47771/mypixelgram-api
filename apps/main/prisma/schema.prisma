@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  login String @db.VarChar(100)
+  email String @db.VarChar(100)
+  passwordHash String
+  createdAt DateTime @db.Timestamptz() @default(now())
+  updatedAt DateTime @db.Timestamptz() @updatedAt
+  deletedAt DateTime? @db.Timestamptz()
+
+  confirmationInfo UserConfirmation?
+  passwordRecoveryInfo PasswordRecovery?
+  providers UserProvider[]
+
+  @@map("users")
+}
+
+model UserConfirmation {
+  confirmationCode String?
+  expirationDate DateTime? @db.Timestamptz()
+  isConfirmed Boolean
+  userId Int @id
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_confirmations")
+}
+
+model PasswordRecovery {
+  recoveryCodeHash String
+  expirationDate DateTime @db.Timestamptz()
+  userId Int @id
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("password_recoveries")
+}
+
+model UserProvider {
+  id Int @id @default(autoincrement())
+  provider String
+  providerUserId String
+  profile Json?
+  userId Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_providers")
+}
