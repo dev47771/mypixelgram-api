@@ -1,0 +1,27 @@
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { PrismaService } from '../../../../core/prisma/prisma.service';
+import { UserViewDto } from '../../api/view-dto/user.view-dto';
+import { User as UserModel } from '@prisma/client';
+
+@Injectable()
+export class UsersQueryRepo {
+  constructor(private prisma: PrismaService) {}
+
+  async findByIdOrInternalFail(id: number): Promise<UserViewDto> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+
+    return user;
+  }
+
+  private async findById(id: number): Promise<UserViewDto | null> {
+    const user: UserModel | null = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
+    });
+
+    return user ? UserViewDto.mapToView(user) : null;
+  }
+}
