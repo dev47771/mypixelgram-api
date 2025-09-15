@@ -10,5 +10,8 @@ export const configModule = ConfigModule.forRoot({
       .valid('development', 'production', 'testing', 'staging')
       .required(),
     DATABASE_URL: Joi.string().required(),
+    EMAIL_CONFIRMATION_CODE_LIFETIME_SECS: Joi.number().required(),
+    MAIL_TRANSPORT: Joi.string().required(),
+    MAIL_FROM_NAME: Joi.string().required(),
   }),
 });
