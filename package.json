@@ -19,10 +19,10 @@
     "test:cov": "cross-env NODE_ENV=testing jest --coverage",
     "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "cross-env NODE_ENV=testing jest --config apps/main/test/jest-e2e.json",
-    "main:prisma:generate": "prisma generate --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:migrate": "prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
-    "main:prisma:reset": "prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:deploy": "prisma migrate deploy --schema=./apps/main/prisma/schema.prisma"
+    "main:prisma:generate": "dotenv -e ./apps/main/.env -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:migrate": "dotenv -e ./apps/main/.env -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
+    "main:prisma:reset": "dotenv -e ./apps/main/.env -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:deploy": "dotenv -e ./apps/main/.env -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -37,6 +37,8 @@
     "class-validator": "^0.14.2",
     "cross-env": "^10.0.0",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.2",
+    "dotenv-cli": "^10.0.0",
     "joi": "^18.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
