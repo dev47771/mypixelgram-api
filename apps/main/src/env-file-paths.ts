@@ -1,7 +1,16 @@
 import { join } from 'node:path';
 import * as process from 'node:process';
 
-const serviceRoot = join(__dirname, '..', '..', '..', 'apps', 'main');
+const serviceRoot = join(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  'apps',
+  'main',
+  'src',
+  'env',
+);
 
 export const envFilePaths = [
   process.env.ENV_FILE_PATH?.trim() || '',

@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="true" type="JavaScriptTestRunnerJest">
+    <node-interpreter value="project" />
+    <working-dir value="$PROJECT_DIR$/apps/main" />
+    <jest-options value="--config ./test/jest-e2e.json --runInBand" />
+    <envs>
+      <env name="NODE_ENV" value="testing" />
+    </envs>
+    <scope-kind value="ALL" />
+    <method v="2">
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_main: reset test db" />
+    </method>
+  </configuration>
+</component>

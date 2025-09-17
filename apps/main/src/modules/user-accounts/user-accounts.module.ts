@@ -7,10 +7,20 @@ import { UsersRepo } from './infrastructure/users.repo';
 import { UsersQueryRepo } from './infrastructure/query/users.query-repo';
 import { RegisterUserUseCase } from './application/usecases/register-user.use-case';
 import { AuthController } from './api/auth.controller';
+import { GetUserOrNotFoundFailQueryHandler } from './application/queries/get-user-or-not-found-fail.query';
+import { BasicStrategy } from './api/guards/basic/basic.strategy';
 
-const queryHandlers = [GetUserByIdOrInternalFailQueryHandler];
+const queryHandlers = [
+  GetUserByIdOrInternalFailQueryHandler,
+  GetUserOrNotFoundFailQueryHandler,
+];
 const commandHandlers = [CreateUserUseCase, RegisterUserUseCase];
-const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo];
+const commonProviders = [
+  CryptoService,
+  UsersRepo,
+  UsersQueryRepo,
+  BasicStrategy,
+];
 
 @Module({
   controllers: [UsersController, AuthController],

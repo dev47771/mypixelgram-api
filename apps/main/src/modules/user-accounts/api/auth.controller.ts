@@ -5,7 +5,9 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetUserByIdOrInternalFailQuery } from '../application/queries/get-user-by-id-or-internal-fail.query';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
 
-@Controller('auth')
+export const AUTH_ROUTE = 'auth';
+
+@Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,

@@ -23,7 +23,7 @@ export abstract class BaseCreateUser {
       });
     }
 
-    const userWithSameEmail = await this.usersRepo.findByEmail(dto.login);
+    const userWithSameEmail = await this.usersRepo.findByEmail(dto.email);
     if (userWithSameEmail) {
       throw new BadRequestException({
         errors: [

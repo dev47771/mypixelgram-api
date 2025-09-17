@@ -13,5 +13,9 @@ export const configModule = ConfigModule.forRoot({
     EMAIL_CONFIRMATION_CODE_LIFETIME_SECS: Joi.number().required(),
     MAIL_TRANSPORT: Joi.string().required(),
     MAIL_FROM_NAME: Joi.string().required(),
+    HTTP_BASIC_USER: Joi.string().required(),
+    HTTP_BASIC_PASS: Joi.string().required(),
+    INCLUDE_TESTING_MODULE: Joi.boolean().required(),
+    DB_LOGGING: Joi.boolean().required(),
   }),
 });

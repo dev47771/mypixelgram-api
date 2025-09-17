@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../../core/prisma/prisma.service';
 import { UserViewDto } from '../../api/view-dto/user.view-dto';
 import { User as UserModel } from '@prisma/client';
@@ -12,6 +16,16 @@ export class UsersQueryRepo {
 
     if (!user) {
       throw new InternalServerErrorException('User not found');
+    }
+
+    return user;
+  }
+
+  async findByIdOrNotFoundFail(id: number): Promise<UserViewDto> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
     return user;

@@ -1,11 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { UserViewDto } from './view-dto/user.view-dto';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/usecases/create-user.use-case';
 import { GetUserByIdOrInternalFailQuery } from '../application/queries/get-user-by-id-or-internal-fail.query';
+import { BasicAuthGuard } from './guards/basic/basic-auth.guard';
+import { IntValidationTransformationPipe } from '../../../core/pipes/int-validation-transformation.pipe';
+import { GetUserOrNotFoundFailQuery } from '../application/queries/get-user-or-not-found-fail.query';
 
-@Controller('users')
+export const USERS_ROUTE = 'users';
+
+@Controller(USERS_ROUTE)
+@UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
     private commandBus: CommandBus,
@@ -22,5 +28,12 @@ export class UsersController {
     return this.queryBus.execute(
       new GetUserByIdOrInternalFailQuery(createdUserId),
     );
+  }
+
+  @Get(':id')
+  async getUser(
+    @Param('id', IntValidationTransformationPipe) id: number,
+  ): Promise<UserViewDto> {
+    return this.queryBus.execute(new GetUserOrNotFoundFailQuery(id));
   }
 }
