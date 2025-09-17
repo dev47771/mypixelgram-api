@@ -17,7 +17,7 @@ export class RegisterUserCommand {
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserUseCase
   extends BaseCreateUser
-  implements ICommandHandler<RegisterUserCommand, number>
+  implements ICommandHandler<RegisterUserCommand, string>
 {
   constructor(
     cryptoService: CryptoService,
@@ -28,7 +28,7 @@ export class RegisterUserUseCase
     super(cryptoService, usersRepo);
   }
 
-  async execute({ dto }: RegisterUserCommand): Promise<number> {
+  async execute({ dto }: RegisterUserCommand): Promise<string> {
     const user: CreateUserRepoDto = await this.createUser(dto);
 
     const confirmationCode = randomUUID();

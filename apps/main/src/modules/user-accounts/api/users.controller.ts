@@ -20,19 +20,14 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
-    const createdUserId = await this.commandBus.execute<
-      CreateUserCommand,
-      number
-    >(new CreateUserCommand(body));
+    const createdUserId = await this.commandBus.execute<CreateUserCommand, string>(new CreateUserCommand(body));
 
-    return this.queryBus.execute(
-      new GetUserByIdOrInternalFailQuery(createdUserId),
-    );
+    return this.queryBus.execute(new GetUserByIdOrInternalFailQuery(createdUserId));
   }
 
   @Get(':id')
   async getUser(
-    @Param('id', IntValidationTransformationPipe) id: number,
+    @Param('id', IntValidationTransformationPipe) id: string,
   ): Promise<UserViewDto> {
     return this.queryBus.execute(new GetUserOrNotFoundFailQuery(id));
   }

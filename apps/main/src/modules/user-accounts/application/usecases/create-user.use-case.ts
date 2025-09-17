@@ -13,13 +13,13 @@ export class CreateUserCommand {
 @CommandHandler(CreateUserCommand)
 export class CreateUserUseCase
   extends BaseCreateUser
-  implements ICommandHandler<CreateUserCommand, number>
+  implements ICommandHandler<CreateUserCommand, string>
 {
   constructor(cryptoService: CryptoService, usersRepo: UsersRepo) {
     super(cryptoService, usersRepo);
   }
 
-  async execute({ dto }: CreateUserCommand): Promise<number> {
+  async execute({ dto }: CreateUserCommand): Promise<string> {
     const user: CreateUserRepoDto = await this.createUser(dto);
 
     const userConfirmation: CreateUserConfirmationRepoDto = {

@@ -18,7 +18,7 @@ export class AuthController {
   async registerUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
     const createdUserId = await this.commandBus.execute<
       RegisterUserCommand,
-      number
+      string
     >(new RegisterUserCommand(body));
 
     return this.queryBus.execute(

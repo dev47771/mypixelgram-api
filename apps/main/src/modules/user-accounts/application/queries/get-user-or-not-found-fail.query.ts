@@ -4,7 +4,7 @@ import { UsersQueryRepo } from '../../infrastructure/query/users.query-repo';
 import { NotFoundException } from '@nestjs/common';
 
 export class GetUserOrNotFoundFailQuery {
-  constructor(public id: number) {}
+  constructor(public id: string) {}
 }
 
 @QueryHandler(GetUserOrNotFoundFailQuery)

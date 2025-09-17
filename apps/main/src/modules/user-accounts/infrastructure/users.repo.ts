@@ -23,7 +23,7 @@ export class UsersRepo {
   async createUserWithConfirmation(
     userDto: CreateUserRepoDto,
     confirmationDto: CreateUserConfirmationRepoDto,
-  ): Promise<number> {
+  ): Promise<string> {
     const createdUser: UserModel = await this.prisma.user.create({
       data: {
         ...userDto,

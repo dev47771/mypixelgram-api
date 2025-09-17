@@ -11,7 +11,7 @@ import { User as UserModel } from '@prisma/client';
 export class UsersQueryRepo {
   constructor(private prisma: PrismaService) {}
 
-  async findByIdOrInternalFail(id: number): Promise<UserViewDto> {
+  async findByIdOrInternalFail(id: string): Promise<UserViewDto> {
     const user = await this.findById(id);
 
     if (!user) {
@@ -21,7 +21,7 @@ export class UsersQueryRepo {
     return user;
   }
 
-  async findByIdOrNotFoundFail(id: number): Promise<UserViewDto> {
+  async findByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
     const user = await this.findById(id);
 
     if (!user) {
@@ -31,7 +31,7 @@ export class UsersQueryRepo {
     return user;
   }
 
-  private async findById(id: number): Promise<UserViewDto | null> {
+  private async findById(id: string): Promise<UserViewDto | null> {
     const user: UserModel | null = await this.prisma.user.findFirst({
       where: { id, deletedAt: null },
     });
