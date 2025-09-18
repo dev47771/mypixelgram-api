@@ -9,21 +9,45 @@ import { RegisterUserUseCase } from './application/usecases/register-user.use-ca
 import { AuthController } from './api/auth.controller';
 import { GetUserOrNotFoundFailQueryHandler } from './application/queries/get-user-or-not-found-fail.query';
 import { BasicStrategy } from './api/guards/basic/basic.strategy';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { jwtConstraints } from './domain/user-constraints';
+import { LoginUserUseCase } from './application/usecases/login-user.use-case';
+import { LocalStrategy } from './api/guards/local-strategy/local.strategy';
+import { ValidateUserUseCase } from './application/usecases/validate-user.use-case';
+import { SessionRepo } from './sessions/infrastructure/sessions.repo';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
   GetUserOrNotFoundFailQueryHandler,
 ];
-const commandHandlers = [CreateUserUseCase, RegisterUserUseCase];
+const commandHandlers = [
+  CreateUserUseCase,
+  RegisterUserUseCase,
+  LoginUserUseCase,
+  ValidateUserUseCase
+];
 const commonProviders = [
   CryptoService,
   UsersRepo,
   UsersQueryRepo,
   BasicStrategy,
+  LocalStrategy,
+  JwtService,
+  SessionRepo
+
 ];
 
 @Module({
+  imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: jwtConstraints.secret,
+      signOptions: { expiresIn: '20m' }
+    })
+  ],
   controllers: [UsersController, AuthController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
 })
 export class UserAccountsModule {}
+

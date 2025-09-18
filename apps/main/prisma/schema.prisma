@@ -25,6 +25,7 @@ model User {
   confirmationInfo     UserConfirmation?
   passwordRecoveryInfo PasswordRecovery?
   providers            UserProvider[]
+  Session              Session[]
 
   @@map("users")
 }
@@ -51,7 +52,7 @@ model PasswordRecovery {
 }
 
 model UserProvider {
-  id             String    @id @default(uuid())
+  id             String @id @default(uuid())
   provider       String
   providerUserId String
   profile        Json?
@@ -60,4 +61,17 @@ model UserProvider {
   user User @relation(fields: [userId], references: [id])
 
   @@map("user_providers")
+}
+
+model Session {
+  id         String @id @default(uuid())
+  userId     String
+  iat        String
+  exp        String
+  deviceName String
+  ip         String
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("session_user")
 }

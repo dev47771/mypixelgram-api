@@ -9,3 +9,7 @@ export const passwordConstraints = {
   match:
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!"#$%&'()*+,\-.\/\\:;<=>?@\[\]^_{|}~]*$/,
 };
+
+export const jwtConstraints = {
+  secret: 'jwt-secret'
+}
