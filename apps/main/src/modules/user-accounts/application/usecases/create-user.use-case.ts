@@ -11,9 +11,7 @@ export class CreateUserCommand {
 }
 
 @CommandHandler(CreateUserCommand)
-export class CreateUserUseCase
-  extends BaseCreateUser
-  implements ICommandHandler<CreateUserCommand, string>
+export class CreateUserUseCase extends BaseCreateUser implements ICommandHandler<CreateUserCommand, string>
 {
   constructor(cryptoService: CryptoService, usersRepo: UsersRepo) {
     super(cryptoService, usersRepo);
