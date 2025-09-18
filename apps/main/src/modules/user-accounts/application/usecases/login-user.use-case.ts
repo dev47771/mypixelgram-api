@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CreateSessionDto } from '../../api/input-dto/create-session.input-dto';
+import { SessionRepo } from '../../sessions/infrastructure/sessions.repo';
 
 export class LoginUserCommand {
   constructor(public dto: LoginUserInputDto, public extractDto: ExtractDeviceAndIpDto) {}
@@ -17,9 +18,10 @@ export class LoginUserCommand {
 export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(protected jwtService: JwtService,
               protected configService: ConfigService,
-              protected usersRepo: UsersRepo,) {}
+              protected usersRepo: UsersRepo,
+              protected sessionRepo: SessionRepo,) {}
 
-  async execute(command: LoginUserCommand){
+  async execute(command: LoginUserCommand): Promise<{accessToken: string, refreshToken: string} | undefined>{
 
     const user = await this.usersRepo.findByEmail(command.dto.email)
     if(user) {
@@ -47,10 +49,15 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
         deviceId: payload.deviceId
       }
 
+      await this.sessionRepo.createSession(sessionDto)
 
+      return {
+        accessToken,
+        refreshToken
+      }
     }
 
 
-    return
+
   }
 }

@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
@@ -16,6 +17,7 @@ import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDevic
 import { ExtractDeviceAndIpDto } from './input-dto/extract-device-ip.input-dto';
 import { LoginUserCommand } from '../application/usecases/login-user.use-case';
 import { LocalAuthGuard } from './guards/local-strategy/local-auth.guard';
+import { Response } from 'express'
 
 export const AUTH_ROUTE = 'auth';
 
@@ -39,7 +41,10 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async loginUser(@Body() body: LoginUserInputDto, @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto) {
-    return await this.commandBus.execute(new LoginUserCommand(body, dto));
+  async loginUser(@Body() body: LoginUserInputDto, @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
+    const tokens =  await this.commandBus.execute(new LoginUserCommand(body, dto));
+
+    response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
+    return { accessToken: tokens.accessToken }
   }
 }

@@ -15,12 +15,18 @@ import { jwtConstraints } from './domain/user-constraints';
 import { LoginUserUseCase } from './application/usecases/login-user.use-case';
 import { LocalStrategy } from './api/guards/local-strategy/local.strategy';
 import { ValidateUserUseCase } from './application/usecases/validate-user.use-case';
+import { SessionRepo } from './sessions/infrastructure/sessions.repo';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
   GetUserOrNotFoundFailQueryHandler,
 ];
-const commandHandlers = [CreateUserUseCase, RegisterUserUseCase, LoginUserUseCase, ValidateUserUseCase];
+const commandHandlers = [
+  CreateUserUseCase,
+  RegisterUserUseCase,
+  LoginUserUseCase,
+  ValidateUserUseCase
+];
 const commonProviders = [
   CryptoService,
   UsersRepo,
@@ -28,7 +34,7 @@ const commonProviders = [
   BasicStrategy,
   LocalStrategy,
   JwtService,
-
+  SessionRepo
 
 ];
 
@@ -44,3 +50,4 @@ const commonProviders = [
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
 })
 export class UserAccountsModule {}
+
