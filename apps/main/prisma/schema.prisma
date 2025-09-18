@@ -61,3 +61,16 @@ model UserProvider {
 
   @@map("user_providers")
 }
+
+model Session {
+    id           String     @id @default(uuid())
+    userId       String     @id
+    iat          String
+    exp          String
+    deviceName   String
+    ip           String
+
+    user User @relation(fields: [userId], references: [id])
+
+    @@map("session_user")
+}
