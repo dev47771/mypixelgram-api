@@ -66,10 +66,12 @@ model UserProvider {
 model Session {
   id         String @id @default(uuid())
   userId     String
+  ip         String
   iat        String
   exp        String
   deviceName String
-  ip         String
+  deviceId   String
+
 
   user User @relation(fields: [userId], references: [id])
 

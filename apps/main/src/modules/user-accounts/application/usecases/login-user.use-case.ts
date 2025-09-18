@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ExtractDeviceAndIpDto } from '../../api/input-dto/extract-device-ip.input-dto';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { v4 as uuidv4 } from 'uuid';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CreateSessionDto } from '../../api/input-dto/create-session.input-dto';
