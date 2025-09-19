@@ -41,9 +41,13 @@ export class UsersRepo {
     return createdUser.id;
   }
 
-  async createPasswordRecovery(dto: PasswordRecoveryModel): Promise<void> {
-    await this.prisma.passwordRecovery.create({
-      data: dto,
+  async createOrUpdatePasswordRecovery(
+    dto: PasswordRecoveryModel,
+  ): Promise<void> {
+    await this.prisma.passwordRecovery.upsert({
+      where: { userId: dto.userId },
+      update: dto,
+      create: dto,
     });
   }
 
