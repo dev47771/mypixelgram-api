@@ -12,6 +12,8 @@ export class UsersQueryRepo {
   constructor(private prisma: PrismaService) {}
 
   async findByIdOrInternalFail(id: string): Promise<UserViewDto> {
+
+    console.log('findByIdOrInternalFail', id);
     const user = await this.findById(id);
 
     if (!user) {

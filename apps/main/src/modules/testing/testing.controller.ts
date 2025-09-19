@@ -27,9 +27,4 @@ export class TestingController {
     }
   }
 
-  async deleteAll1(): Promise<void> {
-    await this.prisma.$transaction([
-      this.prisma.user.deleteMany({})
-    ])
-  }
 }

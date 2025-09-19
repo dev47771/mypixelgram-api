@@ -16,6 +16,7 @@ import { LoginUserUseCase } from './application/usecases/login-user.use-case';
 import { LocalStrategy } from './api/guards/local-strategy/local.strategy';
 import { ValidateUserUseCase } from './application/usecases/validate-user.use-case';
 import { SessionRepo } from './sessions/infrastructure/sessions.repo';
+import { LogoutUserUseCase } from './application/usecases/logout-user.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -25,7 +26,8 @@ const commandHandlers = [
   CreateUserUseCase,
   RegisterUserUseCase,
   LoginUserUseCase,
-  ValidateUserUseCase
+  ValidateUserUseCase,
+  LogoutUserUseCase
 ];
 const commonProviders = [
   CryptoService,
