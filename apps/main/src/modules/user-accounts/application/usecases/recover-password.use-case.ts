@@ -49,6 +49,7 @@ export class RecoverPasswordUseCase
       userId: user.id,
     };
 
+    // todo: replace with create or update
     await this.usersRepo.createPasswordRecovery(passwordRecovery);
 
     this.eventBus.publish(

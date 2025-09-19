@@ -17,6 +17,7 @@ import { LocalStrategy } from './api/guards/local-strategy/local.strategy';
 import { ValidateUserUseCase } from './application/usecases/validate-user.use-case';
 import { SessionRepo } from './sessions/infrastructure/sessions.repo';
 import { RecoverPasswordUseCase } from './application/usecases/recover-password.use-case';
+import { SetNewPasswordUseCase } from './application/usecases/set-new-password.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -28,6 +29,7 @@ const commandHandlers = [
   LoginUserUseCase,
   ValidateUserUseCase,
   RecoverPasswordUseCase,
+  SetNewPasswordUseCase,
 ];
 const commonProviders = [
   CryptoService,

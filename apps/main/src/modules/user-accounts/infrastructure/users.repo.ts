@@ -46,4 +46,31 @@ export class UsersRepo {
       data: dto,
     });
   }
+
+  async findUserByPasswordRecoveryCodeHash(
+    recoveryCodeHash: string,
+  ): Promise<
+    (UserModel & { passwordRecoveryInfo: PasswordRecoveryModel | null }) | null
+  > {
+    return this.prisma.user.findFirst({
+      where: { passwordRecoveryInfo: { recoveryCodeHash } },
+      include: { passwordRecoveryInfo: true },
+    });
+  }
+
+  async deletePasswordRecoveryByUserId(userId: string): Promise<void> {
+    await this.prisma.passwordRecovery.delete({ where: { userId } });
+  }
+
+  async updateUserPasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+      },
+    });
+  }
 }

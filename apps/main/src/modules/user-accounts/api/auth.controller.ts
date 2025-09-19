@@ -20,6 +20,8 @@ import { LocalAuthGuard } from './guards/local-strategy/local-auth.guard';
 import { Response } from 'express';
 import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
 import { RecoverPasswordCommand } from '../application/usecases/recover-password.use-case';
+import { NewPasswordInputDto } from './input-dto/new-password.input-dto';
+import { SetNewPasswordCommand } from '../application/usecases/set-new-password.use-case';
 
 export const AUTH_ROUTE = 'auth';
 
@@ -66,5 +68,13 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
     await this.commandBus.execute(new RecoverPasswordCommand(body.email));
+  }
+
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async setNewPassword(@Body() body: NewPasswordInputDto): Promise<void> {
+    await this.commandBus.execute(
+      new SetNewPasswordCommand(body.newPassword, body.recoveryCode),
+    );
   }
 }
