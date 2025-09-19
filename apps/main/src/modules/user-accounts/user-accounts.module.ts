@@ -16,6 +16,7 @@ import { LoginUserUseCase } from './application/usecases/login-user.use-case';
 import { LocalStrategy } from './api/guards/local-strategy/local.strategy';
 import { ValidateUserUseCase } from './application/usecases/validate-user.use-case';
 import { SessionRepo } from './sessions/infrastructure/sessions.repo';
+import { RecoverPasswordUseCase } from './application/usecases/recover-password.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -25,7 +26,8 @@ const commandHandlers = [
   CreateUserUseCase,
   RegisterUserUseCase,
   LoginUserUseCase,
-  ValidateUserUseCase
+  ValidateUserUseCase,
+  RecoverPasswordUseCase,
 ];
 const commonProviders = [
   CryptoService,
@@ -34,8 +36,7 @@ const commonProviders = [
   BasicStrategy,
   LocalStrategy,
   JwtService,
-  SessionRepo
-
+  SessionRepo,
 ];
 
 @Module({
@@ -43,11 +44,10 @@ const commonProviders = [
     PassportModule,
     JwtModule.register({
       secret: jwtConstraints.secret,
-      signOptions: { expiresIn: '20m' }
-    })
+      signOptions: { expiresIn: '20m' },
+    }),
   ],
   controllers: [UsersController, AuthController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
 })
 export class UserAccountsModule {}
-

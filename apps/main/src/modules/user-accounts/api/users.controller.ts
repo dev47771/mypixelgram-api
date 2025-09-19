@@ -20,9 +20,14 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
-    const createdUserId = await this.commandBus.execute<CreateUserCommand, string>(new CreateUserCommand(body));
+    const createdUserId = await this.commandBus.execute<
+      CreateUserCommand,
+      string
+    >(new CreateUserCommand(body));
 
-    return this.queryBus.execute(new GetUserByIdOrInternalFailQuery(createdUserId));
+    return this.queryBus.execute(
+      new GetUserByIdOrInternalFailQuery(createdUserId),
+    );
   }
 
   @Get(':id')

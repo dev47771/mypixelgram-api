@@ -5,12 +5,12 @@ export const ExtractDeviceAndIpFromReq = createParamDecorator(
   (data: unknown, context: ExecutionContext): ExtractDeviceAndIpDto => {
     const request = context.switchToHttp().getRequest();
 
-    const ip = request.ip
-    const device = request.headers['user-agent']
+    const ip = request.ip;
+    const device = request.headers['user-agent'];
 
     return {
       ip,
-      device
+      device,
     };
   },
 );

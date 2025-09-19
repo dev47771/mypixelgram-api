@@ -7,6 +7,6 @@ export class SessionRepo {
   constructor(private prisma: PrismaService) {}
 
   async createSession(sessionDto: CreateSessionDto) {
-    return this.prisma.session.create({ data: {...sessionDto} });
+    return this.prisma.session.create({ data: { ...sessionDto } });
   }
 }

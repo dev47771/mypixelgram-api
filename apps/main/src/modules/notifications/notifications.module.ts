@@ -4,6 +4,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailService } from './email.service';
 import { SendConfirmationEmailWhenUserRegisteredEventHandler } from './event-handlers/send-confirmation-email-when-user-registered.event-handler';
 import { ConfigService } from '@nestjs/config';
+import { SendPasswordRecoveryEmailWhenRequestedEventHandler } from './event-handlers/send-password-recovery-email-when-requested.event-handler';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     EmailService,
     SendConfirmationEmailWhenUserRegisteredEventHandler,
+    SendPasswordRecoveryEmailWhenRequestedEventHandler,
   ],
 })
 export class NotificationsModule {}

@@ -11,5 +11,5 @@ export const passwordConstraints = {
 };
 
 export const jwtConstraints = {
-  secret: 'jwt-secret'
-}
+  secret: 'jwt-secret',
+};

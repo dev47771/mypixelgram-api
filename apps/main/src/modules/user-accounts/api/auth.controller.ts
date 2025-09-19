@@ -17,7 +17,9 @@ import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDevic
 import { ExtractDeviceAndIpDto } from './input-dto/extract-device-ip.input-dto';
 import { LoginUserCommand } from '../application/usecases/login-user.use-case';
 import { LocalAuthGuard } from './guards/local-strategy/local-auth.guard';
-import { Response } from 'express'
+import { Response } from 'express';
+import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
+import { RecoverPasswordCommand } from '../application/usecases/recover-password.use-case';
 
 export const AUTH_ROUTE = 'auth';
 
@@ -31,7 +33,10 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
-    const createdUserId = await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
+    const createdUserId = await this.commandBus.execute<
+      RegisterUserCommand,
+      string
+    >(new RegisterUserCommand(body));
 
     return this.queryBus.execute(
       new GetUserByIdOrInternalFailQuery(createdUserId),
@@ -41,10 +46,25 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async loginUser(@Body() body: LoginUserInputDto, @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
-    const tokens =  await this.commandBus.execute(new LoginUserCommand(body, dto));
+  async loginUser(
+    @Body() body: LoginUserInputDto,
+    @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const tokens = await this.commandBus.execute(
+      new LoginUserCommand(body, dto),
+    );
 
-    response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
-    return { accessToken: tokens.accessToken }
+    response.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return { accessToken: tokens.accessToken };
+  }
+
+  @Post('recover-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
+    await this.commandBus.execute(new RecoverPasswordCommand(body.email));
   }
 }
