@@ -32,10 +32,11 @@ export class AuthController {
     private queryBus: QueryBus,
   ) {}
 
+
   @Post('register')
-  async registerUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
-    const createdUserId = await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
-    return this.queryBus.execute(new GetUserByIdOrInternalFailQuery(createdUserId),);
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
+    return await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
   }
 
   @UseGuards(LocalAuthGuard)
