@@ -56,8 +56,6 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
         refreshToken
       }
     }
-
-
-
+    throw new UnauthorizedException('Not user' )
   }
 }

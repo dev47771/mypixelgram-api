@@ -18,6 +18,10 @@ import { ExtractDeviceAndIpDto } from './input-dto/extract-device-ip.input-dto';
 import { LoginUserCommand } from '../application/usecases/login-user.use-case';
 import { LocalAuthGuard } from './guards/local-strategy/local-auth.guard';
 import { Response } from 'express'
+import { RefreshAuthGuard } from './guards/refresh-guard/refresh-auth.guard';
+import { RefreshTokenPayloadDto } from '../sessions/api/dto/refresh-token-payload.dto';
+import { ExtractRefreshFromCookie } from '../sessions/api/decorators/extract-refresh-from-coookie';
+import { LogoutUseCaseCommand } from '../application/usecases/logout-user.use-case';
 
 export const AUTH_ROUTE = 'auth';
 
@@ -29,13 +33,9 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<UserViewDto> {
     const createdUserId = await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
-
-    return this.queryBus.execute(
-      new GetUserByIdOrInternalFailQuery(createdUserId),
-    );
+    return this.queryBus.execute(new GetUserByIdOrInternalFailQuery(createdUserId),);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -46,5 +46,12 @@ export class AuthController {
 
     response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
     return { accessToken: tokens.accessToken }
+  }
+
+  @UseGuards(RefreshAuthGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto){
+    await this.commandBus.execute(new LogoutUseCaseCommand(payload))
   }
 }
