@@ -5,7 +5,10 @@ import { CryptoService } from '../../crypto.service';
 import { UsersRepo } from '../../../infrastructure/users.repo';
 
 export abstract class BaseCreateUser {
-  protected constructor(protected cryptoService: CryptoService, protected usersRepo: UsersRepo) {}
+  protected constructor(
+    protected cryptoService: CryptoService,
+    protected usersRepo: UsersRepo,
+  ) {}
 
   async createUser(dto: CreateUserDto): Promise<CreateUserRepoDto> {
     const userWithSameLogin = await this.usersRepo.findByLogin(dto.login);

@@ -18,4 +18,18 @@ export class EmailService {
       },
     });
   }
+
+  async sendPasswordRecoveryEmail(
+    email: string,
+    recoveryCode: string,
+  ): Promise<void> {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Password recovery',
+      template: 'password-recovery',
+      context: {
+        recoveryCode,
+      },
+    });
+  }
 }

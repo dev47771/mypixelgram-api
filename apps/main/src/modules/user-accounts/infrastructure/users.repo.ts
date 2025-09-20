@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { User as UserModel } from '@prisma/client';
+import {
+  User as UserModel,
+  PasswordRecovery as PasswordRecoveryModel,
+} from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
 
@@ -20,7 +23,10 @@ export class UsersRepo {
     });
   }
 
-  async createUserWithConfirmation(userDto: CreateUserRepoDto, confirmationDto: CreateUserConfirmationRepoDto,): Promise<string> {
+  async createUserWithConfirmation(
+    userDto: CreateUserRepoDto,
+    confirmationDto: CreateUserConfirmationRepoDto,
+  ): Promise<string> {
     const createdUser: UserModel = await this.prisma.user.create({
       data: {
         ...userDto,
@@ -33,5 +39,42 @@ export class UsersRepo {
     });
 
     return createdUser.id;
+  }
+
+  async createOrUpdatePasswordRecovery(
+    dto: PasswordRecoveryModel,
+  ): Promise<void> {
+    await this.prisma.passwordRecovery.upsert({
+      where: { userId: dto.userId },
+      update: dto,
+      create: dto,
+    });
+  }
+
+  async findUserByPasswordRecoveryCodeHash(
+    recoveryCodeHash: string,
+  ): Promise<
+    (UserModel & { passwordRecoveryInfo: PasswordRecoveryModel | null }) | null
+  > {
+    return this.prisma.user.findFirst({
+      where: { passwordRecoveryInfo: { recoveryCodeHash } },
+      include: { passwordRecoveryInfo: true },
+    });
+  }
+
+  async deletePasswordRecoveryByUserId(userId: string): Promise<void> {
+    await this.prisma.passwordRecovery.delete({ where: { userId } });
+  }
+
+  async updateUserPasswordHash(
+    userId: string,
+    passwordHash: string,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+      },
+    });
   }
 }

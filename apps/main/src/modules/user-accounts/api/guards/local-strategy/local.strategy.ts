@@ -5,15 +5,17 @@ import { ValidateUserUseCaseCommand } from '../../../application/usecases/valida
 import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy){
+export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private commandBus: CommandBus) {
-    super({ usernameField: 'email'});
+    super({ usernameField: 'email' });
   }
 
-  async validate(email: string, password: string){
-    const user: any = await this.commandBus.execute(new ValidateUserUseCaseCommand(email, password))
-    if(!user) throw new UnauthorizedException('LocalStrategy not User')
+  async validate(email: string, password: string) {
+    const user: any = await this.commandBus.execute(
+      new ValidateUserUseCaseCommand(email, password),
+    );
+    if (!user) throw new UnauthorizedException('LocalStrategy not User');
 
-    return user
+    return user;
   }
 }

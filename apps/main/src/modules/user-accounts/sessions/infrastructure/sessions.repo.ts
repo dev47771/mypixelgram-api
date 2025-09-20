@@ -7,8 +7,8 @@ import { Session } from '@prisma/client'
 export class SessionRepo {
   constructor(private prisma: PrismaService) {}
 
-  async createSession(sessionDto: CreateSessionDto): Promise<Session> {
-    return this.prisma.session.create({ data: {...sessionDto} });
+  async createSession(sessionDto: CreateSessionDto) {
+    return this.prisma.session.create({ data: { ...sessionDto } });
   }
 
   async findByDeviceId(deviceId: string): Promise<Session | null> {
