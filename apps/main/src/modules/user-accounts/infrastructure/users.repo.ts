@@ -21,6 +21,14 @@ export class UsersRepo {
   }
 
   async createUserWithConfirmation(userDto: CreateUserRepoDto, confirmationDto: CreateUserConfirmationRepoDto,): Promise<string> {
+    // @ts-ignore
+    const [{ current_database }] =
+      await this.prisma.$queryRaw<{ current_database: string }[]>`SELECT current_database()`;
+    const [{ current_schema }] =
+      await this.prisma.$queryRaw<{ current_schema: string }[]>`SELECT current_schema()`;
+
+    console.log(current_database, current_schema);
+
     const createdUser: UserModel = await this.prisma.user.create({
       data: {
         ...userDto,
@@ -31,7 +39,9 @@ export class UsersRepo {
         },
       },
     });
-
+    console.log('createdUser', createdUser);
+    const x = await this.prisma.user.findFirst()
+    console.log('users in db', x);
     return createdUser.id;
   }
 }

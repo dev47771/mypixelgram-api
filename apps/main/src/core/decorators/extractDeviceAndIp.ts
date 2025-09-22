@@ -7,10 +7,16 @@ export const ExtractDeviceAndIpFromReq = createParamDecorator(
 
     const ip = request.ip
     const device = request.headers['user-agent']
+    const userId = request.user
+
+    console.log('ip ', ip)
+    console.log('device ', device)
+    console.log('userId ', userId)
 
     return {
       ip,
-      device
+      device,
+      userId
     };
   },
 );

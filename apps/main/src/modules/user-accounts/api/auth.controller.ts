@@ -42,8 +42,8 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async loginUser(@Body() body: LoginUserInputDto, @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
-    const tokens =  await this.commandBus.execute(new LoginUserCommand(body, dto));
+  async loginUser(@ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
+    const tokens =  await this.commandBus.execute(new LoginUserCommand(dto));
 
     response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
     return { accessToken: tokens.accessToken }

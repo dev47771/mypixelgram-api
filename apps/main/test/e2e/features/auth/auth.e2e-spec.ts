@@ -16,6 +16,8 @@ import {
 import { CreateUserInputDto } from '../../../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
 import { UserConfirmation as UserConfirmationModel } from '.prisma/client';
 import { expectValidCreatedUser } from '../../helpers/user-assertions';
+import type { Response } from 'supertest';
+import * as request from 'supertest';
 
 describe('auth', () => {
   let app: INestApplication;
@@ -34,7 +36,7 @@ describe('auth', () => {
   });
 
   afterAll(async () => {
-    await deleteAllData(app);
+    // await deleteAllData(app);
     await app.close();
   });
 
@@ -79,7 +81,6 @@ describe('auth', () => {
         expect(emailService.sendConfirmationEmail).toHaveBeenCalledTimes(1);
       });
     });
-
     describe('validation', () => {
       let existingUser: UserViewDto;
 
@@ -98,6 +99,8 @@ describe('auth', () => {
 
         expect(emailService.sendConfirmationEmail).toHaveBeenCalledTimes(0);
       });
+
+
 
       it('should return 400 if login is invalid', async () => {
         for (const invalidInput of getInvalidLoginCases(existingUser.login)) {
@@ -118,10 +121,7 @@ describe('auth', () => {
 
       it('should return 400 if email is invalid', async () => {
         for (const invalidInput of getInvalidEmailCases(existingUser.email)) {
-          const response = await authTestManager.register(
-            invalidInput,
-            HttpStatus.BAD_REQUEST,
-          );
+          const response = await authTestManager.register(invalidInput, HttpStatus.BAD_REQUEST);
           expect(response.body).toEqual({
             errorsMessages: [
               {
@@ -135,18 +135,8 @@ describe('auth', () => {
 
       it('should return 400 if password is invalid', async () => {
         for (const invalidInput of getInvalidPasswordCases()) {
-          const response = await authTestManager.register(
-            invalidInput,
-            HttpStatus.BAD_REQUEST,
-          );
-          expect(response.body).toEqual({
-            errorsMessages: [
-              {
-                field: 'password',
-                message: expect.any(String),
-              },
-            ],
-          });
+          const response = await authTestManager.register(invalidInput, HttpStatus.BAD_REQUEST,);
+          expect(response.body).toEqual({ errorsMessages: [{ field: 'password', message: expect.any(String)}]});
         }
       });
 
@@ -180,4 +170,36 @@ describe('auth', () => {
       });
     });
   });
+
+  describe('login', () =>{
+      beforeAll(async () => {
+        // await deleteAllData(app);
+      });
+
+    it('should login success', async () => {
+      const userDto = {
+        login: 'takyUnamexx',
+        email: 'tak9087@mail.ru',
+        password: 'take22Dn'
+      }
+
+      const registeredUser = await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(userDto)
+        .expect(204)
+
+
+      const loginUser = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: userDto.email,
+          password: userDto.password
+        })
+        .expect(200)
+
+    })
+
+
+  })
 });

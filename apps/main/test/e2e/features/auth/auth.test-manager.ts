@@ -11,10 +11,7 @@ export const buildAuthPath = (actionPath: string): string => {
 export class AuthTestManager {
   constructor(private app: INestApplication) {}
 
-  async register(
-    inputDto: any,
-    expectedStatusCode: HttpStatus,
-  ): Promise<Response> {
+  async register(inputDto: any, expectedStatusCode: HttpStatus): Promise<Response> {
     return request(this.app.getHttpServer())
       .post(buildAuthPath('register'))
       .send(inputDto)

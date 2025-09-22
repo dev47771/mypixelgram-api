@@ -27,6 +27,6 @@ export class ValidateUserUseCase implements ICommandHandler<ValidateUserUseCaseC
       if (!isPasswordValid) throw new UnauthorizedException('password email is wrong')
     }
 
-    return {id: user.id}
+    return {userId: user.id}
   }
 }
