@@ -39,26 +39,22 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
-    return await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
+    return await this.commandBus.execute<RegisterUserCommand, string>(
+      new RegisterUserCommand(body),
+    );
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async loginUser(
-    @Body() body: LoginUserInputDto,
     @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const tokens = await this.commandBus.execute(
-      new LoginUserCommand(body, dto),
-    );
+    const tokens = await this.commandBus.execute(new LoginUserCommand(dto));
 
-    response.cookie('refreshToken', tokens.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
-    return { accessToken: tokens.accessToken };
+    response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
+    return { accessToken: tokens.accessToken }
   }
 
   @Post('recover-password')
@@ -78,7 +74,7 @@ export class AuthController {
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto){
-    await this.commandBus.execute(new LogoutUseCaseCommand(payload))
+  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
+    await this.commandBus.execute(new LogoutUseCaseCommand(payload));
   }
 }
