@@ -16,10 +16,12 @@ export class LoginUserCommand {
 
 @CommandHandler(LoginUserCommand)
 export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
-  constructor(protected jwtService: JwtService,
-              protected configService: ConfigService,
-              protected usersRepo: UsersRepo,
-              protected sessionRepo: SessionRepo,) {}
+  constructor(
+    protected jwtService: JwtService,
+    protected configService: ConfigService,
+    protected usersRepo: UsersRepo,
+    protected sessionRepo: SessionRepo,
+  ) {}
 
   async execute(command: LoginUserCommand): Promise<{accessToken: string, refreshToken: string} | undefined>{
 

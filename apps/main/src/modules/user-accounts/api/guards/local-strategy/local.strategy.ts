@@ -5,9 +5,9 @@ import { ValidateUserUseCaseCommand } from '../../../application/usecases/valida
 import { CommandBus } from '@nestjs/cqrs';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy){
+export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private commandBus: CommandBus) {
-    super({ usernameField: 'email'});
+    super({ usernameField: 'email' });
   }
 
   async validate(email: string, password: string){

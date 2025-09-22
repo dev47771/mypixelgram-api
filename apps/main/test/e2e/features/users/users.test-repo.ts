@@ -9,7 +9,7 @@ export class UsersTestRepo {
   ): Promise<UserConfirmationModel> {
     const userConfirmation: UserConfirmationModel | null =
       await this.prisma.userConfirmation.findFirst({
-        where: { userId: userId },
+        where: { userId },
       });
 
     expect(userConfirmation).not.toBeNull();
