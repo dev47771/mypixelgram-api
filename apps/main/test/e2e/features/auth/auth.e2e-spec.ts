@@ -18,12 +18,15 @@ import { UserConfirmation as UserConfirmationModel } from '.prisma/client';
 import { expectValidCreatedUser } from '../../helpers/user-assertions';
 import type { Response } from 'supertest';
 import * as request from 'supertest';
+import * as jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
 
 describe('auth', () => {
   let app: INestApplication;
   let authTestManager: AuthTestManager;
   let usersTestManager: UsersTestManager;
   let usersTestRepo: UsersTestRepo;
+  let configService: ConfigService;
 
   beforeAll(async () => {
     app = await initApp();
@@ -33,6 +36,7 @@ describe('auth', () => {
 
     const prisma = app.get(PrismaService);
     usersTestRepo = new UsersTestRepo(prisma);
+    configService = app.get(ConfigService);
   });
 
   afterAll(async () => {
@@ -100,8 +104,6 @@ describe('auth', () => {
         expect(emailService.sendConfirmationEmail).toHaveBeenCalledTimes(0);
       });
 
-
-
       it('should return 400 if login is invalid', async () => {
         for (const invalidInput of getInvalidLoginCases(existingUser.login)) {
           const response = await authTestManager.register(
@@ -121,7 +123,10 @@ describe('auth', () => {
 
       it('should return 400 if email is invalid', async () => {
         for (const invalidInput of getInvalidEmailCases(existingUser.email)) {
-          const response = await authTestManager.register(invalidInput, HttpStatus.BAD_REQUEST);
+          const response = await authTestManager.register(
+            invalidInput,
+            HttpStatus.BAD_REQUEST,
+          );
           expect(response.body).toEqual({
             errorsMessages: [
               {
@@ -135,8 +140,15 @@ describe('auth', () => {
 
       it('should return 400 if password is invalid', async () => {
         for (const invalidInput of getInvalidPasswordCases()) {
-          const response = await authTestManager.register(invalidInput, HttpStatus.BAD_REQUEST,);
-          expect(response.body).toEqual({ errorsMessages: [{ field: 'password', message: expect.any(String)}]});
+          const response = await authTestManager.register(
+            invalidInput,
+            HttpStatus.BAD_REQUEST,
+          );
+          expect(response.body).toEqual({
+            errorsMessages: [
+              { field: 'password', message: expect.any(String) },
+            ],
+          });
         }
       });
 
@@ -171,35 +183,48 @@ describe('auth', () => {
     });
   });
 
-  describe('login', () =>{
-      beforeAll(async () => {
-        // await deleteAllData(app);
-      });
+  describe('login', () => {
+    beforeAll(async () => {
+      await deleteAllData(app);
+    });
 
     it('should login success', async () => {
       const userDto = {
         login: 'takyUnamexx',
         email: 'tak9087@mail.ru',
-        password: 'take22Dn'
-      }
+        password: 'take22Dn',
+      };
 
-      const registeredUser = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(userDto)
-        .expect(204)
-
+        .expect(HttpStatus.NO_CONTENT);
 
       const loginUser = await request(app.getHttpServer())
         .post('/api/auth/login')
         .set('user-agent', 'Chrome')
         .send({
           email: userDto.email,
-          password: userDto.password
+          password: userDto.password,
         })
-        .expect(200)
+        .expect(HttpStatus.OK);
 
-    })
+      const payloadToken = loginUser.body.accessToken;
+      const token = jwt.verify(
+        payloadToken,
+        configService.get('JWT_SECRET_KEY')!,
+      ) as { userId: string; deviceId: string; iat: number; exp: number };
 
+      const user = await request(app.getHttpServer())
+        .get(`/api/users/${token.userId}`)
+        .auth(
+          configService.get('HTTP_BASIC_USER')!,
+          configService.get('HTTP_BASIC_PASS')!,
+        )
+        .expect(HttpStatus.OK);
 
-  })
+      expect(userDto.login).toEqual(user.body.login);
+      expect(userDto.email).toEqual(user.body.email);
+    });
+  });
 });
