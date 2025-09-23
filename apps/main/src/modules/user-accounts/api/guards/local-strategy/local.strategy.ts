@@ -10,12 +10,12 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({ usernameField: 'email' });
   }
 
-  async validate(email: string, password: string){
+  async validate(email: string, password: string) {
+    const user: any = await this.commandBus.execute(
+      new ValidateUserUseCaseCommand(email, password),
+    );
+    if (!user) throw new UnauthorizedException('LocalStrategy not User');
 
-    const user: any = await this.commandBus.execute(new ValidateUserUseCaseCommand(email, password))
-    console.log('user in guard,' , user);
-    if(!user) throw new UnauthorizedException('LocalStrategy not User')
-
-    return user.userId
+    return user.userId;
   }
 }

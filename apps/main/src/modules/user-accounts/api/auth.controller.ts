@@ -53,8 +53,11 @@ export class AuthController {
   ) {
     const tokens = await this.commandBus.execute(new LoginUserCommand(dto));
 
-    response.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true })
-    return { accessToken: tokens.accessToken }
+    response.cookie('refreshToken', tokens.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return { accessToken: tokens.accessToken };
   }
 
   @Post('recover-password')
