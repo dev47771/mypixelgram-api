@@ -1,6 +1,6 @@
 import {
   Body,
-  Controller,
+  Controller, Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
 import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDeviceAndIp';
 import { ExtractDeviceAndIpDto } from './input-dto/extract-device-ip.input-dto';
@@ -24,10 +24,16 @@ import { RecoverPasswordCommand } from '../application/usecases/recover-password
 import { NewPasswordInputDto } from './input-dto/new-password.input-dto';
 import { SetNewPasswordCommand } from '../application/usecases/set-new-password.use-case';
 import { AUTH_ROUTE } from '../domain/constants';
+import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
+import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
+import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @Post('register')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -72,5 +78,11 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
+    return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
   }
 }

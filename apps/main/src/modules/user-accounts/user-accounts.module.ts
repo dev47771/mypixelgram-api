@@ -19,10 +19,16 @@ import { SessionRepo } from './sessions/infrastructure/sessions.repo';
 import { LogoutUserUseCase } from './application/usecases/logout-user.use-case';
 import { RecoverPasswordUseCase } from './application/usecases/recover-password.use-case';
 import { SetNewPasswordUseCase } from './application/usecases/set-new-password.use-case';
+import { JwtStrategy } from './api/guards/jwt-strategy/jwt.strategy';
+import {
+  GetMeUseCase,
+  GetMeUseCaseCommand,
+} from './application/queries/get-me.query';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
   GetUserOrNotFoundFailQueryHandler,
+  GetMeUseCase,
 ];
 const commandHandlers = [
   CreateUserUseCase,
@@ -39,6 +45,7 @@ const commonProviders = [
   UsersRepo,
   UsersQueryRepo,
   BasicStrategy,
+  JwtStrategy,
   LocalStrategy,
   JwtService,
   SessionRepo,

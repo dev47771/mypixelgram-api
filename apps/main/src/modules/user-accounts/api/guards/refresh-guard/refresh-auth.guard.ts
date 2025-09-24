@@ -53,7 +53,6 @@ export class RefreshAuthGuard implements CanActivate {
       /////////// если от этой то записываем payload в request и пропускаем //////////////
       request['payload'] = payload;
     } catch (e) {
-      console.log(e);
       throw UnauthorizedDomainException.create(
         'refreshToken expire',
         'refreshGuard',
