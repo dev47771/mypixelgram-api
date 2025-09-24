@@ -4,12 +4,10 @@ import { CryptoService } from '../crypto.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User as UserModel } from '@prisma/client';
+import { LoginUserDto } from '../../api/input-dto/login-user.input-dto';
 
 export class ValidateUserUseCaseCommand {
-  constructor(
-    public email: string,
-    public password: string,
-  ) {}
+  constructor(public dto: LoginUserDto) {}
 }
 
 @CommandHandler(ValidateUserUseCaseCommand)
@@ -23,12 +21,12 @@ export class ValidateUserUseCase
   ) {}
 
   async execute(command: ValidateUserUseCaseCommand) {
-    const { email, password } = command;
+    const { email, password } = command.dto;
 
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
     if (!user) throw new UnauthorizedException('invalid login');
 
-    if (this.configService.get('SKIPPASSWORDCHECK') === 'true') {
+    if (this.configService.get<boolean>('SKIP_PASSWORD_CHECK') === false) {
       const isPasswordValid = await this.cryptoService.comparePasswords(
         password,
         user.passwordHash,
@@ -37,6 +35,6 @@ export class ValidateUserUseCase
         throw new UnauthorizedException('password email is wrong');
     }
 
-    return {userId: user.id}
+    return { userId: user.id };
   }
 }

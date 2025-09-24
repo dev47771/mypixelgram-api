@@ -20,7 +20,7 @@ export class HttpExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
-    console.error(exception);
+    //console.error(exception);
 
     if (status === 500 && this.configService.get('NODE_ENV') !== 'production') {
       response.status(status).json(exception);
@@ -31,7 +31,9 @@ export class HttpExceptionsFilter implements ExceptionFilter {
       const errorResult: { errorsMessages: FieldError[] } = {
         errorsMessages: [],
       };
+
       const exceptionResponse: any = exception.getResponse();
+
       exceptionResponse.errors.forEach((error: FieldError) =>
         errorResult.errorsMessages.push(error),
       );
