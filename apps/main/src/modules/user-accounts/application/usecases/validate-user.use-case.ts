@@ -5,6 +5,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User as UserModel } from '@prisma/client';
 import { LoginUserDto } from '../../api/input-dto/login-user.input-dto';
+import { UnauthorizedDomainException } from '../../../../core/exceptions/domainException';
 
 export class ValidateUserUseCaseCommand {
   constructor(public dto: LoginUserDto) {}
@@ -24,7 +25,8 @@ export class ValidateUserUseCase
     const { email, password } = command.dto;
 
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
-    if (!user) throw new UnauthorizedException('invalid login');
+    if (!user)
+      throw UnauthorizedDomainException.create('Not exists user', 'user');
 
     if (this.configService.get<boolean>('SKIP_PASSWORD_CHECK') === false) {
       const isPasswordValid = await this.cryptoService.comparePasswords(
@@ -32,7 +34,10 @@ export class ValidateUserUseCase
         user.passwordHash,
       );
       if (!isPasswordValid)
-        throw new UnauthorizedException('password email is wrong');
+        throw UnauthorizedDomainException.create(
+          'password email is wrong',
+          'password',
+        );
     }
 
     return { userId: user.id };

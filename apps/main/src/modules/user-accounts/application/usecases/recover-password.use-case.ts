@@ -7,6 +7,7 @@ import { add } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
 import { PasswordRecoveryRequestedEvent } from '../events/password-recovery-requested.event';
 import { BadRequestException } from '@nestjs/common';
+import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
 
 export class RecoverPasswordCommand {
   constructor(public email: string) {}
@@ -25,16 +26,11 @@ export class RecoverPasswordUseCase
 
   async execute({ email }: RecoverPasswordCommand): Promise<void> {
     const user = await this.usersRepo.findByEmail(email);
-    if (!user) {
-      throw new BadRequestException({
-        errors: [
-          {
-            field: 'email',
-            message: "User with this email doesn't exist",
-          },
-        ],
-      });
-    }
+    if (!user)
+      throw BadRequestDomainException.create(
+        'incorrect email address',
+        'email',
+      );
 
     const recoveryCode = randomBytes(32).toString('hex');
     const recoveryCodeHash =

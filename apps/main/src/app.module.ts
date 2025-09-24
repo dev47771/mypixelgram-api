@@ -4,11 +4,11 @@ import { CoreModule } from './core/core.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
-import { HttpExceptionsFilter } from './core/exceptions/filters/http-exceptions.filter';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ConfigService } from '@nestjs/config';
 import { TestingModule } from './modules/testing/testing.module';
+import { AllHttpExceptionsFilter } from './core/exceptions/all-sxception.filter';
+import { DomainHttpExceptionFilter } from './core/exceptions/exception.filter';
 
 @Module({
   imports: [
@@ -21,11 +21,11 @@ import { TestingModule } from './modules/testing/testing.module';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: AllExceptionsFilter,
+      useClass: AllHttpExceptionsFilter,
     },
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionsFilter,
+      useClass: DomainHttpExceptionFilter,
     },
   ],
 })
