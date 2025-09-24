@@ -33,7 +33,7 @@ export class UsersQueryRepo {
     return user;
   }
 
-  private async findById(id: string): Promise<UserViewDto | null> {
+  async findById(id: string): Promise<UserViewDto | null> {
     const user: UserModel | null = await this.prisma.user.findFirst({
       where: { id, deletedAt: null },
     });

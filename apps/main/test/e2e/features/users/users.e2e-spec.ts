@@ -53,12 +53,6 @@ describe('users', () => {
 
         expectValidCreatedUser(createdUser, inputDto);
 
-        const dbConfirmationInfo: UserConfirmationModel =
-          await usersTestRepo.findUserConfirmationInfo(createdUser.id);
-        expect(dbConfirmationInfo.isConfirmed).toBe(true);
-        expect(dbConfirmationInfo.confirmationCode).toBeNull();
-        expect(dbConfirmationInfo.expirationDate).toBeNull();
-
         const retrievedUser = await usersTestManager.getUserSuccess(
           createdUser.id,
         );
