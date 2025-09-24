@@ -7,8 +7,7 @@ import { GetUserByIdOrInternalFailQuery } from '../application/queries/get-user-
 import { BasicAuthGuard } from './guards/basic/basic-auth.guard';
 import { IntValidationTransformationPipe } from '../../../core/pipes/int-validation-transformation.pipe';
 import { GetUserOrNotFoundFailQuery } from '../application/queries/get-user-or-not-found-fail.query';
-
-export const USERS_ROUTE = 'users';
+import { USERS_ROUTE } from '../domain/constants';
 
 @Controller(USERS_ROUTE)
 @UseGuards(BasicAuthGuard)

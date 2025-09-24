@@ -2,6 +2,7 @@ import { BasicStrategy as Strategy } from 'passport-http';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
+import { UnauthorizedDomainException } from '../../../../../core/exceptions/domainException';
 
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy, 'basic') {
@@ -16,6 +17,6 @@ export class BasicStrategy extends PassportStrategy(Strategy, 'basic') {
     ) {
       return true;
     }
-    throw new UnauthorizedException('Invalid credentials');
+    throw UnauthorizedDomainException.create('Invalid credentials', 'basic');
   }
 }
