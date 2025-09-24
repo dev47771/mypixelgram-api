@@ -17,7 +17,7 @@ export const configModule = ConfigModule.forRoot({
     HTTP_BASIC_PASS: Joi.string().required(),
     INCLUDE_TESTING_MODULE: Joi.boolean().required(),
     DB_LOGGING: Joi.boolean().required(),
-    SKIPPASSWORDCHECK: Joi.boolean().required(),
+    SKIP_PASSWORD_CHECK: Joi.boolean().required(),
     JWT_SECRET_KEY: Joi.string().required(),
     PASSWORD_RECOVERY_CODE_LIFETIME_SECS: Joi.number().required(),
   }),

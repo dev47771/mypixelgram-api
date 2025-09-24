@@ -226,5 +226,74 @@ describe('auth', () => {
       expect(userDto.login).toEqual(user.body.login);
       expect(userDto.email).toEqual(user.body.email);
     });
+    it('400 BadRequest validation', async () => {
+      const userDto = {
+        login: 'takyUnamexxx',
+        email: 'tak90877@mail.ru',
+        password: 'take22Dnn',
+      };
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(userDto)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: userDto.email,
+          password: '123456', // incorrect password
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: 'xxxgmail.ru', // incorrect email
+          password: 'take22Dnn',
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: 12344, // incorrect email
+          password: 'take22Dnn',
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+    it('401 Unauthorized validation', async () => {
+      const userDto = {
+        login: 'tyUnamexxx',
+        email: 't90877@mail.ru',
+        password: 'tak22Dnn',
+      };
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(userDto)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: 'xxxxxxxx@mail.ru', // not exists email
+          password: 'tak22Dnn',
+        })
+        .expect(HttpStatus.UNAUTHORIZED);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: 't90877@mail.ru',
+          password: 'tak22Dnnxxxx', // incorrect password
+        })
+        .expect(HttpStatus.UNAUTHORIZED);
+    });
   });
 });

@@ -1,11 +1,9 @@
-import { LoginUserInputDto } from '../../api/input-dto/login-user.input-dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { ExtractDeviceAndIpDto } from '../../api/input-dto/extract-device-ip.input-dto';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { v4 as uuidv4 } from 'uuid';
 import * as jwt from 'jsonwebtoken';
-import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CreateSessionDto } from '../../api/input-dto/create-session.input-dto';
 import { SessionRepo } from '../../sessions/infrastructure/sessions.repo';
@@ -19,7 +17,6 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(
     protected jwtService: JwtService,
     protected configService: ConfigService,
-    protected usersRepo: UsersRepo,
     protected sessionRepo: SessionRepo,
   ) {}
 

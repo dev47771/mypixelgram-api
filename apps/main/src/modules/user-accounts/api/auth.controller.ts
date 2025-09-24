@@ -12,7 +12,7 @@ import { UserViewDto } from './view-dto/user.view-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetUserByIdOrInternalFailQuery } from '../application/queries/get-user-by-id-or-internal-fail.query';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
-import { LoginUserInputDto } from './input-dto/login-user.input-dto';
+import { LoginUserDto } from './input-dto/login-user.input-dto';
 import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDeviceAndIp';
 import { ExtractDeviceAndIpDto } from './input-dto/extract-device-ip.input-dto';
 import { LoginUserCommand } from '../application/usecases/login-user.use-case';
@@ -48,6 +48,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async loginUser(
+    @Body() loginDto: LoginUserDto,
     @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
     @Res({ passthrough: true }) response: Response,
   ) {

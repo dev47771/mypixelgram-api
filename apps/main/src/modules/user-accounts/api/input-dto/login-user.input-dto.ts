@@ -1,16 +1,13 @@
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
-import {
-  loginConstraints,
-  passwordConstraints,
-} from '../../domain/user-constraints';
+import { passwordConstraints } from '../../domain/user-constraints';
 import { IsStringOfLengthWithTrim } from '../../../../core/decorators/validation/is-string-of-length-with-trim';
 import { Trim } from '../../../../core/decorators/transform/trim';
 
-export class LoginUserInputDto {
+export class LoginUserDto {
   @IsEmail()
   @Trim()
   @IsString()
-  @IsNotEmpty()
+  //@IsNotEmpty()
   email: string;
 
   @Matches(passwordConstraints.match, {

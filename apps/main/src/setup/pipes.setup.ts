@@ -24,6 +24,7 @@ const formatErrors = (errors: ValidationError[]): FieldError[] => {
 export function pipesSetup(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       transform: true,
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
