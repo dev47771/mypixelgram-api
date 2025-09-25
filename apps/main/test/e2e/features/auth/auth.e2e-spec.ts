@@ -45,144 +45,62 @@ describe('auth', () => {
     await app.close();
   });
 
-  // describe('register', () => {
-  //   let emailService: EmailService;
-  //
-  //   beforeAll(async () => {
-  //     emailService = app.get(EmailService);
-  //   });
-  //
-  //   beforeEach(async () => {
-  //     (emailService.sendConfirmationEmail as jest.Mock).mockClear();
-  //   });
-  //
-  //   describe('success', () => {
-  //     beforeAll(async () => {
-  //       await deleteAllData(app);
-  //     });
-  //
-  //     it('should register user', async () => {
-  //       const inputDto: CreateUserInputDto = makeValidUserInput();
-  //
-  //       const response = await authTestManager.register(
-  //         inputDto,
-  //         HttpStatus.CREATED,
-  //       );
-  //       const registeredUser: UserViewDto = response.body;
-  //
-  //       expectValidCreatedUser(registeredUser, inputDto);
-  //
-  //       const dbConfirmationInfo: UserConfirmationModel =
-  //         await usersTestRepo.findUserConfirmationInfo(registeredUser.id);
-  //       expect(dbConfirmationInfo.isConfirmed).toBe(false);
-  //       expect(dbConfirmationInfo.confirmationCode).toEqual(expect.any(String));
-  //       expect(dbConfirmationInfo.expirationDate).toEqual(expect.any(Date));
-  //
-  //       const retrievedUser = await usersTestManager.getUserSuccess(
-  //         registeredUser.id,
-  //       );
-  //       expect(retrievedUser).toEqual(registeredUser);
-  //
-  //       expect(emailService.sendConfirmationEmail).toHaveBeenCalledTimes(1);
-  //     });
-  //   });
-  //   describe('validation', () => {
-  //     let existingUser: UserViewDto;
-  //
-  //     beforeAll(async () => {
-  //       await deleteAllData(app);
-  //
-  //       const takenUserInput = makeValidUserInput({
-  //         login: 'takenUsername',
-  //         email: 'takenUsername@example.com',
-  //       });
-  //       existingUser = await usersTestManager.createUserSuccess(takenUserInput);
-  //     });
-  //
-  //     afterEach(async () => {
-  //       await usersTestRepo.assertUsersCount(1);
-  //
-  //       expect(emailService.sendConfirmationEmail).toHaveBeenCalledTimes(0);
-  //     });
-  //
-  //     it('should return 400 if login is invalid', async () => {
-  //       for (const invalidInput of getInvalidLoginCases(existingUser.login)) {
-  //         const response = await authTestManager.register(
-  //           invalidInput,
-  //           HttpStatus.BAD_REQUEST,
-  //         );
-  //         expect(response.body).toEqual({
-  //           errorsMessages: [
-  //             {
-  //               field: 'login',
-  //               message: expect.any(String),
-  //             },
-  //           ],
-  //         });
-  //       }
-  //     });
-  //
-  //     it('should return 400 if email is invalid', async () => {
-  //       for (const invalidInput of getInvalidEmailCases(existingUser.email)) {
-  //         const response = await authTestManager.register(
-  //           invalidInput,
-  //           HttpStatus.BAD_REQUEST,
-  //         );
-  //         expect(response.body).toEqual({
-  //           errorsMessages: [
-  //             {
-  //               field: 'email',
-  //               message: expect.any(String),
-  //             },
-  //           ],
-  //         });
-  //       }
-  //     });
-  //
-  //     it('should return 400 if password is invalid', async () => {
-  //       for (const invalidInput of getInvalidPasswordCases()) {
-  //         const response = await authTestManager.register(
-  //           invalidInput,
-  //           HttpStatus.BAD_REQUEST,
-  //         );
-  //         expect(response.body).toEqual({
-  //           errorsMessages: [
-  //             { field: 'password', message: expect.any(String) },
-  //           ],
-  //         });
-  //       }
-  //     });
-  //
-  //     it('should return multiple errors if multiple fields are invalid', async () => {
-  //       const invalidInput = {
-  //         login: '',
-  //         email: 'without domain',
-  //       };
-  //
-  //       const response = await authTestManager.register(
-  //         invalidInput,
-  //         HttpStatus.BAD_REQUEST,
-  //       );
-  //       expect(response.body).toEqual({
-  //         errorsMessages: expect.arrayContaining([
-  //           {
-  //             field: 'login',
-  //             message: expect.any(String),
-  //           },
-  //           {
-  //             field: 'email',
-  //             message: expect.any(String),
-  //           },
-  //           {
-  //             field: 'password',
-  //             message: expect.any(String),
-  //           },
-  //         ]),
-  //       });
-  //       expect(response.body.errorsMessages).toHaveLength(3);
-  //     });
-  //   });
-  // });
+  describe('register', () => {
+    it('should register success', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      const response = await authTestManager.login(correctUser); //login user
+      const token = response.body.accessToken;
+
+      const user = await request(app.getHttpServer())
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(HttpStatus.OK);
+
+      expect(user.body.login).toEqual(correctUser.login);
+      expect(user.body.email).toEqual(correctUser.email);
+    });
+    it('400 BadRequest validation', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          login: '', // incorrect login
+          email: 'user-test@mail.ru',
+          password: 'pasS1234',
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          login: 1112, // incorrect login
+          email: 'user-test@mail.ru',
+          password: 'pasS1234',
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          login: 'user-test',
+          email: 'user-testmail.ru', // incorrect email
+          password: 'pasS1234',
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send({
+          login: 'user-test',
+          email: 'user-test@mail.ru',
+          password: 'pas234', // incorrect password
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
 
   describe('login', () => {
     beforeEach(async () => {
