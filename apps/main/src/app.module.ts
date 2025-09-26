@@ -1,22 +1,28 @@
-import { configModule } from './dynamic-config-module';
+//import { configModule } from './dynamic-config-module';
 import { DynamicModule, Module } from '@nestjs/common';
 import { CoreModule } from './core/core.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import { APP_FILTER } from '@nestjs/core';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TestingModule } from './modules/testing/testing.module';
 import { AllHttpExceptionsFilter } from './core/exceptions/all-sxception.filter';
 import { DomainHttpExceptionFilter } from './core/exceptions/exception.filter';
+import { MailModule } from './core/mailModule/mail.module';
+import { validate } from './core/env.validation';
+import { envFilePaths } from './env-file-paths';
 
 @Module({
   imports: [
-    configModule,
+    ConfigModule.forRoot({
+      envFilePath: envFilePaths,
+      validate,
+      isGlobal: true,
+    }),
     CoreModule,
     CqrsModule.forRoot(),
     UserAccountsModule,
-    NotificationsModule,
+    MailModule,
   ],
   providers: [
     {

@@ -24,6 +24,7 @@ import {
   GetMeUseCase,
   GetMeUseCaseCommand,
 } from './application/queries/get-me.query';
+import { MailService } from '../../core/mailModule/mail.service';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -49,6 +50,7 @@ const commonProviders = [
   LocalStrategy,
   JwtService,
   SessionRepo,
+  MailService,
 ];
 
 @Module({
