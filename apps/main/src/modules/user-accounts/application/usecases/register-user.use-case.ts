@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
 import { UserRegisteredEvent } from '../events/user-registered.event';
 import { ConfigService } from '@nestjs/config';
+import { MailService } from '../../../../core/mailModule/mail.service';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -24,6 +25,7 @@ export class RegisterUserUseCase
     usersRepo: UsersRepo,
     private eventBus: EventBus,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {
     super(cryptoService, usersRepo);
   }
@@ -45,13 +47,24 @@ export class RegisterUserUseCase
       isConfirmed: false,
     };
 
+    console.log('configService', this.configService.get('MAIL_MODULE_FROM'));
+
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
       user,
       userConfirmation,
     );
 
-    this.eventBus.publish(
-      new UserRegisteredEvent(user.email, confirmationCode),
+    console.log('user.login,', user.login);
+    console.log('user.email,', user.email);
+    console.log(
+      'userConfirmation.confirmationCode,',
+      userConfirmation.confirmationCode,
+    );
+
+    this.mailService.sendUserRegistration(
+      user.login,
+      user.email,
+      userConfirmation.confirmationCode,
     );
 
     return createdUserId;
