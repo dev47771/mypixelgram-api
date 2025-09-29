@@ -4,7 +4,6 @@ import { UsersTestRepo } from '../users/users.test-repo';
 import { PrismaService } from '../../../../src/core/prisma/prisma.service';
 import { deleteAllData } from '../../helpers/delete-all-data';
 import { AuthTestManager } from './auth.test-manager';
-import { EmailService } from '../../../../src/modules/notifications/email.service';
 import { UserViewDto } from '../../../../src/modules/user-accounts/api/view-dto/user.view-dto';
 //import { UsersTestManager } from '../users/users.test-manager';
 import {
@@ -15,13 +14,19 @@ import {
 } from '../../helpers/fixtures/user-inputs';
 import { CreateUserInputDto } from '../../../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
 import { UserConfirmation as UserConfirmationModel } from '.prisma/client';
-import { expectValidCreatedUser } from '../../helpers/user-assertions';
 import type { Response } from 'supertest';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { correctUser } from '../../helpers/auth.helper';
-import { response } from 'express';
+import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
+
+jest.mock(
+  '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper',
+  () => ({
+    generateConfirmationCode: jest.fn(),
+  }),
+);
 
 describe('auth', () => {
   let app: INestApplication;
@@ -34,7 +39,6 @@ describe('auth', () => {
     app = await initApp();
 
     authTestManager = new AuthTestManager(app);
-    //usersTestManager = new UsersTestManager(app);
 
     const prisma = app.get(PrismaService);
     usersTestRepo = new UsersTestRepo(prisma);
@@ -225,6 +229,29 @@ describe('auth', () => {
         .post('/api/auth/logout')
         .set('Cookie', '') // not refresh token
         .expect(HttpStatus.UNAUTHORIZED);
+    });
+  });
+
+  describe('confirmation', () => {
+    beforeAll(async () => {
+      await deleteAllData(app);
+    });
+
+    it('should confirmation success', async () => {
+      const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
     });
   });
 });

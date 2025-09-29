@@ -25,6 +25,7 @@ import {
   GetMeUseCaseCommand,
 } from './application/queries/get-me.query';
 import { MailService } from '../../core/mailModule/mail.service';
+import { ConfirmationUseCase } from './application/usecases/confirmation.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -40,6 +41,7 @@ const commandHandlers = [
   ValidateUserUseCase,
   RecoverPasswordUseCase,
   SetNewPasswordUseCase,
+  ConfirmationUseCase,
 ];
 const commonProviders = [
   CryptoService,

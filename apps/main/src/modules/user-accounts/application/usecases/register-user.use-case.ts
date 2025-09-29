@@ -7,9 +7,9 @@ import { CreateUserRepoDto } from '../../infrastructure/dto/create-user.repo-dto
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
 import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
-import { UserRegisteredEvent } from '../events/user-registered.event';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../../../../core/mailModule/mail.service';
+import { generateConfirmationCode } from './common/confirmationCode.helper';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -33,7 +33,10 @@ export class RegisterUserUseCase
   async execute({ dto }: RegisterUserCommand): Promise<string> {
     const user: CreateUserRepoDto = await this.createUser(dto);
 
-    const confirmationCode = randomUUID();
+    //const confirmationCode = randomUUID();
+
+    const confirmationCode = generateConfirmationCode();
+
     const codeLifetimeInSecs = this.configService.get<number>(
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',
     )!;
@@ -47,21 +50,12 @@ export class RegisterUserUseCase
       isConfirmed: false,
     };
 
-    console.log('configService', this.configService.get('MAIL_MODULE_FROM'));
-
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
       user,
       userConfirmation,
     );
 
-    console.log('user.login,', user.login);
-    console.log('user.email,', user.email);
-    console.log(
-      'userConfirmation.confirmationCode,',
-      userConfirmation.confirmationCode,
-    );
-
-    this.mailService.sendUserRegistration(
+    this.mailService.sendConfirmationEmail(
       user.login,
       user.email,
       userConfirmation.confirmationCode,

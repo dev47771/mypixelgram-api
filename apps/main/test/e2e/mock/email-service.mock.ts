@@ -1,5 +1,9 @@
-import { EmailService } from '../../../src/modules/notifications/email.service';
+import { MailService } from '../../../src/core/mailModule/mail.service';
 
-export class EmailServiceMock extends EmailService {
-  sendConfirmationEmail = jest.fn().mockResolvedValue(undefined);
+export class EmailServiceMock extends MailService {
+  sendConfirmationEmail = jest
+    .fn()
+    .mockResolvedValue(
+      console.log('EmailServiceMock sendConfirmationEmail called'),
+    );
 }
