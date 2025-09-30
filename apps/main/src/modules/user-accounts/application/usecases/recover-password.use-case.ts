@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { PasswordRecoveryRequestedEvent } from '../events/password-recovery-requested.event';
 import { BadRequestException } from '@nestjs/common';
 import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { MailService } from '../../../../core/mailModule/mail.service';
+import { generateConfirmationCode } from './common/confirmationCode.helper';
 
 export class RecoverPasswordCommand {
   constructor(public email: string) {}
@@ -21,7 +23,7 @@ export class RecoverPasswordUseCase
     private usersRepo: UsersRepo,
     private cryptoService: CryptoService,
     private configService: ConfigService,
-    private eventBus: EventBus,
+    private mailService: MailService,
   ) {}
 
   async execute({ email }: RecoverPasswordCommand): Promise<void> {
@@ -32,12 +34,12 @@ export class RecoverPasswordUseCase
         'email',
       );
 
-    const recoveryCode = randomBytes(32).toString('hex');
-    const recoveryCodeHash =
-      this.cryptoService.createPasswordRecoveryCodeHash(recoveryCode);
+    const recoveryCodeHash = generateConfirmationCode();
     const expirationDate = add(new Date(), {
       seconds: this.configService.get('PASSWORD_RECOVERY_CODE_LIFETIME_SECS'),
     });
+
+    console.log('recoveryCodeHash  ', recoveryCodeHash);
 
     const passwordRecovery: PasswordRecoveryModel = {
       recoveryCodeHash,
@@ -47,8 +49,10 @@ export class RecoverPasswordUseCase
 
     await this.usersRepo.createOrUpdatePasswordRecovery(passwordRecovery);
 
-    this.eventBus.publish(
-      new PasswordRecoveryRequestedEvent(email, recoveryCode),
+    this.mailService.sendUserRecoveryCode(
+      user.login,
+      user.email,
+      recoveryCodeHash,
     );
   }
 }

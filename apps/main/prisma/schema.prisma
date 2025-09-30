@@ -42,7 +42,7 @@ model UserConfirmation {
 }
 
 model PasswordRecovery {
-  recoveryCodeHash String
+  recoveryCodeHash String?
   expirationDate   DateTime @db.Timestamptz()
   userId           String   @id
 

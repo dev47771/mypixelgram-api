@@ -21,11 +21,8 @@ export class SetNewPasswordUseCase
   ) {}
 
   async execute({ newPassword, recoveryCode }: SetNewPasswordCommand) {
-    const recoveryCodeHash =
-      this.cryptoService.createPasswordRecoveryCodeHash(recoveryCode);
-
     const userWithRecoveryInfo =
-      await this.usersRepo.findUserByPasswordRecoveryCodeHash(recoveryCodeHash);
+      await this.usersRepo.findUserByPasswordRecoveryCodeHash(recoveryCode);
 
     if (!userWithRecoveryInfo)
       throw BadRequestDomainException.create(

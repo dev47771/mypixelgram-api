@@ -1,6 +1,7 @@
 import {
   Body,
-  Controller, Get,
+  Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -27,6 +28,8 @@ import { AUTH_ROUTE } from '../domain/constants';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
+import { CodeDto } from './input-dto/code.dto';
+import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation.use-case';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -41,6 +44,12 @@ export class AuthController {
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
+  }
+
+  @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async confirmation(@Body() code: CodeDto) {
+    await this.commandBus.execute(new ConfirmationUseCaseCommand(code.code));
   }
 
   @UseGuards(LocalAuthGuard)

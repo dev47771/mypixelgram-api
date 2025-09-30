@@ -23,6 +23,26 @@ export class UsersRepo {
     });
   }
 
+  async findByCode(code: string) {
+    return this.prisma.userConfirmation.findFirst({
+      where: { confirmationCode: code },
+    });
+  }
+
+  async updateConfirm(
+    userId: string,
+    userConfirmationDto: CreateUserConfirmationRepoDto,
+  ) {
+    return this.prisma.userConfirmation.update({
+      where: { userId },
+      data: {
+        confirmationCode: userConfirmationDto.confirmationCode,
+        expirationDate: userConfirmationDto.expirationDate,
+        isConfirmed: userConfirmationDto.isConfirmed,
+      },
+    });
+  }
+
   async createUserWithConfirmation(
     userDto: CreateUserRepoDto,
     confirmationDto: CreateUserConfirmationRepoDto,
@@ -44,6 +64,7 @@ export class UsersRepo {
   async createOrUpdatePasswordRecovery(
     dto: PasswordRecoveryModel,
   ): Promise<void> {
+    console.log('dto  ', dto);
     await this.prisma.passwordRecovery.upsert({
       where: { userId: dto.userId },
       update: dto,
