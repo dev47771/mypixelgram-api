@@ -22,8 +22,9 @@
     "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:migrate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
     "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:deploy": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
-    "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js"
+    "main:prisma:deploy": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate deploy --schema=.т/apps/main/prisma/schema.prisma",
+    "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
+    "migrate:dev": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -43,7 +44,6 @@
     "cross-env": "^10.0.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
-    "dotenv-cli": "^10.0.0",
     "handlebars": "^4.7.8",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
@@ -71,6 +71,7 @@
     "@types/passport-github2": "^1.2.9",
     "@types/passport-http": "^0.3.11",
     "@types/supertest": "^6.0.2",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

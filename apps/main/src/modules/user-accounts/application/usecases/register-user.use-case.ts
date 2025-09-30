@@ -37,6 +37,8 @@ export class RegisterUserUseCase
 
     const confirmationCode = generateConfirmationCode();
 
+    console.log('confirmationCode', confirmationCode);
+
     const codeLifetimeInSecs = this.configService.get<number>(
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',
     )!;

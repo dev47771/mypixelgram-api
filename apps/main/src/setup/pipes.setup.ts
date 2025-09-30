@@ -18,6 +18,7 @@ const formatErrors = (errors: ValidationError[]): FieldError[] => {
       });
     }
   });
+  console.log('errorsForResponse ', errorsForResponse);
   return errorsForResponse;
 };
 

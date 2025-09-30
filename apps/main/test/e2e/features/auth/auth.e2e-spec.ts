@@ -4,17 +4,6 @@ import { UsersTestRepo } from '../users/users.test-repo';
 import { PrismaService } from '../../../../src/core/prisma/prisma.service';
 import { deleteAllData } from '../../helpers/delete-all-data';
 import { AuthTestManager } from './auth.test-manager';
-import { UserViewDto } from '../../../../src/modules/user-accounts/api/view-dto/user.view-dto';
-//import { UsersTestManager } from '../users/users.test-manager';
-import {
-  getInvalidEmailCases,
-  getInvalidLoginCases,
-  getInvalidPasswordCases,
-  makeValidUserInput,
-} from '../../helpers/fixtures/user-inputs';
-import { CreateUserInputDto } from '../../../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
-import { UserConfirmation as UserConfirmationModel } from '.prisma/client';
-import type { Response } from 'supertest';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -31,7 +20,6 @@ jest.mock(
 describe('auth', () => {
   let app: INestApplication;
   let authTestManager: AuthTestManager;
-  //let usersTestManager: UsersTestManager;
   let usersTestRepo: UsersTestRepo;
   let configService: ConfigService;
 
@@ -250,6 +238,77 @@ describe('auth', () => {
         .post('/api/auth/registration-confirmation')
         .send({
           code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+
+  describe('recovery-password', () => {
+    beforeAll(async () => {
+      await deleteAllData(app);
+    });
+
+    it('should recovery-password success', async () => {
+      const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      (generateConfirmationCode as jest.Mock).mockReturnValue(mockCode);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/recover-password')
+        .send({
+          email: correctUser.email,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+
+  describe('new-password', () => {
+    beforeAll(async () => {
+      await deleteAllData(app);
+    });
+
+    it('should new-password success', async () => {
+      const mockCode1 = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      const mockCode2 = 'c9df3dfc-5c0f-446a-9500-bd747c611112';
+      (generateConfirmationCode as jest.Mock)
+        .mockReturnValueOnce(mockCode1)
+        .mockReturnValueOnce(mockCode2);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode1,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/recover-password')
+        .send({
+          email: correctUser.email,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/new-password')
+        .send({
+          newPassword: '12sgKLbc',
+          recoveryCode: mockCode2,
         })
         .expect(HttpStatus.NO_CONTENT);
     });
