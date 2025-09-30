@@ -78,7 +78,7 @@ describe('auth', () => {
         .post('/api/auth/register')
         .send({
           login: 'user-test',
-          email: 'user-testmail.ru', // incorrect email
+          email: 'user-testmail.ru',  // incorrect email
           password: 'pasS1234',
         })
         .expect(HttpStatus.BAD_REQUEST);
