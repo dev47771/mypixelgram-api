@@ -25,15 +25,7 @@ describe('users', () => {
       await deleteAllData(app);
     });
 
-    it('should create user', async () => {
-      // await request(app.getHttpServer())
-      //   .post('/api/users')
-      //   .auth('admin', 'qwerty')
-      //   .send({
-      //     correctUser,
-      //   })
-      //   .expect(HttpStatus.CREATED);
-    });
+    it('should create user', async () => {});
     it('return 400 data incorrect', async () => {});
   });
 
