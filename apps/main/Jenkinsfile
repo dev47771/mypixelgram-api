@@ -4,6 +4,7 @@ pipeline {
     environment {
         ENV_TYPE = "production"
         PORT = 4028
+        DATABASE_URL = "postgresql://neondb_owner:npg_FXg0w9EPTpGb@ep-patient-mouse-agr6mzwv-pooler.c-2.eu-central-1.aws.neon.tech/mypixel-db?sslmode=require&channel_binding=require"
         NAMESPACE = "mypixelgram-ru"
         REGISTRY_HOSTNAME = "daarrys"
         PROJECT = "mypixelgram-main-api"
