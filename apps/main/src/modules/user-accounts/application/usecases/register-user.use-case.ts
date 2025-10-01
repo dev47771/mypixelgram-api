@@ -31,13 +31,11 @@ export class RegisterUserUseCase
   }
 
   async execute({ dto }: RegisterUserCommand): Promise<string> {
+    console.log('  dto', dto);
+
     const user: CreateUserRepoDto = await this.createUser(dto);
 
-    //const confirmationCode = randomUUID();
-
     const confirmationCode = generateConfirmationCode();
-
-    console.log('confirmationCode', confirmationCode);
 
     const codeLifetimeInSecs = this.configService.get<number>(
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',

@@ -65,7 +65,6 @@ export class UsersRepo {
   async createOrUpdatePasswordRecovery(
     dto: PasswordRecoveryModel,
   ): Promise<void> {
-    console.log('dto  ', dto);
     await this.prisma.passwordRecovery.upsert({
       where: { userId: dto.userId },
       update: dto,
