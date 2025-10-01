@@ -41,6 +41,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
+    console.log("registerUser", body);
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
