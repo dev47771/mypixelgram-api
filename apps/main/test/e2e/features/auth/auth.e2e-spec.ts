@@ -44,7 +44,7 @@ describe('auth', () => {
     const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
     (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
 
-    it('should rdegister, confirmation, login success', async () => {
+    it('should register, confirmation, login success', async () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(correctUser)
