@@ -48,7 +48,7 @@ describe('auth', () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(correctUser)
-        .expect(HttpStatus.FAILED_DEPENDENCY);
+        .expect(HttpStatus.NO_CONTENT);
 
       await request(app.getHttpServer())
         .post('/api/auth/registration-confirmation')
