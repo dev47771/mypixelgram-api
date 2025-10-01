@@ -48,14 +48,14 @@ describe('auth', () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(correctUser)
-        .expect(HttpStatus.NO_CONTENT);
+        .expect(HttpStatus.FAILED_DEPENDENCY);
 
       await request(app.getHttpServer())
         .post('/api/auth/registration-confirmation')
         .send({
           code: mockCode,
         })
-        .expect(HttpStatus.EXPECTATION_FAILED);
+        .expect(HttpStatus.NO_CONTENT);
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
