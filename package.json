@@ -18,7 +18,7 @@
     "test:watch": "cross-env NODE_ENV=testing jest --watch",
     "test:cov": "cross-env NODE_ENV=testing jest --coverage",
     "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e:main": "npm run main:reset:test-db && cross-env NODE_ENV=testing jest --config apps/main/test/jest-e2e.json",
+    "test:e2e": "npm run main:reset:test-db && cross-env NODE_ENV=testing jest --config apps/main/test/jest-e2e.json",
     "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:migrate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
     "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
