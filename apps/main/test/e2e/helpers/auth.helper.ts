@@ -2,6 +2,6 @@ import { CreateUserInputDto } from '../../../src/modules/user-accounts/api/input
 
 export const correctUser: CreateUserInputDto = {
   login: 'Klava009',
-  email: 'klava999@mail.ru',
+  email: 'al.humbatli@gmail.com',
   password: '1234Abc',
 };

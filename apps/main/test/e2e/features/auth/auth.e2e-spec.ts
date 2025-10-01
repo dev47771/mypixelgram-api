@@ -44,7 +44,15 @@ describe('auth', () => {
         .send(correctUser)
         .expect(HttpStatus.NO_CONTENT);
 
-      const response = await authTestManager.login(correctUser); //login user
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
+
       const token = response.body.accessToken;
 
       const user = await request(app.getHttpServer())
@@ -78,7 +86,7 @@ describe('auth', () => {
         .post('/api/auth/register')
         .send({
           login: 'user-test',
-          email: 'user-testmail.ru',  // incorrect email
+          email: 'user-testmail.ru', // incorrect email
           password: 'pasS1234',
         })
         .expect(HttpStatus.BAD_REQUEST);
@@ -188,9 +196,16 @@ describe('auth', () => {
 
     it('should logout success', async () => {
       await authTestManager.register(correctUser); // register user
-      const response = await authTestManager.login(correctUser); //login user
+      const result = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
 
-      const token = response.body.accessToken;
+      const token = result.body.accessToken;
 
       const user = await request(app.getHttpServer())
         .get('/api/auth/me')
@@ -201,12 +216,19 @@ describe('auth', () => {
 
       await request(app.getHttpServer())
         .post('/api/auth/logout')
-        .set('Cookie', response.headers['set-cookie'][0])
+        .set('Cookie', result.headers['set-cookie'][0])
         .expect(HttpStatus.NO_CONTENT);
     });
     it('400 Unauthorized', async () => {
       await authTestManager.register(correctUser); // register user
-      await authTestManager.login(correctUser); //login user
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
 
       await request(app.getHttpServer())
         .post('/api/auth/logout')
