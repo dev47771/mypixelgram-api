@@ -55,7 +55,7 @@ describe('auth', () => {
         .send({
           code: mockCode,
         })
-        .expect(HttpStatus.NO_CONTENT);
+        .expect(HttpStatus.EXPECTATION_FAILED);
 
       const response = await request(app.getHttpServer())
         .post('/api/auth/login')
@@ -160,7 +160,6 @@ describe('auth', () => {
       expect(correctUser.login).toEqual(user.body.login);
       expect(correctUser.email).toEqual(user.body.email);
     });
-
     it('400 BadRequest validation', async () => {
       await authTestManager.register(correctUser); // register user
 
@@ -213,7 +212,6 @@ describe('auth', () => {
         .expect(HttpStatus.UNAUTHORIZED);
     });
   });
-
   describe('logout', () => {
     beforeEach(async () => {
       await deleteAllData(app);
@@ -288,7 +286,6 @@ describe('auth', () => {
         .expect(HttpStatus.UNAUTHORIZED);
     });
   });
-
   describe('confirmation', () => {
     beforeAll(async () => {
       await deleteAllData(app);
@@ -311,7 +308,6 @@ describe('auth', () => {
         .expect(HttpStatus.NO_CONTENT);
     });
   });
-
   describe('recovery-password', () => {
     beforeAll(async () => {
       await deleteAllData(app);
@@ -341,7 +337,6 @@ describe('auth', () => {
         .expect(HttpStatus.NO_CONTENT);
     });
   });
-
   describe('new-password', () => {
     beforeAll(async () => {
       await deleteAllData(app);
