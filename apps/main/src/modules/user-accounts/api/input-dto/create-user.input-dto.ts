@@ -12,10 +12,21 @@ import {
 import { Trim } from '../../../../core/decorators/transform/trim';
 
 export class CreateUserInputDto {
-  @Length(3, 10)
+
+  @Length(6, 30)
+  @Trim()
   login: string;
-  @Length(6, 20)
-  password: string;
-  @IsEmail({}, { message: 'Incorrect email' })
+
+  @IsEmail()
+  @Trim()
   email: string;
+
+  @Matches(passwordConstraints.match, {
+    message:
+      'Password must contain 0-9, a-z, A-Z, ! " # $ % & \' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _ { | } ~',
+  })
+  @Length(6, 20)
+  @Trim()
+  @IsNotEmpty()
+  password: string;
 }
