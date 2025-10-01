@@ -12,7 +12,7 @@ import {
 import { Trim } from '../../../../core/decorators/transform/trim';
 
 export class CreateUserInputDto {
-  @Matches(/^[a-zA-Z0-9_-]*$/)
+  //@Matches(/^[a-zA-Z0-9_-]*$/)
   @Length(6, 30)
   @Trim()
   login: string;
