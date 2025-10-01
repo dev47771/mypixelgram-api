@@ -6,6 +6,7 @@ import {
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
+import { UnauthorizedDomainException } from '../../../core/exceptions/domainException';
 
 @Injectable()
 export class UsersRepo {
@@ -70,6 +71,16 @@ export class UsersRepo {
       update: dto,
       create: dto,
     });
+  }
+
+  async checkConfirmed(user: UserModel) {
+    const confirmedUser = await this.prisma.userConfirmation.findFirst({
+      where: { isConfirmed: true },
+    });
+    if (!confirmedUser) {
+      throw UnauthorizedDomainException.create('Not exists user', 'user');
+    }
+    return true;
   }
 
   async findUserByPasswordRecoveryCodeHash(

@@ -28,6 +28,10 @@ export class ValidateUserUseCase
     if (!user)
       throw UnauthorizedDomainException.create('Not exists user', 'user');
 
+    const confirmed = await this.usersRepo.checkConfirmed(user);
+
+    console.log('confirmed ', confirmed);
+
     if (this.configService.get<boolean>('SKIP_PASSWORD_CHECK') === false) {
       const isPasswordValid = await this.cryptoService.comparePasswords(
         password,
