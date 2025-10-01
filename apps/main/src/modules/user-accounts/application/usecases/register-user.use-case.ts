@@ -31,8 +31,6 @@ export class RegisterUserUseCase
   }
 
   async execute({ dto }: RegisterUserCommand): Promise<string> {
-    console.log('  dto', dto);
-
     const user: CreateUserRepoDto = await this.createUser(dto);
 
     const confirmationCode = generateConfirmationCode();
