@@ -39,8 +39,6 @@ export class RecoverPasswordUseCase
       seconds: this.configService.get('PASSWORD_RECOVERY_CODE_LIFETIME_SECS'),
     });
 
-    console.log('recoveryCodeHash  ', recoveryCodeHash);
-
     const passwordRecovery: PasswordRecoveryModel = {
       recoveryCodeHash,
       expirationDate,

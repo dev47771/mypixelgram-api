@@ -7,7 +7,7 @@ import { AuthTestManager } from './auth.test-manager';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { correctUser } from '../../helpers/auth.helper';
+import { correctUser, delay } from '../../helpers/auth.helper';
 import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
 
 jest.mock(
@@ -114,7 +114,6 @@ describe('auth', () => {
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
-
   describe('login', () => {
     beforeEach(async () => {
       await deleteAllData(app);
@@ -375,6 +374,44 @@ describe('auth', () => {
           recoveryCode: mockCode2,
         })
         .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+  describe('check-recovery-code', () => {
+    beforeEach(async () => {
+      await deleteAllData(app);
+    });
+
+    const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+    (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
+    it('should return 200 OK ', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/check-recovery-code')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 Bad request ', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await delay(4000);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/check-recovery-code')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });

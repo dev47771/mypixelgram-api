@@ -93,6 +93,12 @@ export class UsersRepo {
     });
   }
 
+  async findUserConfirmationByRecoveryCode(recoveryCode: string) {
+    return this.prisma.userConfirmation.findFirst({
+      where: { confirmationCode: recoveryCode },
+    });
+  }
+
   async deletePasswordRecoveryByUserId(userId: string): Promise<void> {
     await this.prisma.passwordRecovery.delete({ where: { userId } });
   }
