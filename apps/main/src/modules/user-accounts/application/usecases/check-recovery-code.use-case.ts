@@ -15,7 +15,7 @@ export class CheckRecoveryCodeUseCase
 
   async execute({ recoveryCode }: CheckRecoveryCodeCommand) {
     const userWithRecoveryInfo =
-      await this.usersRepo.findUserConfirmationByRecoveryCode(recoveryCode);
+      await this.usersRepo.findUserRecoveryInfoByRecoveryCode(recoveryCode);
 
     if (!userWithRecoveryInfo)
       throw BadRequestDomainException.create(
@@ -23,15 +23,7 @@ export class CheckRecoveryCodeUseCase
         'code',
       );
 
-    console.log(
-      'userWithRecoveryInfo.passwordRecoveryInfo!.expirationDate',
-      userWithRecoveryInfo.expirationDate,
-    );
-
-    console.log('new Date() ', new Date());
-
-    if (new Date() > userWithRecoveryInfo.expirationDate!) {
-      console.log('!!!!!!!!!!!!!!!');
+    if (new Date() > userWithRecoveryInfo.expirationDate) {
       throw BadRequestDomainException.create(
         'Recovery code is expired',
         'recoveryCode',

@@ -93,9 +93,9 @@ export class UsersRepo {
     });
   }
 
-  async findUserConfirmationByRecoveryCode(recoveryCode: string) {
-    return this.prisma.userConfirmation.findFirst({
-      where: { confirmationCode: recoveryCode },
+  async findUserRecoveryInfoByRecoveryCode(recoveryCode: string) {
+    return this.prisma.passwordRecovery.findFirst({
+      where: { recoveryCodeHash: recoveryCode },
     });
   }
 

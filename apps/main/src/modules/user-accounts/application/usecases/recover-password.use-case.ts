@@ -1,15 +1,11 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
-import { randomBytes } from 'node:crypto';
-import { CryptoService } from '../crypto.service';
 import { PasswordRecovery as PasswordRecoveryModel } from '@prisma/client';
-import { add } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
-import { PasswordRecoveryRequestedEvent } from '../events/password-recovery-requested.event';
-import { BadRequestException } from '@nestjs/common';
 import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
 import { MailService } from '../../../../core/mailModule/mail.service';
 import { generateConfirmationCode } from './common/confirmationCode.helper';
+import { addSeconds } from 'date-fns/addSeconds';
 
 export class RecoverPasswordCommand {
   constructor(public email: string) {}
@@ -21,7 +17,6 @@ export class RecoverPasswordUseCase
 {
   constructor(
     private usersRepo: UsersRepo,
-    private cryptoService: CryptoService,
     private configService: ConfigService,
     private mailService: MailService,
   ) {}
@@ -35,9 +30,10 @@ export class RecoverPasswordUseCase
       );
 
     const recoveryCodeHash = generateConfirmationCode();
-    const expirationDate = add(new Date(), {
-      seconds: this.configService.get('PASSWORD_RECOVERY_CODE_LIFETIME_SECS'),
-    });
+    const expirationDate = addSeconds(
+      new Date(),
+      this.configService.get<number>('PASSWORD_RECOVERY_CODE_LIFETIME_SECS')!,
+    );
 
     const passwordRecovery: PasswordRecoveryModel = {
       recoveryCodeHash,
