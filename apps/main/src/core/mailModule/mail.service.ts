@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { BadRequestDomainException } from '../exceptions/domainException';
 
 @Injectable()
 export class MailService {
@@ -11,6 +12,21 @@ export class MailService {
     code: string | null,
   ) {
     const url = `https://some.com?code=${code}`;
+
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: `Welcome to Nice App! Registration ${login}`,
+        template: './registration',
+        context: {
+          login: login,
+          url,
+          code,
+        },
+      });
+    } catch (e) {
+      throw BadRequestDomainException.create('no exist email address', 'email');
+    }
 
     await this.mailerService.sendMail({
       to: email,

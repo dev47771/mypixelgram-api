@@ -23,7 +23,6 @@ export class RegisterUserUseCase
   constructor(
     cryptoService: CryptoService,
     usersRepo: UsersRepo,
-    private eventBus: EventBus,
     private configService: ConfigService,
     private mailService: MailService,
   ) {
@@ -31,46 +30,28 @@ export class RegisterUserUseCase
   }
 
   async execute({ dto }: RegisterUserCommand): Promise<string> {
-    console.log('[RegisterUserUseCase] input dto =', dto); // посмотреть, не пустой ли DTO [web:76][web:77][web:81]
-
     const user: CreateUserRepoDto = await this.createUser(dto);
-    console.log('[RegisterUserUseCase] created user dto =', user); // должен содержать login/email/passwordHash и т.п. [web:76][web:77][web:81]
 
     const confirmationCode = generateConfirmationCode();
-    console.log('[RegisterUserUseCase] confirmationCode =', confirmationCode); // отладка генерации кода [web:76][web:77][web:85]
 
     const codeLifetimeInSecs = this.configService.get<number>(
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',
     )!;
-    console.log('[RegisterUserUseCase] codeLifetimeInSecs =', codeLifetimeInSecs); // проверить подхват env и тип [web:81][web:90][web:87]
 
-    const expirationDate = add(new Date(), {
-      seconds: codeLifetimeInSecs,
-    });
-    console.log('[RegisterUserUseCase] expirationDate =', expirationDate.toISOString()); // контроль расчёта даты [web:86][web:91][web:80]
-
+    const expirationDate = add(new Date(), { seconds: codeLifetimeInSecs });
 
     const userConfirmation: CreateUserConfirmationRepoDto = {
       confirmationCode,
       expirationDate,
       isConfirmed: false,
     };
-    console.log('[RegisterUserUseCase] userConfirmation =', userConfirmation); // полная структура перед сохранением [web:76][web:77][web:85]
-
 
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
       user,
       userConfirmation,
     );
-    console.log('[RegisterUserUseCase] createdUserId =', createdUserId); // убедиться, что insert прошёл [web:76][web:77][web:85]
 
-    console.log('[RegisterUserUseCase] sendConfirmationEmail args =', {
-      login: user.login,
-      email: user.email,
-      code: userConfirmation.confirmationCode,
-    }); // лог параметров письма [web:76][web:77][web:85]
-
-    this.mailService.sendConfirmationEmail(
+    await this.mailService.sendConfirmationEmail(
       user.login,
       user.email,
       userConfirmation.confirmationCode,
