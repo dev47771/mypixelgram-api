@@ -26,6 +26,7 @@ export class CreateUserUseCase
       confirmationCode: null,
       expirationDate: null,
       isConfirmed: true,
+      isAgreeWithPrivacy: true,
     };
 
     return this.usersRepo.createUserWithConfirmation(user, userConfirmation);
