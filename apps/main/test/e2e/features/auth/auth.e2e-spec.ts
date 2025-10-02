@@ -37,10 +37,6 @@ describe('auth', () => {
   });
 
   describe('register', () => {
-    // beforeEach(async () => {
-    //   await deleteAllData(app);
-    // });
-
     const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
     (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
 
@@ -212,6 +208,7 @@ describe('auth', () => {
         .expect(HttpStatus.UNAUTHORIZED);
     });
   });
+
   describe('logout', () => {
     beforeEach(async () => {
       await deleteAllData(app);
@@ -286,6 +283,7 @@ describe('auth', () => {
         .expect(HttpStatus.UNAUTHORIZED);
     });
   });
+
   describe('confirmation', () => {
     beforeAll(async () => {
       await deleteAllData(app);
@@ -308,6 +306,7 @@ describe('auth', () => {
         .expect(HttpStatus.NO_CONTENT);
     });
   });
+
   describe('recovery-password', () => {
     beforeAll(async () => {
       await deleteAllData(app);
@@ -337,6 +336,7 @@ describe('auth', () => {
         .expect(HttpStatus.NO_CONTENT);
     });
   });
+
   describe('new-password', () => {
     beforeAll(async () => {
       await deleteAllData(app);
@@ -375,6 +375,40 @@ describe('auth', () => {
           recoveryCode: mockCode2,
         })
         .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+
+  describe('register-email-resending', () => {
+    beforeEach(async () => {
+      await deleteAllData(app);
+    });
+
+    it('should register-email-resending success', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-email-resending')
+        .send({
+          email: correctUser.email,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+    });
+
+    it('should 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-email-resending')
+        .send({
+          email: 'xxxx@xxxxx', // incorrect email
+        })
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });
