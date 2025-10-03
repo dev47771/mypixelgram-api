@@ -47,6 +47,7 @@ export class ConfirmationUseCase
       isConfirmed: true,
       expirationDate: null,
       confirmationCode: null,
+      isAgreeWithPrivacy: true,
     };
     await this.usersRepo.updateConfirm(
       userConfirmation.userId,

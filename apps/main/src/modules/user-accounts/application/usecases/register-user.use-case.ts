@@ -42,21 +42,26 @@ export class RegisterUserUseCase
     const codeLifetimeInSecs = this.configService.get<number>(
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',
     )!;
-    console.log('[RegisterUserUseCase] codeLifetimeInSecs =', codeLifetimeInSecs); // проверить подхват env и тип [web:81][web:90][web:87]
+    console.log(
+      '[RegisterUserUseCase] codeLifetimeInSecs =',
+      codeLifetimeInSecs,
+    ); // проверить подхват env и тип [web:81][web:90][web:87]
 
     const expirationDate = add(new Date(), {
       seconds: codeLifetimeInSecs,
     });
-    console.log('[RegisterUserUseCase] expirationDate =', expirationDate.toISOString()); // контроль расчёта даты [web:86][web:91][web:80]
-
+    console.log(
+      '[RegisterUserUseCase] expirationDate =',
+      expirationDate.toISOString(),
+    ); // контроль расчёта даты [web:86][web:91][web:80]
 
     const userConfirmation: CreateUserConfirmationRepoDto = {
       confirmationCode,
       expirationDate,
       isConfirmed: false,
+      isAgreeWithPrivacy: true,
     };
     console.log('[RegisterUserUseCase] userConfirmation =', userConfirmation); // полная структура перед сохранением [web:76][web:77][web:85]
-
 
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
       user,
