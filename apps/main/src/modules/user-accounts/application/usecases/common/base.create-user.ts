@@ -11,7 +11,7 @@ export abstract class BaseCreateUser {
     protected usersRepo: UsersRepo,
   ) {}
 
-  async createUser(dto: CreateUserDto): Promise<CreateUserRepoDto> {
+  async createUserDto(dto: CreateUserDto): Promise<CreateUserRepoDto> {
     const userWithSameLogin = await this.usersRepo.findByLogin(dto.login);
     if (userWithSameLogin) {
       throw BadRequestDomainException.create('Login is already taken', 'login');

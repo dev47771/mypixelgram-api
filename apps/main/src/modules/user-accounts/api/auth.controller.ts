@@ -30,6 +30,8 @@ import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
 import { CodeDto } from './input-dto/code.dto';
 import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation.use-case';
+import { EmailDto } from './input-dto/email.resending.dto';
+import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -41,10 +43,18 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
-    console.log("registerUser", body);
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
+  }
+
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationEmailResending(@Body() email: EmailDto) {
+    await this.commandBus.execute(
+      new RegistrationEmailResendingUseCaseCommand(email.email),
+    );
+    return;
   }
 
   @Post('registration-confirmation')

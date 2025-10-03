@@ -3,6 +3,7 @@ import { PrismaService } from '../../../core/prisma/prisma.service';
 import {
   User as UserModel,
   PasswordRecovery as PasswordRecoveryModel,
+  UserConfirmation,
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
@@ -27,6 +28,14 @@ export class UsersRepo {
   async findByCode(code: string) {
     return this.prisma.userConfirmation.findFirst({
       where: { confirmationCode: code },
+    });
+  }
+
+  async findUserConfirmationByUserId(
+    userId: string,
+  ): Promise<UserConfirmation | null> {
+    return this.prisma.userConfirmation.findFirst({
+      where: { userId },
     });
   }
 
