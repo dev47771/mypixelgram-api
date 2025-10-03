@@ -1,16 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestDomainException } from '../exceptions/domainException';
+import { SendEmailDto } from '../../modules/user-accounts/api/input-dto/send.email.dto';
 
 @Injectable()
 export class MailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendConfirmationEmail(
-    login: string,
-    email: string,
-    code: string | null,
-  ) {
+  async sendConfirmationEmail(sendEmailDto: SendEmailDto) {
+    const { login, email, code } = sendEmailDto;
     const url = `https://some.com?code=${code}`;
 
     try {
@@ -40,11 +38,9 @@ export class MailService {
     });
   }
 
-  async sendUserRecoveryCode(
-    login: string,
-    email: string,
-    code: string | null,
-  ) {
+  async sendUserRecoveryCode(sendEmailDto: SendEmailDto) {
+    const { login, email, code } = sendEmailDto;
+
     const url = `https://some.com?code=${code}`;
 
     await this.mailerService.sendMail({
