@@ -20,12 +20,13 @@ export class CreateUserUseCase
   }
 
   async execute({ dto }: CreateUserCommand): Promise<string> {
-    const user: CreateUserRepoDto = await this.createUser(dto);
+    const user: CreateUserRepoDto = await this.createUserDto(dto);
 
     const userConfirmation: CreateUserConfirmationRepoDto = {
       confirmationCode: null,
       expirationDate: null,
       isConfirmed: true,
+      isAgreeWithPrivacy: true,
     };
 
     return this.usersRepo.createUserWithConfirmation(user, userConfirmation);

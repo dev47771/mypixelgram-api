@@ -44,6 +44,7 @@ export class RegisterUserUseCase
       confirmationCode,
       expirationDate,
       isConfirmed: false,
+      isAgreeWithPrivacy: true,
     };
 
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
