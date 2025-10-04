@@ -1,10 +1,12 @@
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { PasswordRecovery as PasswordRecoveryModel } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
+import { User as UserModel } from '@prisma/client';
 import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
 import { MailService } from '../../../../core/mailModule/mail.service';
 import { generateConfirmationCode } from './common/confirmationCode.helper';
+import { SendEmailDto } from '../../api/input-dto/send.email.dto';
 import { addSeconds } from 'date-fns/addSeconds';
 
 export class RecoverPasswordCommand {
@@ -22,7 +24,7 @@ export class RecoverPasswordUseCase
   ) {}
 
   async execute({ email }: RecoverPasswordCommand): Promise<void> {
-    const user = await this.usersRepo.findByEmail(email);
+    const user: UserModel | null = await this.usersRepo.findByEmail(email);
     if (!user)
       throw BadRequestDomainException.create(
         'incorrect email address',
@@ -43,10 +45,12 @@ export class RecoverPasswordUseCase
 
     await this.usersRepo.createOrUpdatePasswordRecovery(passwordRecovery);
 
-    this.mailService.sendUserRecoveryCode(
-      user.login,
-      user.email,
-      recoveryCodeHash,
-    );
+    const sendEmailDto: SendEmailDto = {
+      login: user.login,
+      email: user.email,
+      code: recoveryCodeHash,
+    };
+
+    this.mailService.sendUserRecoveryCode(sendEmailDto);
   }
 }
