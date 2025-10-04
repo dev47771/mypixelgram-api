@@ -58,6 +58,7 @@ export class RegistrationEmailResendingUseCase
       confirmationCode: confirmationCode,
       expirationDate: expirationDate,
       isConfirmed: false,
+      isAgreeWithPrivacy: true,
     };
 
     await this.usersRepo.updateConfirm(user.id, updatedConfirmationDto);
