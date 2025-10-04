@@ -9,9 +9,9 @@ export class PrismaService
 {
   constructor(private configService: ConfigService) {
     super({
-      log: configService.get('DB_LOGGING')
-        ? ['query', 'info', 'warn', 'error']
-        : [],
+      //   log: configService.get('DB_LOGGING')
+      //     ? ['query', 'info', 'warn', 'error']
+      //     : [],
     });
   }
 

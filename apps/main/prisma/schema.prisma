@@ -31,10 +31,11 @@ model User {
 }
 
 model UserConfirmation {
-  confirmationCode String?
-  expirationDate   DateTime? @db.Timestamptz()
-  isConfirmed      Boolean
-  userId           String    @id
+  confirmationCode     String?
+  expirationDate       DateTime? @db.Timestamptz()
+  isConfirmed          Boolean
+  userId               String    @id
+  isAgreeWithPrivacy   Boolean?
 
   user User @relation(fields: [userId], references: [id])
 

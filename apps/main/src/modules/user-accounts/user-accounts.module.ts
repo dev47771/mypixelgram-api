@@ -26,6 +26,8 @@ import {
 } from './application/queries/get-me.query';
 import { MailService } from '../../core/mailModule/mail.service';
 import { ConfirmationUseCase } from './application/usecases/confirmation.use-case';
+import { CheckRecoveryCodeUseCase } from './application/usecases/check-recovery-code.use-case';
+import { RegistrationEmailResendingUseCase } from './application/usecases/register-resending.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -42,6 +44,8 @@ const commandHandlers = [
   RecoverPasswordUseCase,
   SetNewPasswordUseCase,
   ConfirmationUseCase,
+  CheckRecoveryCodeUseCase,
+  RegistrationEmailResendingUseCase,
 ];
 const commonProviders = [
   CryptoService,

@@ -7,7 +7,7 @@ import { AuthTestManager } from './auth.test-manager';
 import * as request from 'supertest';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { correctUser } from '../../helpers/auth.helper';
+import { correctUser, delay } from '../../helpers/auth.helper';
 import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
 
 jest.mock(
@@ -25,7 +25,6 @@ describe('auth', () => {
 
   beforeAll(async () => {
     app = await initApp();
-
     authTestManager = new AuthTestManager(app);
 
     const prisma = app.get(PrismaService);
@@ -38,13 +37,31 @@ describe('auth', () => {
   });
 
   describe('register', () => {
-    it('should register success', async () => {
+    const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+    (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
+    it('should register, confirmation, login success', async () => {
       await request(app.getHttpServer())
         .post('/api/auth/register')
         .send(correctUser)
         .expect(HttpStatus.NO_CONTENT);
 
-      const response = await authTestManager.login(correctUser); //login user
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
+
       const token = response.body.accessToken;
 
       const user = await request(app.getHttpServer())
@@ -93,14 +110,23 @@ describe('auth', () => {
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
-
   describe('login', () => {
     beforeEach(async () => {
       await deleteAllData(app);
     });
 
     it('should login success', async () => {
+      const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
       await authTestManager.register(correctUser); // register user
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
 
       const loginUser = await request(app.getHttpServer())
         .post('/api/auth/login')
@@ -112,6 +138,7 @@ describe('auth', () => {
         .expect(HttpStatus.OK);
 
       const payloadToken = loginUser.body.accessToken;
+
       const token = jwt.verify(
         payloadToken,
         configService.get('JWT_SECRET_KEY')!,
@@ -187,10 +214,28 @@ describe('auth', () => {
     });
 
     it('should logout success', async () => {
-      await authTestManager.register(correctUser); // register user
-      const response = await authTestManager.login(correctUser); //login user
+      const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
 
-      const token = response.body.accessToken;
+      await authTestManager.register(correctUser); // register user
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      const result = await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
+
+      const token = result.body.accessToken;
 
       const user = await request(app.getHttpServer())
         .get('/api/auth/me')
@@ -201,12 +246,30 @@ describe('auth', () => {
 
       await request(app.getHttpServer())
         .post('/api/auth/logout')
-        .set('Cookie', response.headers['set-cookie'][0])
+        .set('Cookie', result.headers['set-cookie'][0])
         .expect(HttpStatus.NO_CONTENT);
     });
     it('400 Unauthorized', async () => {
+      const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+      (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
       await authTestManager.register(correctUser); // register user
-      await authTestManager.login(correctUser); //login user
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-confirmation')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/login')
+        .set('user-agent', 'Chrome')
+        .send({
+          email: correctUser.email,
+          password: correctUser.password,
+        })
+        .expect(HttpStatus.OK);
 
       await request(app.getHttpServer())
         .post('/api/auth/logout')
@@ -311,6 +374,78 @@ describe('auth', () => {
           recoveryCode: mockCode2,
         })
         .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+  describe('check-recovery-code', () => {
+    beforeEach(async () => {
+      await deleteAllData(app);
+    });
+
+    const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+    (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
+    it('should return 200 OK ', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/check-recovery-code')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.OK);
+    });
+
+    it('should return 400 Bad request ', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await delay(4000);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/check-recovery-code')
+        .send({
+          code: mockCode,
+        })
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+  });
+
+  describe('register-email-resending', () => {
+    beforeEach(async () => {
+      await deleteAllData(app);
+    });
+
+    it('should register-email-resending success', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-email-resending')
+        .send({
+          email: correctUser.email,
+        })
+        .expect(HttpStatus.NO_CONTENT);
+    });
+
+    it('should 400 Bad Request', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/register')
+        .send(correctUser)
+        .expect(HttpStatus.NO_CONTENT);
+
+      await request(app.getHttpServer())
+        .post('/api/auth/registration-email-resending')
+        .send({
+          email: 'xxxx@xxxxx', // incorrect email
+        })
+        .expect(HttpStatus.BAD_REQUEST);
     });
   });
 });
