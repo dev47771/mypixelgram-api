@@ -31,8 +31,8 @@ export class RecoverPasswordUseCase
         'email',
       );
 
-    const recoveryCodeHash: string = generateConfirmationCode();
-    const expirationDate: Date = addSeconds(
+    const recoveryCodeHash = generateConfirmationCode();
+    const expirationDate = addSeconds(
       new Date(),
       this.configService.get<number>('PASSWORD_RECOVERY_CODE_LIFETIME_SECS')!,
     );

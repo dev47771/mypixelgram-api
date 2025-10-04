@@ -5,3 +5,7 @@ export const correctUser: CreateUserInputDto = {
   email: 'al.humbatli@gmail.com',
   password: '1234Abc',
 };
+
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

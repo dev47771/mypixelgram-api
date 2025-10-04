@@ -102,6 +102,12 @@ export class UsersRepo {
     });
   }
 
+  async findUserRecoveryInfoByRecoveryCode(recoveryCode: string) {
+    return this.prisma.passwordRecovery.findFirst({
+      where: { recoveryCodeHash: recoveryCode },
+    });
+  }
+
   async deletePasswordRecoveryByUserId(userId: string): Promise<void> {
     await this.prisma.passwordRecovery.delete({ where: { userId } });
   }

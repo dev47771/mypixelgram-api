@@ -30,6 +30,7 @@ import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
 import { CodeDto } from './input-dto/code.dto';
 import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation.use-case';
+import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
 import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
 
@@ -83,6 +84,12 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
     await this.commandBus.execute(new RecoverPasswordCommand(body.email));
+  }
+
+  @Post('check-recovery-code')
+  @HttpCode(HttpStatus.OK)
+  async checkRecoveryCode(@Body() body: CodeDto): Promise<void> {
+    await this.commandBus.execute(new CheckRecoveryCodeCommand(body.code));
   }
 
   @Post('new-password')

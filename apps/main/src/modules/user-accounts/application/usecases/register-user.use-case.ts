@@ -1,14 +1,14 @@
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BaseCreateUser } from './common/base.create-user';
 import { CryptoService } from '../crypto.service';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { CreateUserRepoDto } from '../../infrastructure/dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
-import { add } from 'date-fns';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../../../../core/mailModule/mail.service';
 import { generateConfirmationCode } from './common/confirmationCode.helper';
+import { addSeconds } from 'date-fns/addSeconds';
 import { SendEmailDto } from '../../api/input-dto/send.email.dto';
 
 export class RegisterUserCommand {
@@ -38,7 +38,7 @@ export class RegisterUserUseCase
       'EMAIL_CONFIRMATION_CODE_LIFETIME_SECS',
     )!;
 
-    const expirationDate = add(new Date(), { seconds: codeLifetimeInSecs });
+    const expirationDate = addSeconds(new Date(), codeLifetimeInSecs);
 
     const userConfirmationDto: CreateUserConfirmationRepoDto = {
       confirmationCode,
