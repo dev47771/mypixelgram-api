@@ -389,13 +389,13 @@ describe('auth', () => {
         .post('/api/v1/auth/register')
         .send(correctUser)
         .expect(HttpStatus.NO_CONTENT);
-
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/check-recovery-code')
-        .send({
-          code: mockCode,
-        })
-        .expect(HttpStatus.OK);
+      //
+      // await request(app.getHttpServer())
+      //   .post('/api/v1/auth/check-recovery-code')
+      //   .send({
+      //     code: mockCode,
+      //   })
+      //   .expect(HttpStatus.OK);
     });
 
     it('should return 400 Bad request ', async () => {

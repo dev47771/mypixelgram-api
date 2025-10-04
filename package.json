@@ -28,6 +28,7 @@
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
     "migrate:dev": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "migrate:dev:local" : "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
+    "migrate:test:local" : "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:generate:local": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma"
   },
   "dependencies": {
