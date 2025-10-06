@@ -17,17 +17,16 @@ async function bootstrap() {
     .setTitle('MyPixelGram API')
     .setDescription('API documentation for MyPixelGram application')
     .setVersion('1.0')
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management endpoints')
     .addBearerAuth() // Для JWT авторизации
+    .addBasicAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(GLOBAL_PREFIX, app, document, {
     swaggerOptions: {
       persistAuthorization: true,
+      withCredentials: true,
       tagsSorter: 'alpha',
-      operationsSorter: 'alpha',
     },
     customSiteTitle: 'MyPixelGram API Docs',
   });

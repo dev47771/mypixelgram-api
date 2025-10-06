@@ -1,12 +1,22 @@
 import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UserViewDto } from '../user-accounts/api/view-dto/user.view-dto';
 
-export const TESTING_ROUTE = 'testing';
+export const TESTING_ROUTE = 'api/v1/testing';
 
 @Controller(TESTING_ROUTE)
 export class TestingController {
   constructor(private prisma: PrismaService) {}
 
+  @ApiOperation({
+    summary: 'Clear database',
+    description: 'Delete all data from all tables/collections',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'All data is deleted',
+  })
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll(): Promise<void> {
