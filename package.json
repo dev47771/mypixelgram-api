@@ -25,7 +25,7 @@
     "main:prisma:migrate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
     "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:deploy": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
-    "main:reset:test-db": "dotenv -e ./apps/main/src/env/.env.testing.local -- node ./apps/main/scripts/reset-test-db.js",
+    "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
     "migrate:dev": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "migrate:dev:local" : "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "migrate:test:local" : "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
