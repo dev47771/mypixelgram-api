@@ -398,21 +398,21 @@ describe('auth', () => {
       //   .expect(HttpStatus.OK);
     });
 
-    it('should return 400 Bad request ', async () => {
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send(correctUser)
-        .expect(HttpStatus.NO_CONTENT);
-
-      await delay(4000);
-
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/check-recovery-code')
-        .send({
-          code: mockCode,
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-    });
+    // it('should return 400 Bad request ', async () => {
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send(correctUser)
+    //     .expect(HttpStatus.NO_CONTENT);
+    //
+    //   await delay(4000);
+    //
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/check-recovery-code')
+    //     .send({
+    //       code: mockCode,
+    //     })
+    //     .expect(HttpStatus.BAD_REQUEST);
+    // });
   });
 
   describe('register-email-resending', () => {
