@@ -34,42 +34,19 @@ pipeline {
             }
         }
 
-       stage('Apply database migrations') {
-           steps {
-               script {
-                   sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm use --lts
+      stage('Apply database migrations') {
+          steps {
+              script {
+                  sh '''
+                      export NVM_DIR="$HOME/.nvm"
+                      [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                      nvm use --lts
 
-                       # Проверяем статус миграций
-                       if ! yarn run main:prisma:status --schema=./apps/main/prisma/schema.prisma | grep -q "No pending migrations."; then
-                           echo "Database schema is not empty. Baseline required."
-
-                           # Создаём директорию для baseline
-                           mkdir -p prisma/migrations/0_init
-
-                           # Генерируем SQL для baseline
-                           npx prisma migrate diff \
-                             --from-empty \
-                             --to-schema-datamodel ./apps/main/prisma/schema.prisma \
-                             --script > prisma/migrations/0_init/migration.sql
-
-                           # Отмечаем baseline как применённый
-                           npx prisma migrate resolve --schema=./apps/main/prisma/schema.prisma --applied 0_init
-
-                           echo "Baseline applied successfully."
-                       else
-                           echo "No baseline needed. Proceeding with deploy."
-                       fi
-
-                       # Теперь можно безопасно применить миграции
-                       yarn run main:prisma:deploy
-                   '''
-               }
-           }
-       }
-
+                      yarn run main:prisma:deploy
+                  '''
+              }
+          }
+      }
         stage('Unit tests') {
             steps {
                 script {
