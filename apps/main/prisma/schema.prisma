@@ -9,8 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
@@ -31,11 +32,11 @@ model User {
 }
 
 model UserConfirmation {
-  confirmationCode     String?
-  expirationDate       DateTime? @db.Timestamptz()
-  isConfirmed          Boolean
-  userId               String    @id
-  isAgreeWithPrivacy   Boolean?
+  confirmationCode   String?
+  expirationDate     DateTime? @db.Timestamptz()
+  isConfirmed        Boolean
+  userId             String    @id
+  isAgreeWithPrivacy Boolean?
 
   user User @relation(fields: [userId], references: [id])
 
@@ -72,7 +73,6 @@ model Session {
   exp        String
   deviceName String
   deviceId   String
-
 
   user User @relation(fields: [userId], references: [id])
 
