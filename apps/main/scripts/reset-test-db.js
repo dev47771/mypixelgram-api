@@ -1,3 +1,5 @@
+require('dotenv').config({ path: './apps/main/src/env/.env.testing.local' });
+
 const { execSync } = require('child_process');
 
 console.log('Resetting test database...');
