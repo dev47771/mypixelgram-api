@@ -13,14 +13,14 @@ export class AuthTestManager {
 
   async register(userDto: CreateUserInputDto) {
     return await request(this.app.getHttpServer())
-      .post('/api/auth/register')
+      .post('/api/v1/auth/register')
       .send(userDto)
       .expect(HttpStatus.NO_CONTENT);
   }
 
   async login(userDto: CreateUserInputDto) {
     return await request(this.app.getHttpServer())
-      .post('/api/auth/login')
+      .post('/api/v1/auth/login')
       .set('user-agent', 'Chrome')
       .send({
         email: userDto.email,
