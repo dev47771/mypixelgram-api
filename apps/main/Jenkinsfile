@@ -21,6 +21,18 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Apply database migrations') {
+            steps {
+                script {
+                    sh '''
+                        export NVM_DIR="$HOME/.nvm"
+                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+                        nvm use --lts
+                        yarn run main:prisma:deploy
+                    '''
+                }
+            }
+        }
         stage('Unit tests') {
             steps {
                 script {
