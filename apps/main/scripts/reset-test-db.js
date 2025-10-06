@@ -5,7 +5,8 @@ const { execSync } = require('child_process');
 console.log('Resetting test database...');
 try {
   execSync('npx prisma db push --force-reset --schema=./apps/main/prisma/schema.prisma', {
-    stdio: 'inherit'
+    stdio: 'inherit',
+    env: process.env  // Передаём переменные окружения в дочерний процесс
   });
 
   console.log('Test database reset successfully');
