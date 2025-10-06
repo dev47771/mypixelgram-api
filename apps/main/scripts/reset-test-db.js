@@ -1,12 +1,9 @@
-require('dotenv').config({ path: './apps/main/src/env/.env.testing.local' });
-
 const { execSync } = require('child_process');
 
 console.log('Resetting test database...');
 try {
-  execSync('npx prisma db push --force-reset --schema=./apps/main/prisma/schema.prisma', {
-    stdio: 'inherit',
-    env: process.env  // Передаём переменные окружения в дочерний процесс
+  execSync('dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma db push --force-reset --schema=./apps/main/prisma/schema.prisma', {
+    stdio: 'inherit'
   });
 
   console.log('Test database reset successfully');
