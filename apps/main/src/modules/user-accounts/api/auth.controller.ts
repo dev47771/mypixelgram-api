@@ -33,6 +33,7 @@ import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation
 import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
 import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
+import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -78,6 +79,22 @@ export class AuthController {
       secure: true,
     });
     return { accessToken: tokens.accessToken };
+  }
+
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  @HttpCode(200)
+  async createNewTokensPair(
+    @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ accessToken: string }> {
+    const tokenPair = await this.commandBus.execute(
+      new RefreshTokenCommand(payload),
+    );
+    response.cookie('refreshToken', tokenPair.refreshToken, { httpOnly: true, secure: true });
+    return {
+      accessToken: tokenPair.accessToken,
+    };
   }
 
   @Post('recover-password')

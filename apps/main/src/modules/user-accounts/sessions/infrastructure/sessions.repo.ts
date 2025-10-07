@@ -18,4 +18,12 @@ export class SessionRepo {
   async deleteSession(id: string) {
     return this.prisma.session.delete({ where: { id } });
   }
+
+  async updateSessionByDeviceId(deviceId: string, updateData: Partial<Session>) {
+    return this.prisma.session.updateMany({
+      where: { deviceId },
+      data: { ...updateData }
+    });
+  }
+
 }
