@@ -30,6 +30,10 @@ export class BadRequestDomainException extends DomainException {
   static create(message?: string, field?: string) {
     return new this(message ? [new ErrorExtension(message, field)] : []);
   }
+
+  static createMany(data: ErrorExtension[]) {
+    return new this(data);
+  }
 }
 
 export class UnauthorizedDomainException extends DomainException {

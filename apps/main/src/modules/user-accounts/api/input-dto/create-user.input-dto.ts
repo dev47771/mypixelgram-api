@@ -15,6 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateUserInputDto {
   @ApiProperty({
     description: 'must be unique login',
+    example: 'lolikkk',
     minLength: 6,
     maxLength: 30,
   })
@@ -43,7 +44,7 @@ export class CreateUserInputDto {
     message:
       'Password must contain 0-9, a-z, A-Z, ! " # $ % & \' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _ { | } ~',
   })
-  @Length(6, 20)
+  @Length(passwordConstraints.minLength, passwordConstraints.maxLength)
   @Trim()
   @IsNotEmpty()
   password: string;
