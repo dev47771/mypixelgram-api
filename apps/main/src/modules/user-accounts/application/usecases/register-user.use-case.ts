@@ -46,12 +46,10 @@ export class RegisterUserUseCase
       isConfirmed: false,
       isAgreeWithPrivacy: true,
     };
-
     const createdUserId = await this.usersRepo.createUserWithConfirmation(
       userDto,
       userConfirmationDto,
     );
-
     const sendEmailDto: SendEmailDto = {
       login: userDto.login,
       email: userDto.email,
