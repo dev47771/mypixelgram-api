@@ -10,7 +10,7 @@
     "build:main": "nest build main",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "cross-env NODE_ENV=development nest start main --watch",
+    "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
     "start:dev:files-api": "cross-env NODE_ENV=development nest start files-api --watch",
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "start:main": "cross-env NODE_ENV=production nest start main --watch",
@@ -28,6 +28,7 @@
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
     "migrate:dev": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "migrate:dev:local" : "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:deploy:dev:local": "npx dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "migrate:test:local" : "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:generate:local": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma"

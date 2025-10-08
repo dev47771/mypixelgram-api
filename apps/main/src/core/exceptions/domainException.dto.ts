@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BadRequestException } from '@nestjs/common';
 
 class ErrorDescription {
   @ApiProperty()
@@ -9,6 +8,6 @@ class ErrorDescription {
 }
 
 export class DomainExeptionDto {
-  @ApiProperty({ type: [BadRequestException] })
-  errorsMessages: BadRequestException[];
+  @ApiProperty({ type: [ErrorDescription] })
+  errorsMessages: ErrorDescription[];
 }

@@ -13,24 +13,6 @@ async function bootstrap() {
   const app = await NestFactory.create(DynamicAppModule);
   await appContext.close();
 
-  const config = new DocumentBuilder()
-    .setTitle('MyPixelGram API')
-    .setDescription('API documentation for MyPixelGram application')
-    .setVersion('1.0')
-    .addBearerAuth() // Для JWT авторизации
-    .addBasicAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(GLOBAL_PREFIX, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      withCredentials: true,
-      tagsSorter: 'alpha',
-    },
-    customSiteTitle: 'MyPixelGram API Docs',
-  });
-
   appSetup(app);
 
   await app.listen(process.env.PORT ?? 3000);
