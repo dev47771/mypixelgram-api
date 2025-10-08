@@ -14,6 +14,7 @@ import {
   DESCRIPT_HEAD_LOGOUT,
   DESCRIPT_HEAD_NEW_PASSWORD,
   DESCRIPT_HEAD_RECOVER_PASSWORD,
+  DESCRIPT_HEAD_REFRESH_TOKEN,
   DESCRIPT_HEAD_REGISTR,
   DESCRIPT_HEAD_RESENDING,
   DESCRIPT_SUCCESS_CHECK_RECOVERY,
@@ -27,9 +28,11 @@ import {
   DESCRIPT_SUCCESS_USER_ACC,
   DESCRIPT_TEXT_CONFIRM,
   DESCRIPT_TEXT_RECOVER_PASSWORD,
+  DESCRIPT_TEXT_REFRESH_TOKEN,
   DESCRIPT_TEXT_REGISTR,
   DESCRIPT_UNAUTHORIZED_LOGIN,
   DESCRIPT_UNAUTHORIZED_LOGOUT,
+  DESCRIPT_UNAUTHORIZED_REFRESH_TOKEN,
   DESCRIPT_UNAUTHORIZED_USER_ACC,
   EXAMPLE_EMAIL_LINK_CODE,
 } from './constants';
@@ -213,6 +216,25 @@ export function GetUserAccounts() {
     ApiResponse({
       status: HttpStatus.UNAUTHORIZED,
       description: DESCRIPT_UNAUTHORIZED_USER_ACC,
+    }),
+  );
+}
+
+export function RefreshToken() {
+  return applyDecorators(
+    ApiOperation({
+      summary: DESCRIPT_HEAD_REFRESH_TOKEN,
+      description: DESCRIPT_TEXT_REFRESH_TOKEN,
+    }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description:
+        'Returns JWT accessToken (expired after 10 seconds) in body and JWT refreshToken in cookie (http-only, secure) (expired after 20 seconds).',
+      type: AccessToken,
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: DESCRIPT_UNAUTHORIZED_REFRESH_TOKEN,
     }),
   );
 }

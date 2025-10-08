@@ -66,3 +66,10 @@ export const DESCRIPT_UNAUTHORIZED_LOGOUT = 'Unauthorized';
 export const DESCRIPT_HEAD_GET_USER_ACC = 'Get infirmation about current user';
 export const DESCRIPT_SUCCESS_USER_ACC = 'Success';
 export const DESCRIPT_UNAUTHORIZED_USER_ACC = 'Unauthorized';
+
+//refresh-token
+export const DESCRIPT_HEAD_REFRESH_TOKEN =
+  'Generate new pair of access and refresh tokens';
+export const DESCRIPT_TEXT_REFRESH_TOKEN =
+  'In cookie clients must send correct refreshToken that will be revokked after refreshing. Device LastActiveDate should be issued Date of new refresh token';
+export const DESCRIPT_UNAUTHORIZED_REFRESH_TOKEN = 'Unauthorized';

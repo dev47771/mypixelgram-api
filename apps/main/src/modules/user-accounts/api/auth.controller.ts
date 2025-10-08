@@ -33,9 +33,6 @@ import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation
 import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
 import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { DomainExeptionDto } from '../../../core/exceptions/domainException.dto';
-import { UserViewDto } from './view-dto/user.view-dto';
 import { AccessToken } from './view-dto/access.token.dto';
 import {
   RegisterEmailResending,
@@ -47,8 +44,10 @@ import {
   SetNewPassword,
   Logout,
   GetUserAccounts,
+  RefreshToken,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
+import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -102,6 +101,7 @@ export class AuthController {
 
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
+  @RefreshToken()
   @HttpCode(HttpStatus.OK)
   async createNewTokensPair(
     @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
@@ -110,7 +110,10 @@ export class AuthController {
     const tokenPair = await this.commandBus.execute(
       new RefreshTokenCommand(payload),
     );
-    response.cookie('refreshToken', tokenPair.refreshToken, { httpOnly: true, secure: true });
+    response.cookie('refreshToken', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
     return {
       accessToken: tokenPair.accessToken,
     };
