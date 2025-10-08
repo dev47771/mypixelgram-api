@@ -1,7 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
-  Injectable,
+  Injectable, LOG_LEVELS,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -18,7 +18,6 @@ export class RefreshAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-
     /////////////////////// проверяем если токен ///////////////////////
     if (!request.cookies)
       throw UnauthorizedDomainException.create('no cookie', 'refreshGuard');

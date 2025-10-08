@@ -28,6 +28,7 @@ import { MailService } from '../../core/mailModule/mail.service';
 import { ConfirmationUseCase } from './application/usecases/confirmation.use-case';
 import { CheckRecoveryCodeUseCase } from './application/usecases/check-recovery-code.use-case';
 import { RegistrationEmailResendingUseCase } from './application/usecases/register-resending.use-case';
+import { RefreshTokenUseCase } from './application/usecases/create-new-tokens.use-case';
 
 const queryHandlers = [
   GetUserByIdOrInternalFailQueryHandler,
@@ -46,6 +47,7 @@ const commandHandlers = [
   ConfirmationUseCase,
   CheckRecoveryCodeUseCase,
   RegistrationEmailResendingUseCase,
+  RefreshTokenUseCase
 ];
 const commonProviders = [
   CryptoService,

@@ -48,6 +48,7 @@ import {
   Logout,
   GetUserAccounts,
 } from './decorators/auth.swagger.decorators';
+import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -60,7 +61,9 @@ export class AuthController {
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
-    return await this.commandBus.execute(new RegisterUserCommand(body));
+    return await this.commandBus.execute<RegisterUserCommand, string>(
+      new RegisterUserCommand(body),
+    );
   }
 
   @Post('registration-email-resending')
@@ -97,6 +100,22 @@ export class AuthController {
     return { accessToken: tokens.accessToken } as AccessToken;
   }
 
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  async createNewTokensPair(
+    @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ accessToken: string }> {
+    const tokenPair = await this.commandBus.execute(
+      new RefreshTokenCommand(payload),
+    );
+    response.cookie('refreshToken', tokenPair.refreshToken, { httpOnly: true, secure: true });
+    return {
+      accessToken: tokenPair.accessToken,
+    };
+  }
+
   @Post('recover-password')
   @RecoverPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -120,6 +139,7 @@ export class AuthController {
     );
   }
 
+  @UseGuards(RefreshAuthGuard)
   @Post('logout')
   @Logout()
   @HttpCode(HttpStatus.NO_CONTENT)
