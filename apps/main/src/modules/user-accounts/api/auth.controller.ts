@@ -47,7 +47,13 @@ import {
   RefreshToken,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
-import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -99,6 +105,7 @@ export class AuthController {
     return { accessToken: tokens.accessToken } as AccessToken;
   }
 
+  @ApiCookieAuth()
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
   @RefreshToken()
@@ -142,6 +149,7 @@ export class AuthController {
     );
   }
 
+  @ApiCookieAuth()
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
   @Logout()
@@ -150,6 +158,7 @@ export class AuthController {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @GetUserAccounts()

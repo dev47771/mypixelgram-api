@@ -8,6 +8,14 @@ export function swaggerSetup(app: INestApplication) {
     .setDescription('API documentation for MyPixelGram application')
     .setVersion('1.0')
     .addBearerAuth() // Для JWT авторизации
+    .addApiKey(
+      {
+        type: 'apiKey',
+        in: 'cookie',
+        name: 'refreshToken', // имя куки
+      },
+      'refreshToken', // имя схемы безопасности
+    )
     .addBasicAuth()
     .build();
 
