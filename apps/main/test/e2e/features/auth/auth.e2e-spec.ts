@@ -448,4 +448,57 @@ describe('auth', () => {
         .expect(HttpStatus.BAD_REQUEST);
     });
   });
+  it('should refresh token successfully', async () => {
+    //подтверждение
+    const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+    (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/registration-confirmation')
+      .send({ code: mockCode })
+      .expect(HttpStatus.NO_CONTENT);
+
+    // логин — получаем refreshToken
+    const loginRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/login')
+      .set('user-agent', 'Chrome')
+      .send({
+        email: correctUser.email,
+        password: correctUser.password,
+      })
+      .expect(HttpStatus.OK);
+
+    const refreshTokenCookie = loginRes.headers['set-cookie'][0];
+    // обновление токена по cookie
+    const refreshRes = await request(app.getHttpServer())
+      .post('/api/v1/auth/refresh-token')
+      .set('Cookie', refreshTokenCookie)
+      .expect(HttpStatus.OK);
+
+    expect(refreshRes.body).toHaveProperty('accessToken');
+  });
+  it('should return 401 for invalid refresh token', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/refresh-token')
+      .set('Cookie', 'refreshToken=invalidtoken')
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
+  it('should return 401 for expired refresh token', async () => {
+    // генерируем искусственно устаревший refreshToken
+    const expiredToken = jwt.sign(
+      { userId: 'someId', deviceId: 'someDeviceId' },
+      configService.get('JWT_SECRET_KEY')!,
+      { expiresIn: '-1h' }
+    );
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/refresh-token')
+      .set('Cookie', `refreshToken=${expiredToken}`)
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
+  it('should return 401 if refresh token is missing', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/auth/refresh-token')
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
+
 });
