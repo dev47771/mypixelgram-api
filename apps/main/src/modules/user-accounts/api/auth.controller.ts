@@ -83,7 +83,7 @@ export class AuthController {
 
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async createNewTokensPair(
     @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
     @Res({ passthrough: true }) response: Response,
