@@ -1,6 +1,5 @@
 import { initApp } from '../../helpers/app';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { UsersTestRepo } from '../users/users.test-repo';
 import { PrismaService } from '../../../../src/core/prisma/prisma.service';
 import { deleteAllData } from '../../helpers/delete-all-data';
 import { AuthTestManager } from './auth.test-manager';
@@ -20,7 +19,6 @@ jest.mock(
 describe('auth', () => {
   let app: INestApplication;
   let authTestManager: AuthTestManager;
-  let usersTestRepo: UsersTestRepo;
   let configService: ConfigService;
 
   beforeAll(async () => {
@@ -28,7 +26,6 @@ describe('auth', () => {
     authTestManager = new AuthTestManager(app);
 
     const prisma = app.get(PrismaService);
-    usersTestRepo = new UsersTestRepo(prisma);
     configService = app.get(ConfigService);
   });
 
@@ -488,7 +485,7 @@ describe('auth', () => {
     const expiredToken = jwt.sign(
       { userId: 'someId', deviceId: 'someDeviceId' },
       configService.get('JWT_SECRET_KEY')!,
-      { expiresIn: '-1h' }
+      { expiresIn: '-1h' },
     );
     await request(app.getHttpServer())
       .post('/api/v1/auth/refresh-token')
@@ -500,5 +497,4 @@ describe('auth', () => {
       .post('/api/v1/auth/refresh-token')
       .expect(HttpStatus.UNAUTHORIZED);
   });
-
 });
