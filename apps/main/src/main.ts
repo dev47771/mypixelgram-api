@@ -18,25 +18,6 @@ async function bootstrap() {
   });
   await appContext.close();
 
-  const config = new DocumentBuilder()
-    .setTitle('MyPixelGram API')
-    .setDescription('API documentation for MyPixelGram application')
-    .setVersion('1.0')
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('users', 'User management endpoints')
-    .addBearerAuth() // Для JWT авторизации
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(GLOBAL_PREFIX, app, document, {
-    swaggerOptions: {
-      persistAuthorization: true,
-      tagsSorter: 'alpha',
-      operationsSorter: 'alpha',
-    },
-    customSiteTitle: 'MyPixelGram API Docs',
-  });
-
   appSetup(app);
 
   await app.listen(process.env.PORT ?? 3000);

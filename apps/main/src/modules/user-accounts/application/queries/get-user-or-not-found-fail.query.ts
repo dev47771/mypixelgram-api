@@ -12,7 +12,7 @@ export class GetUserOrNotFoundFailQueryHandler
 {
   constructor(private usersQueryRepo: UsersQueryRepo) {}
 
-  async execute({ id }: GetUserOrNotFoundFailQuery): Promise<UserViewDto> {
+  async execute({ id }: GetUserOrNotFoundFailQuery) {
     return this.usersQueryRepo.findByIdOrNotFoundFail(id);
   }
 }

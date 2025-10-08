@@ -5,6 +5,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FieldError } from '../core/exceptions/field-error';
+import { BadRequestDomainException } from '../core/exceptions/domainException';
 
 const formatErrors = (errors: ValidationError[]): FieldError[] => {
   const errorsForResponse: FieldError[] = [];
@@ -30,7 +31,7 @@ export function pipesSetup(app: INestApplication) {
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const formattedErrors = formatErrors(errors);
-        throw new BadRequestException({ errors: formattedErrors });
+        throw BadRequestDomainException.createMany(formattedErrors);
       },
     }),
   );

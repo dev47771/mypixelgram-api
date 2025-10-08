@@ -33,7 +33,27 @@ import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation
 import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
 import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
+import { AccessToken } from './view-dto/access.token.dto';
+import {
+  RegisterEmailResending,
+  Registration,
+  RegistrationConfirmation,
+  Login,
+  RecoverPassword,
+  CheckRecoveryCode,
+  SetNewPassword,
+  Logout,
+  GetUserAccounts,
+  RefreshToken,
+} from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
+import {
+  ApiBearerAuth,
+  ApiCookieAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -42,7 +62,8 @@ export class AuthController {
     private queryBus: QueryBus,
   ) {}
 
-  @Post('register')
+  @Post('registr')
+  @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
     return await this.commandBus.execute<RegisterUserCommand, string>(
@@ -51,6 +72,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
+  @RegisterEmailResending()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(@Body() email: EmailDto) {
     await this.commandBus.execute(
@@ -60,6 +82,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
+  @RegistrationConfirmation()
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmation(@Body() code: CodeDto) {
     await this.commandBus.execute(new ConfirmationUseCaseCommand(code.code));
@@ -67,6 +90,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @Login()
   @HttpCode(HttpStatus.OK)
   async loginUser(
     @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
@@ -78,11 +102,13 @@ export class AuthController {
       httpOnly: true,
       secure: true,
     });
-    return { accessToken: tokens.accessToken };
+    return { accessToken: tokens.accessToken } as AccessToken;
   }
 
+  @ApiCookieAuth()
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
+  @RefreshToken()
   @HttpCode(HttpStatus.OK)
   async createNewTokensPair(
     @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
@@ -91,25 +117,31 @@ export class AuthController {
     const tokenPair = await this.commandBus.execute(
       new RefreshTokenCommand(payload),
     );
-    response.cookie('refreshToken', tokenPair.refreshToken, { httpOnly: true, secure: true });
+    response.cookie('refreshToken', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
     return {
       accessToken: tokenPair.accessToken,
     };
   }
 
   @Post('recover-password')
+  @RecoverPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
     await this.commandBus.execute(new RecoverPasswordCommand(body.email));
   }
 
   @Post('check-recovery-code')
+  @CheckRecoveryCode()
   @HttpCode(HttpStatus.OK)
   async checkRecoveryCode(@Body() body: CodeDto): Promise<void> {
     await this.commandBus.execute(new CheckRecoveryCodeCommand(body.code));
   }
 
   @Post('new-password')
+  @SetNewPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() body: NewPasswordInputDto): Promise<void> {
     await this.commandBus.execute(
@@ -117,15 +149,19 @@ export class AuthController {
     );
   }
 
+  @ApiCookieAuth()
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
+  @Logout()
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
   }

@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsNumber,
   IsString,
-  IsUrl,
   Max,
   Min,
   validateSync,
@@ -15,6 +14,8 @@ enum Environment {
   Production = 'production',
   Test = 'testing',
   Provision = 'provision',
+  DevelopmentHome = 'development.local',
+  TestHome = 'testing.local',
 }
 
 class EnvironmentVariables {
