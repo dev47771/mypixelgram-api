@@ -16,7 +16,6 @@ export function swaggerSetup(app: INestApplication) {
       },
       'refreshToken', // имя схемы безопасности
     )
-    .addBasicAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

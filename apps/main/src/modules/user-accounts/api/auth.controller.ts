@@ -47,13 +47,7 @@ import {
   RefreshToken,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
-import {
-  ApiBearerAuth,
-  ApiCookieAuth,
-  ApiOkResponse,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {

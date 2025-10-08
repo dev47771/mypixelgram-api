@@ -9,13 +9,7 @@ async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(AppModule);
   const configService = appContext.get(ConfigService);
   const DynamicAppModule = await AppModule.forRoot(configService);
-
   const app = await NestFactory.create(DynamicAppModule);
-  app.enableCors({
-    origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    credentials: true
-  });
   await appContext.close();
 
   appSetup(app);

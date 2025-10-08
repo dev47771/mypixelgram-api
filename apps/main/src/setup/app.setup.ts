@@ -9,4 +9,9 @@ export function appSetup(app: INestApplication) {
   swaggerSetup(app);
   pipesSetup(app);
   app.use(cookieParser());
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
 }
