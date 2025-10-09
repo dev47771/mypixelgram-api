@@ -17,6 +17,7 @@
     "start:prod": "cross-env NODE_ENV=production node dist/apps/main/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "cross-env NODE_ENV=testing jest",
+    "test:local": "cross-env NODE_ENV=testing.local jest",
     "test:watch": "cross-env NODE_ENV=testing jest --watch",
     "test:cov": "cross-env NODE_ENV=testing jest --coverage",
     "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -30,6 +31,7 @@
     "migrate:dev:local" : "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:deploy:dev:local": "npx dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "migrate:test:local" : "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:deploy:testing:local": "npx dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:generate:local": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma"
 

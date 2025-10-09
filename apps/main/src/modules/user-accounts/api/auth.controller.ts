@@ -56,7 +56,7 @@ export class AuthController {
     private queryBus: QueryBus,
   ) {}
 
-  @Post('registr')
+  @Post('register')
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: CreateUserInputDto): Promise<string> {

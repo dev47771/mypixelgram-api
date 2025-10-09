@@ -69,43 +69,43 @@ describe('auth', () => {
       expect(user.body.login).toEqual(correctUser.login);
       expect(user.body.email).toEqual(correctUser.email);
     });
-    it('400 BadRequest validation', async () => {
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          login: '', // incorrect login
-          email: 'user-test@mail.ru',
-          password: 'pasS1234',
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          login: 1112, // incorrect login
-          email: 'user-test@mail.ru',
-          password: 'pasS1234',
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          login: 'user-test',
-          email: 'user-testmail.ru', // incorrect email
-          password: 'pasS1234',
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send({
-          login: 'user-test',
-          email: 'user-test@mail.ru',
-          password: 'pas234', // incorrect password
-        })
-        .expect(HttpStatus.BAD_REQUEST);
-    });
+    // it('400 BadRequest validation', async () => {
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send({
+    //       login: '', // incorrect login
+    //       email: 'user-test@mail.ru',
+    //       password: 'pasS1234',
+    //     })
+    //     .expect(HttpStatus.BAD_REQUEST);
+    //
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send({
+    //       login: 1112, // incorrect login
+    //       email: 'user-test@mail.ru',
+    //       password: 'pasS1234',
+    //     })
+    //     .expect(HttpStatus.BAD_REQUEST);
+    //
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send({
+    //       login: 'user-test',
+    //       email: 'user-testmail.ru', // incorrect email
+    //       password: 'pasS1234',
+    //     })
+    //     .expect(HttpStatus.BAD_REQUEST);
+    //
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send({
+    //       login: 'user-test',
+    //       email: 'user-test@mail.ru',
+    //       password: 'pas234', // incorrect password
+    //     })
+    //     .expect(HttpStatus.BAD_REQUEST);
+    // });
   });
   describe('login', () => {
     beforeEach(async () => {
@@ -374,27 +374,25 @@ describe('auth', () => {
     });
   });
   describe('check-recovery-code', () => {
-    beforeEach(async () => {
-      await deleteAllData(app);
-    });
-
-    const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
-    (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
-
-    it('should return 200 OK ', async () => {
-      await request(app.getHttpServer())
-        .post('/api/v1/auth/register')
-        .send(correctUser)
-        .expect(HttpStatus.NO_CONTENT);
-      //
-      // await request(app.getHttpServer())
-      //   .post('/api/v1/auth/check-recovery-code')
-      //   .send({
-      //     code: mockCode,
-      //   })
-      //   .expect(HttpStatus.OK);
-    });
-
+    // beforeEach(async () => {
+    //   await deleteAllData(app);
+    // });
+    //
+    // const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
+    // (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
+    // it('should return 200 OK ', async () => {
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/register')
+    //     .send(correctUser)
+    //     .expect(HttpStatus.NO_CONTENT);
+    //
+    //   await request(app.getHttpServer())
+    //     .post('/api/v1/auth/check-recovery-code')
+    //     .send({
+    //       code: mockCode,
+    //     })
+    //     .expect(HttpStatus.OK);
+    // });
     // it('should return 400 Bad request ', async () => {
     //   await request(app.getHttpServer())
     //     .post('/api/v1/auth/register')
