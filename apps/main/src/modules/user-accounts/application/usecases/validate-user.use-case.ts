@@ -31,18 +31,18 @@ export class ValidateUserUseCase
         'user login',
       );
 
-    const confirmed = await this.usersRepo.checkConfirmed(user);
+    await this.usersRepo.checkConfirmed(user);
 
-    if (this.configService.get('SKIP_PASSWORD_CHECK') === true) {
-      const isPasswordValid = await this.cryptoService.comparePasswords(
-        password,
-        user.passwordHash,
+    const isPasswordValid = await this.cryptoService.comparePasswords(
+      password,
+      user.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw UnauthorizedDomainException.create(
+        'password is wrong',
+        'password by login',
       );
-      if (!isPasswordValid)
-        throw UnauthorizedDomainException.create(
-          'password is wrong',
-          'password by login',
-        );
     }
 
     return { userId: user.id };
