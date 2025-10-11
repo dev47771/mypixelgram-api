@@ -13,7 +13,6 @@ export class DomainHttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-
     const status = this.getStatus(exception);
     const responseBody = this.getResponseBody(exception);
     response.status(status).json(responseBody);

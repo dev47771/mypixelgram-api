@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { CryptoService } from '../crypto.service';
-import { BadRequestException } from '@nestjs/common';
 import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
 
 export class SetNewPasswordCommand {

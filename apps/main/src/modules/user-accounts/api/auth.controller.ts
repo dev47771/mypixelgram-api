@@ -8,7 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserInputDto } from './input-dto/create-user.input-dto';
+import { RegistrationUserDto } from './input-dto/register-user.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
 import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDeviceAndIp';
@@ -30,6 +30,27 @@ import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
 import { CodeDto } from './input-dto/code.dto';
 import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation.use-case';
+import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
+import { EmailDto } from './input-dto/email.resending.dto';
+import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
+import { AccessToken } from './view-dto/access.token.dto';
+import {
+  RegisterEmailResending,
+  Registration,
+  RegistrationConfirmation,
+  Login,
+  RecoverPassword,
+  CheckRecoveryCode,
+  SetNewPassword,
+  Logout,
+  GetUserAccounts,
+  RefreshToken,
+} from './decorators/auth.swagger.decorators';
+import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
+import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
+import { Recaptcha, RecaptchaBody } from './decorators/recaptcha.decorators';
+import { RecaptchaGuard } from './guards/recaptcha-guard/recaptcha.guard';
+import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -39,14 +60,34 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  //@UseGuards(RecaptchaGuard)
+  @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
+  async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
   }
 
+  @Post('recaptcha')
+  @Recaptcha()
+  @HttpCode(HttpStatus.OK)
+  async recaptcha(@Body() body: RecaptchaTokenDto) {
+    return;
+  }
+
+  @Post('registration-email-resending')
+  @RegisterEmailResending()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationEmailResending(@Body() email: EmailDto) {
+    await this.commandBus.execute(
+      new RegistrationEmailResendingUseCaseCommand(email.email),
+    );
+    return;
+  }
+
   @Post('registration-confirmation')
+  @RegistrationConfirmation()
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmation(@Body() code: CodeDto) {
     await this.commandBus.execute(new ConfirmationUseCaseCommand(code.code));
@@ -54,6 +95,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @Login()
   @HttpCode(HttpStatus.OK)
   async loginUser(
     @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
@@ -63,18 +105,48 @@ export class AuthController {
 
     response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
     });
-    return { accessToken: tokens.accessToken };
+    return { accessToken: tokens.accessToken } as AccessToken;
+  }
+
+  @ApiCookieAuth()
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  @RefreshToken()
+  @HttpCode(HttpStatus.OK)
+  async createNewTokensPair(
+    @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ accessToken: string }> {
+    const tokenPair = await this.commandBus.execute(
+      new RefreshTokenCommand(payload),
+    );
+    response.cookie('refreshToken', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: false,
+    });
+    return {
+      accessToken: tokenPair.accessToken,
+    };
   }
 
   @Post('recover-password')
+  @RecoverPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
     await this.commandBus.execute(new RecoverPasswordCommand(body.email));
   }
 
+  @Post('check-recovery-code')
+  @CheckRecoveryCode()
+  @HttpCode(HttpStatus.OK)
+  async checkRecoveryCode(@Body() body: CodeDto): Promise<void> {
+    await this.commandBus.execute(new CheckRecoveryCodeCommand(body.code));
+  }
+
   @Post('new-password')
+  @SetNewPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() body: NewPasswordInputDto): Promise<void> {
     await this.commandBus.execute(
@@ -82,15 +154,19 @@ export class AuthController {
     );
   }
 
+  @ApiCookieAuth()
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
+  @Logout()
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
   }

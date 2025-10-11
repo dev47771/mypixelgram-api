@@ -3,9 +3,11 @@ import { PrismaService } from '../../../core/prisma/prisma.service';
 import {
   User as UserModel,
   PasswordRecovery as PasswordRecoveryModel,
+  UserConfirmation,
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
+import { UnauthorizedDomainException } from '../../../core/exceptions/domainException';
 
 @Injectable()
 export class UsersRepo {
@@ -26,6 +28,14 @@ export class UsersRepo {
   async findByCode(code: string) {
     return this.prisma.userConfirmation.findFirst({
       where: { confirmationCode: code },
+    });
+  }
+
+  async findUserConfirmationByUserId(
+    userId: string,
+  ): Promise<UserConfirmation | null> {
+    return this.prisma.userConfirmation.findFirst({
+      where: { userId },
     });
   }
 
@@ -64,12 +74,24 @@ export class UsersRepo {
   async createOrUpdatePasswordRecovery(
     dto: PasswordRecoveryModel,
   ): Promise<void> {
-    console.log('dto  ', dto);
     await this.prisma.passwordRecovery.upsert({
       where: { userId: dto.userId },
       update: dto,
       create: dto,
     });
+  }
+
+  async checkConfirmed(user: UserModel) {
+    const confirmedUser = await this.prisma.userConfirmation.findFirst({
+      where: { isConfirmed: true },
+    });
+    if (!confirmedUser) {
+      throw UnauthorizedDomainException.create(
+        'Non-existent user',
+        'user confirmation',
+      );
+    }
+    return true;
   }
 
   async findUserByPasswordRecoveryCodeHash(
@@ -80,6 +102,12 @@ export class UsersRepo {
     return this.prisma.user.findFirst({
       where: { passwordRecoveryInfo: { recoveryCodeHash } },
       include: { passwordRecoveryInfo: true },
+    });
+  }
+
+  async findUserRecoveryInfoByRecoveryCode(recoveryCode: string) {
+    return this.prisma.passwordRecovery.findFirst({
+      where: { recoveryCodeHash: recoveryCode },
     });
   }
 

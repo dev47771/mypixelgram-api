@@ -26,18 +26,23 @@ export class ValidateUserUseCase
 
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
     if (!user)
-      throw UnauthorizedDomainException.create('Not exists user', 'user');
-
-    if (this.configService.get<boolean>('SKIP_PASSWORD_CHECK') === false) {
-      const isPasswordValid = await this.cryptoService.comparePasswords(
-        password,
-        user.passwordHash,
+      throw UnauthorizedDomainException.create(
+        'Non-existent user',
+        'user login',
       );
-      if (!isPasswordValid)
-        throw UnauthorizedDomainException.create(
-          'password email is wrong',
-          'password',
-        );
+
+    await this.usersRepo.checkConfirmed(user);
+
+    const isPasswordValid = await this.cryptoService.comparePasswords(
+      password,
+      user.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw UnauthorizedDomainException.create(
+        'password is wrong',
+        'password by login',
+      );
     }
 
     return { userId: user.id };

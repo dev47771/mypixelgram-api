@@ -13,7 +13,7 @@ export class GetMeUseCase implements IQueryHandler<GetMeUseCaseCommand> {
   async execute(command: GetMeUseCaseCommand) {
     const user = await this.queryRepo.findById(command.userId);
     if (!user)
-      throw NotFoundDomainException.create('Not exsist user', 'gueryMe');
+      throw NotFoundDomainException.create('Non-existent user', 'get me');
     return user;
   }
 }
