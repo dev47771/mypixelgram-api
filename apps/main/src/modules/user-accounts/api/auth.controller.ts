@@ -8,7 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserInputDto } from './input-dto/create-user.input-dto';
+import { RegistrationUserDto } from './input-dto/register-user.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
 import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDeviceAndIp';
@@ -48,6 +48,9 @@ import {
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
+import { Recaptcha, RecaptchaBody } from './decorators/recaptcha.decorators';
+import { RecaptchaGuard } from './guards/recaptcha-guard/recaptcha.guard';
+import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -57,12 +60,20 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  //@UseGuards(RecaptchaGuard)
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
+  async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
+  }
+
+  @Post('recaptcha')
+  @Recaptcha()
+  @HttpCode(HttpStatus.OK)
+  async recaptcha(@Body() body: RecaptchaTokenDto) {
+    return;
   }
 
   @Post('registration-email-resending')
@@ -94,7 +105,7 @@ export class AuthController {
 
     response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }
@@ -113,7 +124,7 @@ export class AuthController {
     );
     response.cookie('refreshToken', tokenPair.refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
     });
     return {
       accessToken: tokenPair.accessToken,

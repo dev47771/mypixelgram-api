@@ -73,3 +73,7 @@ export const DESCRIPT_HEAD_REFRESH_TOKEN =
 export const DESCRIPT_TEXT_REFRESH_TOKEN =
   'In cookie clients must send correct refreshToken that will be revokked after refreshing. Device LastActiveDate should be issued Date of new refresh token';
 export const DESCRIPT_UNAUTHORIZED_REFRESH_TOKEN = 'Unauthorized';
+
+//reCAPTCHA
+export const RECAPTCHA_ACTION = 'recaptcha_action';
+export const RECAPTCHA_SKIP = 'recaptcha_skip';

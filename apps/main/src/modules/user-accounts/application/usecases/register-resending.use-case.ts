@@ -32,7 +32,7 @@ export class RegistrationEmailResendingUseCase
     if (!user)
       throw BadRequestDomainException.create(
         `user with email ${command.email} not exist`,
-        'email',
+        'email by resending`',
       );
 
     const userConfirmation: UserConfirmation | null =

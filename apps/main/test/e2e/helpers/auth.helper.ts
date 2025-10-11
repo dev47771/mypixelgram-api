@@ -1,4 +1,4 @@
-import { CreateUserInputDto } from '../../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
+import { CreateUserInputDto } from '../../../src/modules/user-accounts/api/input-dto/register-user.input-dto';
 
 export const correctUser: CreateUserInputDto = {
   login: 'Klava009',

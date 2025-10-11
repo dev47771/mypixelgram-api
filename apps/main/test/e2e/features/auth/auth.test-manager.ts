@@ -2,7 +2,7 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import { GLOBAL_PREFIX } from '../../../../src/setup/global-prefix.setup';
 import * as request from 'supertest';
 import { AUTH_ROUTE } from '../../../../src/modules/user-accounts/domain/constants';
-import { CreateUserInputDto } from '../../../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
+import { CreateUserInputDto } from '../../../../src/modules/user-accounts/api/input-dto/register-user.input-dto';
 
 export const buildAuthPath = (actionPath: string): string => {
   return `/${GLOBAL_PREFIX}/${AUTH_ROUTE}/${actionPath}`;
