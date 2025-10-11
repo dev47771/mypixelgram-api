@@ -28,7 +28,7 @@ export class RecoverPasswordUseCase
     if (!user)
       throw BadRequestDomainException.create(
         'incorrect email address',
-        'email',
+        'email by recovery password',
       );
 
     const recoveryCodeHash = generateConfirmationCode();

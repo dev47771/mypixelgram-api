@@ -6,20 +6,22 @@ import { RefreshTokenPayloadDto } from '../../sessions/api/dto/refresh-token-pay
 import * as jwt from 'jsonwebtoken';
 
 export class RefreshTokenCommand {
-  constructor(
-    public payload: RefreshTokenPayloadDto,
-  ) {}
+  constructor(public payload: RefreshTokenPayloadDto) {}
 }
 
 @CommandHandler(RefreshTokenCommand)
-export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand> {
+export class RefreshTokenUseCase
+  implements ICommandHandler<RefreshTokenCommand>
+{
   constructor(
     protected jwtService: JwtService,
     protected configService: ConfigService,
     protected sessionRepo: SessionRepo,
   ) {}
 
-  async execute(command: RefreshTokenCommand): Promise<{  accessToken: string, refreshToken: string }> {
+  async execute(
+    command: RefreshTokenCommand,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken: string = this.jwtService.sign(
       { userId: command.payload.userId },
       {
@@ -29,7 +31,7 @@ export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand>
     );
 
     const refreshToken: string = this.jwtService.sign(
-      { userId: command.payload.userId, deviceId:  command.payload.deviceId },
+      { userId: command.payload.userId, deviceId: command.payload.deviceId },
       {
         secret: this.configService.get('JWT_SECRET_KEY'),
         expiresIn: this.configService.get('JWT_EXPIRES_IN', '1h'),
@@ -43,18 +45,13 @@ export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand>
     const iat_Date: string = new Date(payload.iat * 1000).toISOString();
     const exp_Date: string = new Date(payload.exp * 1000).toISOString();
 
-    await this.sessionRepo.updateSessionByDeviceId(
-      payload.deviceId,
-      {
-        userId: payload.userId,
-        iat: iat_Date,
-        exp: exp_Date,
+    await this.sessionRepo.updateSessionByDeviceId(payload.deviceId, {
+      userId: payload.userId,
+      iat: iat_Date,
+      exp: exp_Date,
       // deviceName и ip взять из исходного payload, если нужно
-      }
-    );
+    });
 
     return { accessToken: accessToken, refreshToken: refreshToken };
   }
-
-
 }

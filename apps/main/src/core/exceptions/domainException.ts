@@ -7,8 +7,8 @@ export enum DomainExceptionCode {
 
 export class ErrorExtension {
   constructor(
-    public message: string,
     public field: string | null = null,
+    public message: string,
   ) {}
 }
 
@@ -28,7 +28,7 @@ export class BadRequestDomainException extends DomainException {
   }
 
   static create(message?: string, field?: string) {
-    return new this(message ? [new ErrorExtension(message, field)] : []);
+    return new this(message ? [new ErrorExtension(field, message)] : []);
   }
 
   static createMany(data: ErrorExtension[]) {
@@ -42,7 +42,7 @@ export class UnauthorizedDomainException extends DomainException {
   }
 
   static create(message?: string, field?: string) {
-    return new this(message ? [new ErrorExtension(message, field)] : []);
+    return new this(message ? [new ErrorExtension(field, message)] : []);
   }
 }
 
@@ -52,7 +52,7 @@ export class ForbiddenDomainException extends DomainException {
   }
 
   static create(message?: string, field?: string) {
-    return new this(message ? [new ErrorExtension(message, field)] : []);
+    return new this(message ? [new ErrorExtension(field, message)] : []);
   }
 }
 
@@ -62,6 +62,6 @@ export class NotFoundDomainException extends DomainException {
   }
 
   static create(message?: string, field?: string) {
-    return new this(message ? [new ErrorExtension(message, field)] : []);
+    return new this(message ? [new ErrorExtension(field, message)] : []);
   }
 }

@@ -36,13 +36,13 @@ import {
   DESCRIPT_UNAUTHORIZED_USER_ACC,
   EXAMPLE_EMAIL_LINK_CODE,
 } from './constants';
-import { CreateUserInputDto } from '../input-dto/create-user.input-dto';
 import { DomainExeptionDto } from '../../../../core/exceptions/domainException.dto';
 import { EmailDto } from '../input-dto/email.resending.dto';
 import { CodeDto } from '../input-dto/code.dto';
 import { AccessToken } from '../view-dto/access.token.dto';
 import { NewPasswordInputDto } from '../input-dto/new-password.input-dto';
 import { UserViewDto } from '../view-dto/user.view-dto';
+import { RegistrationUserDto } from '../input-dto/register-user.input-dto';
 
 export function Registration() {
   return applyDecorators(
@@ -50,7 +50,7 @@ export function Registration() {
       summary: DESCRIPT_HEAD_REGISTR,
       description: DESCRIPT_TEXT_REGISTR,
     }),
-    ApiBody({ type: CreateUserInputDto }),
+    ApiBody({ type: RegistrationUserDto }),
     ApiResponse({
       status: HttpStatus.NO_CONTENT,
       description: DESCRIPT_SUCCESS_REGISTR,

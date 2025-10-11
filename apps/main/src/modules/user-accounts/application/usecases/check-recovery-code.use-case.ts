@@ -20,7 +20,7 @@ export class CheckRecoveryCodeUseCase
     if (!userWithRecoveryInfo)
       throw BadRequestDomainException.create(
         'Recovery code is incorrect',
-        'code',
+        'check recovery code',
       );
 
     if (new Date() > userWithRecoveryInfo.expirationDate) {

@@ -86,7 +86,10 @@ export class UsersRepo {
       where: { isConfirmed: true },
     });
     if (!confirmedUser) {
-      throw UnauthorizedDomainException.create('Not exists user', 'user');
+      throw UnauthorizedDomainException.create(
+        'Non-existent user',
+        'user confirmation',
+      );
     }
     return true;
   }

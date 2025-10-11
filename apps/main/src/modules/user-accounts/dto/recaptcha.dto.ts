@@ -5,14 +5,20 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import {
-  loginConstraints,
-  passwordConstraints,
-} from '../../domain/user-constraints';
-import { Trim } from '../../../../core/decorators/transform/trim';
 import { ApiProperty } from '@nestjs/swagger';
+import { Trim } from '../../../core/decorators/transform/trim';
+import { passwordConstraints } from '../domain/user-constraints';
 
-export class CreateUserInputDto {
+export class RecaptchaTokenDto {
+  @ApiProperty({
+    description: 'Google reCAPTCHA token',
+  })
+  @IsString()
+  @IsNotEmpty()
+  recaptchaToken: string;
+}
+
+export class RegistrationWithRecaptchaDto {
   @ApiProperty({
     description: 'must be unique login',
     example: 'lolikkk',
@@ -48,4 +54,9 @@ export class CreateUserInputDto {
   @Trim()
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  recaptchaToken: string;
 }

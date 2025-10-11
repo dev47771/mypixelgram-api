@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './api/users.controller';
-import { GetUserByIdOrInternalFailQueryHandler } from './application/queries/get-user-by-id-or-internal-fail.query';
 import { CryptoService } from './application/crypto.service';
 import { UsersRepo } from './infrastructure/users.repo';
 import { UsersQueryRepo } from './infrastructure/query/users.query-repo';
 import { RegisterUserUseCase } from './application/usecases/register-user.use-case';
 import { AuthController } from './api/auth.controller';
-import { GetUserOrNotFoundFailQueryHandler } from './application/queries/get-user-or-not-found-fail.query';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConstraints } from './domain/user-constraints';
@@ -24,12 +22,11 @@ import { ConfirmationUseCase } from './application/usecases/confirmation.use-cas
 import { CheckRecoveryCodeUseCase } from './application/usecases/check-recovery-code.use-case';
 import { RegistrationEmailResendingUseCase } from './application/usecases/register-resending.use-case';
 import { RefreshTokenUseCase } from './application/usecases/create-new-tokens.use-case';
+import { RecaptchaService } from './application/recaptcha.service';
+import { RecaptchaGuard } from './api/guards/recaptcha-guard/recaptcha.guard';
+import { GetUserById } from './application/queries/get-user-by-id.query';
 
-const queryHandlers = [
-  GetUserByIdOrInternalFailQueryHandler,
-  GetUserOrNotFoundFailQueryHandler,
-  GetMeUseCase,
-];
+const queryHandlers = [GetUserById, GetMeUseCase];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
@@ -52,6 +49,8 @@ const commonProviders = [
   JwtService,
   SessionRepo,
   MailService,
+  RecaptchaService,
+  RecaptchaGuard,
 ];
 
 @Module({

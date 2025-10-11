@@ -16,19 +16,15 @@ export class ConfirmationUseCase
   async execute(command: ConfirmationUseCaseCommand) {
     const userConfirmation = await this.usersRepo.findByCode(command.code);
     if (!userConfirmation) {
-      console.log(
-        'If the confirmation code is incorrect, expired or already been applied',
-      );
       throw BadRequestDomainException.create(
         'If the confirmation code is incorrect, expired or already been applied',
-        'code',
+        'code confirmation',
       );
     }
     if (userConfirmation.isConfirmed) {
-      console.log('Such a user already exists');
       throw BadRequestDomainException.create(
         'Such a user already exists',
-        'code',
+        'code confirmation',
       );
     }
 
@@ -36,10 +32,9 @@ export class ConfirmationUseCase
       !userConfirmation.expirationDate ||
       userConfirmation.expirationDate < new Date()
     ) {
-      console.log('The link in the email has expired');
       throw BadRequestDomainException.create(
         'The link in the email has expired',
-        'ExpirationDate',
+        'code confirmation',
       );
     }
 
