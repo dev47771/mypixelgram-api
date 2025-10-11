@@ -42,9 +42,6 @@ class EnvironmentVariables {
   @IsBoolean()
   INCLUDE_TESTING_MODULE: boolean;
 
-  @IsBoolean()
-  SKIP_PASSWORD_CHECK: boolean;
-
   @IsString()
   JWT_SECRET_KEY: string;
 
