@@ -7,7 +7,7 @@ import {
 import { RecaptchaGuard } from '../guards/recaptcha-guard/recaptcha.guard';
 import { RECAPTCHA_ACTION, RECAPTCHA_SKIP } from './constants';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { DomainExeptionDto } from '../../../../core/exceptions/domainException.dto';
+import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 
 export function Recaptcha(action?: string) {
   return applyDecorators(
@@ -30,7 +30,7 @@ export function Recaptcha(action?: string) {
       status: HttpStatus.FORBIDDEN,
       description:
         'reCAPTCHA token is required or recaptcha verification failed',
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }

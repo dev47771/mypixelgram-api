@@ -68,7 +68,6 @@ export class AuthController {
       new RegisterUserCommand(body),
     );
   }
-
   @Post('recaptcha')
   @Recaptcha()
   @HttpCode(HttpStatus.OK)

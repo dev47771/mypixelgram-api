@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
-import { BadRequestDomainException } from '../exceptions/domainException';
+import { BadRequestDomainException } from '../exceptions/domain/domainException';
 import { SendEmailDto } from '../../modules/user-accounts/api/input-dto/send.email.dto';
 import { ConfigService } from '@nestjs/config';
+import { ErrorConstants } from '../exceptions/errorConstants';
 
 @Injectable()
 export class MailService {
@@ -28,7 +29,10 @@ export class MailService {
         },
       });
     } catch (e) {
-      throw BadRequestDomainException.create('no exist email address', 'email');
+      throw BadRequestDomainException.create(
+        ErrorConstants.EMAIL_SEND_FAILED,
+        'MailService',
+      );
     }
   }
 

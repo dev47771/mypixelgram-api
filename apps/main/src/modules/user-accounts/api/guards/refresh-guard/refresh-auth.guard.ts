@@ -7,7 +7,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SessionRepo } from '../../../sessions/infrastructure/sessions.repo';
 import { Request } from 'express';
-import { UnauthorizedDomainException } from '../../../../../core/exceptions/domainException';
+import { UnauthorizedDomainException } from '../../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../../core/exceptions/errorConstants';
 
 @Injectable()
 export class RefreshAuthGuard implements CanActivate {
@@ -20,8 +21,10 @@ export class RefreshAuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     /////////////////////// проверяем если токен ///////////////////////
     if (!request.cookies)
-      throw UnauthorizedDomainException.create('no cookie', 'refreshGuard');
-
+      throw UnauthorizedDomainException.create(
+        ErrorConstants.NO_REFRESH_COOKIE,
+        'refreshGuard',
+      );
     const refreshToken = request.cookies.refreshToken;
 
     try {
@@ -35,7 +38,7 @@ export class RefreshAuthGuard implements CanActivate {
       /////////////////// если нет сессии ошибка, нужно логиниться ////////////////
       if (!session)
         throw UnauthorizedDomainException.create(
-          'refresh token expire',
+          ErrorConstants.REFRESH_TOKEN_EXPIRED,
           'refreshGuard',
         );
 
@@ -45,7 +48,7 @@ export class RefreshAuthGuard implements CanActivate {
       ////////// если токен не от этой сессии то ошибка нужно залогиниться /////////////
       if (session.iat !== payloadIat)
         throw UnauthorizedDomainException.create(
-          'refresh token invalid',
+          ErrorConstants.REFRESH_TOKEN_SESSION_MISMATCH,
           'refreshGuard',
         );
 
@@ -53,7 +56,7 @@ export class RefreshAuthGuard implements CanActivate {
       request['payload'] = payload;
     } catch (e) {
       throw UnauthorizedDomainException.create(
-        'refreshToken expire',
+        ErrorConstants.REFRESH_TOKEN_EXPIRED,
         'refreshGuard',
       );
     }

@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { CryptoService } from '../crypto.service';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class CheckRecoveryCodeCommand {
   constructor(public recoveryCode: string) {}
@@ -19,14 +20,14 @@ export class CheckRecoveryCodeUseCase
 
     if (!userWithRecoveryInfo)
       throw BadRequestDomainException.create(
-        'Recovery code is incorrect',
-        'check recovery code',
+        ErrorConstants.RECOVERY_CODE_INCORRECT,
+        'CheckRecoveryCodeUseCase',
       );
 
     if (new Date() > userWithRecoveryInfo.expirationDate) {
       throw BadRequestDomainException.create(
-        'Recovery code is expired',
-        'recoveryCode',
+        ErrorConstants.RECOVERY_CODE_EXPIRED,
+        'CheckRecoveryCodeUseCase',
       );
     }
 

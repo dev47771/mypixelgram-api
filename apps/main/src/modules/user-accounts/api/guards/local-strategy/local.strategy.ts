@@ -9,35 +9,32 @@ import { plainToInstance } from 'class-transformer';
 import {
   BadRequestDomainException,
   UnauthorizedDomainException,
-} from '../../../../../core/exceptions/domainException';
+} from '../../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../../core/exceptions/errorConstants';
+import {
+  BadRequestPresentationalException,
+  PresentationErrorExtension,
+  PresentationException,
+} from '../../../../../core/exceptions/presentational/presentationalException';
+import { formatErrors } from '../../../../../setup/pipes.setup';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private commandBus: CommandBus) {
     super({ usernameField: 'email' });
   }
-
   async validate(email: string, password: string) {
     const dto = plainToInstance(LoginUserDto, { email, password });
-
     try {
       await validateOrReject(dto);
     } catch (errors) {
-      throw BadRequestDomainException.create(
-        'Bad request data',
-        'localStarategy',
-      );
+      const formattedErrors = formatErrors(errors);
+      throw BadRequestPresentationalException.createMany(formattedErrors);
     }
 
     const user = await this.commandBus.execute(
       new ValidateUserUseCaseCommand(dto),
     );
-    if (!user)
-      throw UnauthorizedDomainException.create(
-        'LocalStrategy not User',
-        'local-strategy',
-      );
-
     return user.userId;
   }
 }
