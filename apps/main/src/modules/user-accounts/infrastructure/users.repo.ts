@@ -8,6 +8,7 @@ import {
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domainException';
+import { GithubUserAccounts } from '../api/input-dto/github.user.dto';
 
 @Injectable()
 export class UsersRepo {
@@ -80,6 +81,12 @@ export class UsersRepo {
       create: dto,
     });
   }
+
+  // async checkEmailInUserProvider(email: string) {
+  //   return await this.prisma.userProvider.findFirst({
+  //     where: { email: email },
+  //   });
+  // }
 
   async checkConfirmed(user: UserModel) {
     const confirmedUser = await this.prisma.userConfirmation.findFirst({

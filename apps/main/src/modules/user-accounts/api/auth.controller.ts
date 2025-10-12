@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -48,25 +49,51 @@ import {
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
-import { Recaptcha, RecaptchaBody } from './decorators/recaptcha.decorators';
-import { RecaptchaGuard } from './guards/recaptcha-guard/recaptcha.guard';
+import { Recaptcha } from './decorators/recaptcha.decorators';
 import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
+import { AuthService } from '../application/auth.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private authService: AuthService,
   ) {}
 
   @Post('register')
-  //@UseGuards(RecaptchaGuard)
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
     return await this.commandBus.execute<RegisterUserCommand, string>(
       new RegisterUserCommand(body),
     );
+  }
+
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  async githubAuth() {}
+
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubAuthCallback(@Req() req: any, @Res() res: Response) {
+    console.log('req.user ', req.user);
+    try {
+      const result = await this.authService.githubLogin(req.user);
+
+      // Здесь вы можете:
+      // 1. Установить JWT токен в cookie
+      // 2. Перенаправить на фронтенд с токеном
+      // 3. Вернуть JSON ответ
+
+      // Перенаправление на фронтенд с токеном
+      //return res.redirect(
+      //`http://localhost:3001/auth/success?token=${result.access_token}&user=${encodeURIComponent(JSON.stringify(result.user))}`,
+      // );
+    } catch (error) {
+      return res.redirect('http://localhost:3001/auth/error');
+    }
   }
 
   @Post('recaptcha')

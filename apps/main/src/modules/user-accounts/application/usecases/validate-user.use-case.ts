@@ -1,8 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { CryptoService } from '../crypto.service';
-import { UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { User as UserModel } from '@prisma/client';
 import { LoginUserDto } from '../../api/input-dto/login-user.input-dto';
 import { UnauthorizedDomainException } from '../../../../core/exceptions/domainException';
@@ -17,7 +15,6 @@ export class ValidateUserUseCase
 {
   constructor(
     private usersRepo: UsersRepo,
-    private configService: ConfigService,
     private cryptoService: CryptoService,
   ) {}
 
