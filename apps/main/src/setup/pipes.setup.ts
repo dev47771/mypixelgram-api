@@ -29,7 +29,7 @@ export function pipesSetup(app: INestApplication) {
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const formattedErrors = formatErrors(errors);
-        throw BadRequestPresentationalException.createMany(formattedErrors);
+        throw BadRequestPresentationalException.create(formattedErrors);
       },
     }),
   );

@@ -26,7 +26,7 @@ export class PresentationalHttpExceptionFilter implements ExceptionFilter {
       case PresentationalExceptionCode.BadRequest:
         return HttpStatus.BAD_REQUEST;
       default:
-        return HttpStatus.I_AM_A_TEAPOT;
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 

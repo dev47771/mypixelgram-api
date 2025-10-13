@@ -37,8 +37,8 @@ export class UnauthorizedDomainException extends DomainException {
     super('Unauthorized', DomainExceptionCode.Unauthorized, extensions);
   }
 
-  static create(message?: string, meta?: string) {
-    return new this(new ErrorExtension(message!, meta!));
+  static create(message: string, meta: string) {
+    return new this(new ErrorExtension(message, meta));
   }
 }
 
@@ -47,8 +47,8 @@ export class ForbiddenDomainException extends DomainException {
     super('Forbidden', DomainExceptionCode.Forbidden, extensions);
   }
 
-  static create(message?: string, meta?: string) {
-    return new this(new ErrorExtension(message!, meta!));
+  static create(message: string, meta: string) {
+    return new this(new ErrorExtension(message, meta));
   }
 }
 
@@ -57,7 +57,7 @@ export class NotFoundDomainException extends DomainException {
     super('Not Found', DomainExceptionCode.NotFound, extensions);
   }
 
-  static create(message?: string, meta?: string) {
-    return new this(new ErrorExtension(message!, meta!));
+  static create(message: string, meta: string) {
+    return new this(new ErrorExtension(message, meta));
   }
 }

@@ -27,13 +27,7 @@ export class BadRequestPresentationalException extends PresentationException {
     super('Bad Request', PresentationalExceptionCode.BadRequest, extensions);
   }
 
-  static create(message?: string, field?: string) {
-    return new this(
-      message ? [new PresentationErrorExtension(field, message)] : [],
-    );
-  }
-
-  static createMany(data: PresentationErrorExtension[]) {
+  static create(data: PresentationErrorExtension[]) {
     return new this(data);
   }
 }

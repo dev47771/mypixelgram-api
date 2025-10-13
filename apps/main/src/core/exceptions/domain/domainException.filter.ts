@@ -29,7 +29,7 @@ export class DomainHttpExceptionFilter implements ExceptionFilter {
       case DomainExceptionCode.Unauthorized:
         return HttpStatus.UNAUTHORIZED;
       default:
-        return HttpStatus.I_AM_A_TEAPOT;
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 

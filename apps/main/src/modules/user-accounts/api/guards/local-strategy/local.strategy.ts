@@ -29,7 +29,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       await validateOrReject(dto);
     } catch (errors) {
       const formattedErrors = formatErrors(errors);
-      throw BadRequestPresentationalException.createMany(formattedErrors);
+      throw BadRequestPresentationalException.create(formattedErrors);
     }
 
     const user = await this.commandBus.execute(

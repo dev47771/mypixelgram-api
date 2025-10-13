@@ -6,7 +6,6 @@ import { Trim } from '../../../../core/decorators/transform/trim';
 export class LoginUserDto {
   @IsEmail()
   @Trim()
-  @IsString()
   email: string;
 
   @Matches(passwordConstraints.match, {

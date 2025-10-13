@@ -29,10 +29,7 @@ export class MailService {
         },
       });
     } catch (e) {
-      throw BadRequestDomainException.create(
-        ErrorConstants.EMAIL_SEND_FAILED,
-        'MailService',
-      );
+      throw new Error(ErrorConstants.EMAIL_SEND_FAILED);
     }
   }
 
