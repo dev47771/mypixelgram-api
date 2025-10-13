@@ -35,21 +35,20 @@ import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
 import { AccessToken } from './view-dto/access.token.dto';
 import {
+  CheckRecoveryCode,
+  GetUserAccounts,
+  Login,
+  Logout,
+  RecoverPassword,
+  RefreshToken,
   RegisterEmailResending,
   Registration,
   RegistrationConfirmation,
-  Login,
-  RecoverPassword,
-  CheckRecoveryCode,
   SetNewPassword,
-  Logout,
-  GetUserAccounts,
-  RefreshToken,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
-import { Recaptcha, RecaptchaBody } from './decorators/recaptcha.decorators';
-import { RecaptchaGuard } from './guards/recaptcha-guard/recaptcha.guard';
+import { Recaptcha } from './decorators/recaptcha.decorators';
 import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
 
 @Controller(AUTH_ROUTE)
@@ -106,6 +105,7 @@ export class AuthController {
     response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: false,
+      sameSite: 'none',
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }
@@ -125,6 +125,7 @@ export class AuthController {
     response.cookie('refreshToken', tokenPair.refreshToken, {
       httpOnly: true,
       secure: false,
+      sameSite: 'none',
     });
     return {
       accessToken: tokenPair.accessToken,
