@@ -27,6 +27,13 @@ export function Recaptcha(action?: string) {
     UseGuards(RecaptchaGuard),
     ApiParam({ name: 'reCAPTCHA', type: 'string' }),
     ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Successful recaptcha verification',
+      schema: {
+        example: { success: true }
+      },
+    }),
+    ApiResponse({
       status: HttpStatus.FORBIDDEN,
       description:
         'reCAPTCHA token is required or recaptcha verification failed',

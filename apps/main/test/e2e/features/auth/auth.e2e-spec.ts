@@ -250,6 +250,7 @@ describe('auth', () => {
       const mockCode = 'c9df3dfc-5c0f-446a-9500-bd747c611111';
       (generateConfirmationCode as jest.Mock).mockReturnValueOnce(mockCode);
 
+
       await authTestManager.register(correctUser); // register user
 
       await request(app.getHttpServer())
