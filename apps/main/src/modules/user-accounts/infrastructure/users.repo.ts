@@ -7,7 +7,8 @@ import {
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
-import { UnauthorizedDomainException } from '../../../core/exceptions/domainException';
+import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../core/exceptions/errorConstants';
 
 @Injectable()
 export class UsersRepo {
@@ -87,8 +88,8 @@ export class UsersRepo {
     });
     if (!confirmedUser) {
       throw UnauthorizedDomainException.create(
-        'Non-existent user',
-        'user confirmation',
+        ErrorConstants.USER_NOT_CONFIRMED,
+        'UsersRepo',
       );
     }
     return true;
