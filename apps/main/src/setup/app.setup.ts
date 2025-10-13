@@ -10,8 +10,7 @@ export function appSetup(app: INestApplication) {
   pipesSetup(app);
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: 'http://localhost:3000',
     credentials: true,
   });
 }
