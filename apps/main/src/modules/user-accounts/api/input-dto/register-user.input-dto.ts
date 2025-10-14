@@ -47,5 +47,5 @@ export class RegistrationUserDto {
   @Length(passwordConstraints.minLength, passwordConstraints.maxLength)
   @Trim()
   @IsNotEmpty()
-  password: string;
+  password: string | null;
 }

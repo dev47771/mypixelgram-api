@@ -53,13 +53,14 @@ import { Recaptcha } from './decorators/recaptcha.decorators';
 import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
 import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
+import { GithubInputDto } from './input-dto/githubInputDto';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
-    private authService: AuthService,
   ) {}
 
   @Post('register')
@@ -79,9 +80,19 @@ export class AuthController {
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
   async githubAuthCallback(@Req() req: any, @Res() res: Response) {
-    console.log('req.user ', req.user);
+    console.log('1111');
+    const dto: GithubInputDto = {
+      ip: req.ip,
+      device: req.headers['user-agent'],
+      githubId: req.user.githubId,
+      login: req.user.username,
+      email: req.user.email,
+    };
+    console.log('dto', dto);
     try {
-      const result = await this.authService.githubLogin(req.user);
+      const result = await this.commandBus.execute(
+        new GithubRegisterUseCaseCommand(dto),
+      );
 
       // Здесь вы можете:
       // 1. Установить JWT токен в cookie
@@ -136,7 +147,6 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
       maxAge: 3600_000,
-
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }

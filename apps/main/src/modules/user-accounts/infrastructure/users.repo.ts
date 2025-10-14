@@ -4,13 +4,14 @@ import {
   User as UserModel,
   PasswordRecovery as PasswordRecoveryModel,
   UserConfirmation,
+  UserProvider,
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
-import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { ErrorConstants } from '../../../core/exceptions/errorConstants';
-import { UnauthorizedDomainException } from '../../../core/exceptions/domainException';
-import { GithubUserAccounts } from '../api/input-dto/github.user.dto';
+import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
+import { RegistrationUserDto } from '../api/input-dto/register-user.input-dto';
+import { UserProviderInputDto } from '../api/input-dto/user.provider.dto';
 
 @Injectable()
 export class UsersRepo {
@@ -31,6 +32,12 @@ export class UsersRepo {
   async findByCode(code: string) {
     return this.prisma.userConfirmation.findFirst({
       where: { confirmationCode: code },
+    });
+  }
+
+  async findByGithubId(githubId: string) {
+    return this.prisma.userProvider.findFirst({
+      where: { providerUserId: githubId },
     });
   }
 
@@ -84,11 +91,24 @@ export class UsersRepo {
     });
   }
 
-  // async checkEmailInUserProvider(email: string) {
-  //   return await this.prisma.userProvider.findFirst({
-  //     where: { email: email },
-  //   });
-  // }
+  async createUserProvider(dto: UserProviderInputDto) {
+    return await this.prisma.userProvider.create({
+      data: dto,
+    });
+  }
+
+  async checkEmailInUserProvider(email: string) {
+    return await this.prisma.userProvider.findFirst({
+      where: { email: email },
+    });
+  }
+
+  async updateEmailInUserProvider(providerUserId: string, email: string) {
+    return await this.prisma.userProvider.update({
+      where: { providerUserId },
+      data: { email },
+    });
+  }
 
   async checkConfirmed(user: UserModel) {
     const confirmedUser = await this.prisma.userConfirmation.findFirst({
@@ -117,6 +137,14 @@ export class UsersRepo {
   async findUserRecoveryInfoByRecoveryCode(recoveryCode: string) {
     return this.prisma.passwordRecovery.findFirst({
       where: { recoveryCodeHash: recoveryCode },
+    });
+  }
+
+  async createUser(userDto: CreateUserRepoDto) {
+    return this.prisma.user.create({
+      data: {
+        ...userDto,
+      },
     });
   }
 

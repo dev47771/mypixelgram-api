@@ -31,6 +31,10 @@ export class ValidateUserUseCase
 
     await this.usersRepo.checkConfirmed(user);
 
+    if (user.passwordHash === null) {
+      throw UnauthorizedDomainException.create('Create password', 'Password');
+    }
+
     const isPasswordValid = await this.cryptoService.comparePasswords(
       password,
       user.passwordHash,

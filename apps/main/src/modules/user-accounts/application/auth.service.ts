@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { NotFoundDomainException } from '../../../core/exceptions/domainException';
 import { User as UserModel } from '@prisma/client';
 import { UsersRepo } from '../infrastructure/users.repo';
+import { NotFoundDomainException } from '../../../core/exceptions/domain/domainException';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,7 @@ export class AuthService {
 
   async githubLogin(user: any) {
     if (!user) {
-      throw NotFoundDomainException.create('User not found');
+      throw NotFoundDomainException.create('User not found', 'githibLogin');
     }
 
     const foundUser: UserModel | null = await this.userRepo.findByEmail(
