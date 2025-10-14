@@ -106,12 +106,11 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
       maxAge: 3600_000,
-
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }
 
-  @ApiCookieAuth()
+  @ApiCookieAuth('refreshToken')
   @UseGuards(RefreshAuthGuard)
   @Post('refresh-token')
   @RefreshToken()
@@ -157,7 +156,7 @@ export class AuthController {
     );
   }
 
-  @ApiCookieAuth()
+  @ApiCookieAuth('refreshToken')
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
   @Logout()
@@ -166,7 +165,7 @@ export class AuthController {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @GetUserAccounts()
