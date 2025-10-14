@@ -7,7 +7,7 @@ class ErrorDescription {
   message: string;
 }
 
-export class DomainExeptionDto {
+export class DomainExceptionDto {
   @ApiProperty({ type: [ErrorDescription] })
   errorsMessages: ErrorDescription[];
 }

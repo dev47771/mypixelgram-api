@@ -17,7 +17,6 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    //console.log(exception);
     response.status(status).json({
       errorsMessages:
         (exception as any).message || 'Internal server error iiii',

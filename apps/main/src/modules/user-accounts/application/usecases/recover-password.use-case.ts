@@ -3,11 +3,12 @@ import { UsersRepo } from '../../infrastructure/users.repo';
 import { PasswordRecovery as PasswordRecoveryModel } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { User as UserModel } from '@prisma/client';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
 import { MailService } from '../../../../core/mailModule/mail.service';
 import { generateConfirmationCode } from './common/confirmationCode.helper';
 import { SendEmailDto } from '../../api/input-dto/send.email.dto';
 import { addSeconds } from 'date-fns/addSeconds';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class RecoverPasswordCommand {
   constructor(public email: string) {}
@@ -27,8 +28,8 @@ export class RecoverPasswordUseCase
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
     if (!user)
       throw BadRequestDomainException.create(
-        'incorrect email address',
-        'email by recovery password',
+        ErrorConstants.USER_WITH_EMAIL_NOT_EXIST,
+        'RecoverPasswordUseCase',
       );
 
     const recoveryCodeHash = generateConfirmationCode();
