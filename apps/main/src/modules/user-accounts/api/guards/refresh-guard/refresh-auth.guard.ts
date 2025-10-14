@@ -1,7 +1,8 @@
 import {
   CanActivate,
   ExecutionContext,
-  Injectable, LOG_LEVELS,
+  Injectable,
+  LOG_LEVELS,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
