@@ -43,6 +43,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       refreshToken,
       this.configService.get<string>('JWT_SECRET_KEY')!,
     ) as { userId: string; deviceId: string; iat: number; exp: number };
+
     const iat_Date: string = new Date(payload.iat * 1000).toISOString();
     const exp_Date: string = new Date(payload.exp * 1000).toISOString();
 
