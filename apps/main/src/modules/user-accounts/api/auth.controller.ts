@@ -63,6 +63,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  //@UseGuards(RecaptchaGuard)
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
@@ -132,7 +133,10 @@ export class AuthController {
 
     response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 3600_000,
+
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }
@@ -151,7 +155,9 @@ export class AuthController {
     );
     response.cookie('refreshToken', tokenPair.refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 3600_000,
     });
     return {
       accessToken: tokenPair.accessToken,

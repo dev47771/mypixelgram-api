@@ -1,7 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { UserViewDto } from '../../api/view-dto/user.view-dto';
 import { UsersQueryRepo } from '../../infrastructure/query/users.query-repo';
-import { NotFoundDomainException } from '../../../../core/exceptions/domainException';
+import { NotFoundDomainException } from '../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class GetUserByIdQuery {
   constructor(public id: string) {}
@@ -17,8 +18,8 @@ export class GetUserById
     const user: UserViewDto | null = await this.usersQueryRepo.findById(id);
     if (!user) {
       throw NotFoundDomainException.create(
-        'User does not exist',
-        'get user by id',
+        ErrorConstants.USER_NOT_FOUND,
+        'GetUserById',
       );
     }
     return user;

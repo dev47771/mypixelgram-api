@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class ConfirmationUseCaseCommand {
   constructor(public code: string) {}
@@ -17,14 +18,14 @@ export class ConfirmationUseCase
     const userConfirmation = await this.usersRepo.findByCode(command.code);
     if (!userConfirmation) {
       throw BadRequestDomainException.create(
-        'If the confirmation code is incorrect, expired or already been applied',
-        'code confirmation',
+        ErrorConstants.CONFIRMATION_CODE_INVALID,
+        'ConfirmationUseCase',
       );
     }
     if (userConfirmation.isConfirmed) {
       throw BadRequestDomainException.create(
-        'Such a user already exists',
-        'code confirmation',
+        ErrorConstants.USER_ALREADY_CONFIRMED_CODE,
+        'ConfirmationUseCase',
       );
     }
 
@@ -33,8 +34,8 @@ export class ConfirmationUseCase
       userConfirmation.expirationDate < new Date()
     ) {
       throw BadRequestDomainException.create(
-        'The link in the email has expired',
-        'code confirmation',
+        ErrorConstants.CONFIRMATION_LINK_EXPIRED,
+        'ConfirmationUseCase',
       );
     }
 

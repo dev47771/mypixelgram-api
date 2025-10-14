@@ -5,7 +5,8 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { ForbiddenDomainException } from '../../../../../core/exceptions/domainException';
+import { ForbiddenDomainException } from '../../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../../core/exceptions/errorConstants';
 
 @Injectable()
 export class RecaptchaGuard implements CanActivate {
@@ -16,13 +17,16 @@ export class RecaptchaGuard implements CanActivate {
     const token = request.body.recaptchaToken;
     if (!token) {
       throw ForbiddenDomainException.create(
-        'reCAPTCHA token is required',
-        'reCAPTCHA',
+        ErrorConstants.RECAPTCHA_TOKEN_REQUIRED,
+        'RecaptchaGuard',
       );
     }
     const isValid = await this.recaptchaService.verifyToken(token);
     if (!isValid) {
-      throw new ForbiddenException('Recaptcha verification failed');
+      throw ForbiddenDomainException.create(
+        ErrorConstants.RECAPTCHA_VERIFICATION_FAILED,
+        'RecaptchaGuard',
+      );
     }
 
     return true;

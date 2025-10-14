@@ -36,7 +36,7 @@ import {
   DESCRIPT_UNAUTHORIZED_USER_ACC,
   EXAMPLE_EMAIL_LINK_CODE,
 } from './constants';
-import { DomainExeptionDto } from '../../../../core/exceptions/domainException.dto';
+import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { EmailDto } from '../input-dto/email.resending.dto';
 import { CodeDto } from '../input-dto/code.dto';
 import { AccessToken } from '../view-dto/access.token.dto';
@@ -55,7 +55,7 @@ export function Registration() {
       status: HttpStatus.NO_CONTENT,
       description: DESCRIPT_SUCCESS_REGISTR,
     }),
-    ApiResponse({ status: HttpStatus.BAD_REQUEST, type: DomainExeptionDto }),
+    ApiResponse({ status: HttpStatus.BAD_REQUEST, type: DomainExceptionDto }),
     ApiResponse({
       status: HttpStatus.UNAUTHORIZED,
       description: 'Unauthorized',
@@ -77,7 +77,7 @@ export function RegisterEmailResending() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_RESENDING,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }
@@ -96,7 +96,7 @@ export function RegistrationConfirmation() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_CONFIRM,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }
@@ -123,7 +123,7 @@ export function Login() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_LOGIN,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
     ApiResponse({
       status: HttpStatus.UNAUTHORIZED,
@@ -146,7 +146,7 @@ export function RecoverPassword() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_RECOVER_PASSWORD,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }
@@ -164,7 +164,7 @@ export function CheckRecoveryCode() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_CHECK_RECOVERY,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }
@@ -182,7 +182,7 @@ export function SetNewPassword() {
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: DESCRIPT_BAD_REQUEST_NEW_PASSWORD,
-      type: DomainExeptionDto,
+      type: DomainExceptionDto,
     }),
   );
 }

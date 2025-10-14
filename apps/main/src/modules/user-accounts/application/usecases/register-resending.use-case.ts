@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { User as UserModel } from '@prisma/client';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
 import { MailService } from '../../../../core/mailModule/mail.service';
 import { ConfigService } from '@nestjs/config';
 import { UserConfirmation } from '@prisma/client';
@@ -10,6 +10,7 @@ import { UsersRepo } from '../../infrastructure/users.repo';
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
 import { SendEmailDto } from '../../api/input-dto/send.email.dto';
 import { addSeconds } from 'date-fns/addSeconds';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class RegistrationEmailResendingUseCaseCommand {
   constructor(public email: string) {}
@@ -31,20 +32,22 @@ export class RegistrationEmailResendingUseCase
     );
     if (!user)
       throw BadRequestDomainException.create(
-        `user with email ${command.email} not exist`,
-        'email by resending`',
+        ErrorConstants.USER_WITH_EMAIL_NOT_EXIST,
+        'RegistrationEmailResendingUseCase',
       );
 
     const userConfirmation: UserConfirmation | null =
       await this.usersRepo.findUserConfirmationByUserId(user.id);
     if (!userConfirmation)
-      throw new InternalServerErrorException(
-        `user with email ${command.email}  exists but confirmation data doesn't`,
-        'email',
+      throw new Error(
+        `user with email ${command.email} exists but confirmation data doesn't`,
       );
 
     if (userConfirmation.isConfirmed) {
-      throw BadRequestDomainException.create('User already confirmed', 'email');
+      throw BadRequestDomainException.create(
+        ErrorConstants.USER_ALREADY_CONFIRMED,
+        'RegistrationEmailResendingUseCase',
+      );
     }
     const confirmationCode: string = uuidv4();
 

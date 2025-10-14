@@ -3,7 +3,8 @@ import { UsersRepo } from '../../infrastructure/users.repo';
 import { CryptoService } from '../crypto.service';
 import { User as UserModel } from '@prisma/client';
 import { LoginUserDto } from '../../api/input-dto/login-user.input-dto';
-import { UnauthorizedDomainException } from '../../../../core/exceptions/domainException';
+import { UnauthorizedDomainException } from '../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class ValidateUserUseCaseCommand {
   constructor(public dto: LoginUserDto) {}
@@ -24,8 +25,8 @@ export class ValidateUserUseCase
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
     if (!user)
       throw UnauthorizedDomainException.create(
-        'Non-existent user',
-        'user login',
+        ErrorConstants.USER_NOT_FOUND,
+        'ValidateUserUseCase',
       );
 
     await this.usersRepo.checkConfirmed(user);
@@ -37,8 +38,8 @@ export class ValidateUserUseCase
 
     if (!isPasswordValid) {
       throw UnauthorizedDomainException.create(
-        'password is wrong',
-        'password by login',
+        ErrorConstants.INVALID_PASSWORD,
+        'ValidateUserUseCase',
       );
     }
 
