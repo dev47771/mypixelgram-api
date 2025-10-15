@@ -21,7 +21,7 @@ export class GithubRegisterUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: GithubRegisterUseCaseCommand) {
+  async execute(command: GithubRegisterUseCaseCommand): Promise<{ accessToken: string }> {
     const { githubId, email, ip, device, login } = command.dto;
 
     const githubUser = await this.usersRepo.findByGithubId(githubId);
@@ -88,5 +88,20 @@ export class GithubRegisterUseCase
     }
 
     //---- user c таким email есть в нашей системе создаем только учетную запись в user-provider и выдаем токены
+    const foundUser = await this.usersRepo.findByEmail(email);
+    const userProviderDto: UserProviderInputDto = {
+      provider: 'github',
+      providerUserId: githubId,
+      login: login,
+      email: email,
+      userId: foundUser!.id,
+    };
+    await this.usersRepo.createUserProvider(userProviderDto);
+    const loginDto = {
+      ip: ip,
+      device: device,
+      userId: foundUser!.id,
+    };
+    return await this.commandBus.execute(new LoginUserCommand(loginDto));
   }
 }
