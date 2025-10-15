@@ -29,6 +29,14 @@ export abstract class BaseCreateUser {
       );
     }
 
+    if (!dto.password) {
+      return {
+        login: dto.login,
+        email: dto.email,
+        passwordHash: null,
+      };
+    }
+
     const passwordHash = await this.cryptoService.createPasswordHash(
       dto.password,
     );
@@ -36,7 +44,7 @@ export abstract class BaseCreateUser {
     return {
       login: dto.login,
       email: dto.email,
-      passwordHash,
+      passwordHash: passwordHash,
     };
   }
 }

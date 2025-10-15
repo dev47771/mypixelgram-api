@@ -25,6 +25,9 @@ import { RefreshTokenUseCase } from './application/usecases/create-new-tokens.us
 import { RecaptchaService } from './application/recaptcha.service';
 import { RecaptchaGuard } from './api/guards/recaptcha-guard/recaptcha.guard';
 import { GetUserById } from './application/queries/get-user-by-id.query';
+import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
+import { AuthService } from './application/auth.service';
+import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
 
 const queryHandlers = [GetUserById, GetMeUseCase];
 const commandHandlers = [
@@ -39,6 +42,7 @@ const commandHandlers = [
   CheckRecoveryCodeUseCase,
   RegistrationEmailResendingUseCase,
   RefreshTokenUseCase,
+  GithubRegisterUseCase,
 ];
 const commonProviders = [
   CryptoService,
@@ -51,6 +55,8 @@ const commonProviders = [
   MailService,
   RecaptchaService,
   RecaptchaGuard,
+  GitHubStrategy,
+  AuthService,
 ];
 
 @Module({
