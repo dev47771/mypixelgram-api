@@ -28,6 +28,7 @@ import { GetUserById } from './application/queries/get-user-by-id.query';
 import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
 import { AuthService } from './application/auth.service';
 import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
+import { LoginGenerateService } from './application/login.generate.service';
 
 const queryHandlers = [GetUserById, GetMeUseCase];
 const commandHandlers = [
@@ -57,6 +58,7 @@ const commonProviders = [
   RecaptchaGuard,
   GitHubStrategy,
   AuthService,
+  LoginGenerateService,
 ];
 
 @Module({

@@ -51,16 +51,17 @@ import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.u
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import { Recaptcha } from './decorators/recaptcha.decorators';
 import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
-import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
 import { GithubInputDto } from './input-dto/githubInputDto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private configService: ConfigService,
   ) {}
 
   @Post('register')
@@ -80,7 +81,6 @@ export class AuthController {
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
   async githubAuthCallback(@Req() req: any, @Res() res: Response) {
-    console.log('1111');
     const dto: GithubInputDto = {
       ip: req.ip,
       device: req.headers['user-agent'],
@@ -88,24 +88,17 @@ export class AuthController {
       login: req.user.username,
       email: req.user.email,
     };
-    console.log('dto', dto);
-    try {
-      const result = await this.commandBus.execute(
-        new GithubRegisterUseCaseCommand(dto),
-      );
-
-      // Здесь вы можете:
-      // 1. Установить JWT токен в cookie
-      // 2. Перенаправить на фронтенд с токеном
-      // 3. Вернуть JSON ответ
-
-      // Перенаправление на фронтенд с токеном
-      //return res.redirect(
-      //`http://localhost:3001/auth/success?token=${result.access_token}&user=${encodeURIComponent(JSON.stringify(result.user))}`,
-      // );
-    } catch (error) {
-      return res.redirect('http://localhost:3001/auth/error');
-    }
+    const tokens = await this.commandBus.execute(
+      new GithubRegisterUseCaseCommand(dto),
+    );
+    res
+      .cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+      })
+      .redirect(this.configService.get<string>('URL_TOKEN_SUCCESS')!);
   }
 
   @Post('recaptcha')
