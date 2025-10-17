@@ -29,14 +29,20 @@ export class UsersRepo {
     });
   }
 
+  async findProviderByEmail(email: string) {
+    return this.prisma.userProvider.findFirst({
+      where: { email },
+    });
+  }
+
   async findByCode(code: string) {
     return this.prisma.userConfirmation.findFirst({
       where: { confirmationCode: code },
     });
   }
 
-  async findByGithubId(githubId: string) {
-    return this.prisma.userProvider.findFirst({
+  async findDataByGithubId(githubId: string) {
+    return this.prisma.userProvider.findUnique({
       where: { providerUserId: githubId },
     });
   }
@@ -98,7 +104,7 @@ export class UsersRepo {
   }
 
   async checkEmailInUserProvider(email: string) {
-    return await this.prisma.userProvider.findFirst({
+    return await this.prisma.user.findFirst({
       where: { email: email },
     });
   }
