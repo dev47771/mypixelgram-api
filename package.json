@@ -22,17 +22,14 @@
     "test:cov": "cross-env NODE_ENV=testing jest --coverage",
     "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "dotenv -e ./apps/main/src/env/.env.testing -- npm run main:reset:test-db && dotenv -e ./apps/main/src/env/.env.testing -- cross-env NODE_ENV=testing jest --config apps/main/test/jest-e2e.json --runInBand",
-    "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:migrate": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
-    "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
+
+    "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:migrate:dev": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
     "main:prisma:deploy": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
+
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
-    "migrate:dev": "dotenv -e ./apps/main/src/env/.env.development -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
-    "migrate:dev:local": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:deploy:dev:local": "npx dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
-    "migrate:test:local": "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:deploy:testing:local": "npx dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:generate:local": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
+    "prisma:migrate:test:local": "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma"
   },
   "dependencies": {
@@ -80,6 +77,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.18.1",
     "@types/nodemailer": "^7.0.1",
+    "@types/passport": "^1.0.17",
     "@types/passport-github2": "^1.2.9",
     "@types/passport-http": "^0.3.11",
     "@types/supertest": "^6.0.2",

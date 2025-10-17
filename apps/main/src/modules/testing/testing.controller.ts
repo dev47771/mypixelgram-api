@@ -3,7 +3,7 @@ import { PrismaService } from '../../core/prisma/prisma.service';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserViewDto } from '../user-accounts/api/view-dto/user.view-dto';
 
-export const TESTING_ROUTE = 'api/v1/testing';
+export const TESTING_ROUTE = 'testing';
 
 @Controller(TESTING_ROUTE)
 export class TestingController {
