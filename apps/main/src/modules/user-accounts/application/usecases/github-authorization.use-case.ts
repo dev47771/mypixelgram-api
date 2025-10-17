@@ -64,6 +64,7 @@ export class GithubRegisterUseCase
       try {
         const createUser = await this.usersRepo.createUser(userDto);
 
+
         const userProviderDto: UserProviderInputDto = {
           provider: 'github',
           providerUserId: githubId,

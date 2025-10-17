@@ -28,6 +28,8 @@ import { GetUserById } from './application/queries/get-user-by-id.query';
 import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
 import { AuthService } from './application/auth.service';
 import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
+import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
+import { GoogleRegistrationUseCase } from './application/usecases/google-authorization.use-case';
 
 const queryHandlers = [GetUserById, GetMeUseCase];
 const commandHandlers = [
@@ -43,6 +45,7 @@ const commandHandlers = [
   RegistrationEmailResendingUseCase,
   RefreshTokenUseCase,
   GithubRegisterUseCase,
+  GoogleRegistrationUseCase,
 ];
 const commonProviders = [
   CryptoService,
@@ -57,6 +60,7 @@ const commonProviders = [
   RecaptchaGuard,
   GitHubStrategy,
   AuthService,
+  GoogleStrategy,
 ];
 
 @Module({

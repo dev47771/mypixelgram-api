@@ -55,6 +55,7 @@ import { AuthService } from '../application/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
 import { GithubInputDto } from './input-dto/githubInputDto';
+import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -212,5 +213,29 @@ export class AuthController {
   @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
+  }
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Роут для редиректа на Google OAuth (ничего не возвращает)
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: any, @Res() res: Response) {
+    const dto = {
+      googleId: req.user.googleId,
+      email: req.user.email,
+      login: req.user.username,
+      ip: req.ip,
+      device: req.headers['user-agent'],
+    };
+    try {
+      const result = await this.commandBus.execute(
+        new GoogleRegistrationUseCaseCommand(dto),
+      );
+    } catch (error) {
+      return res.redirect('http://localhost:3001/auth/error');
+    }
   }
 }
