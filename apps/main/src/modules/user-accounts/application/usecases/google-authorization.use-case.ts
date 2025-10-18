@@ -251,7 +251,6 @@ export class GoogleRegistrationUseCase
     };
     return this.commandBus.execute(new LoginUserCommand(loginDto));
   }
-
   async generateUniqueLogin(baseLogin: string): Promise<string> {
     if (!(await this.usersRepo.findByLogin(baseLogin))) {
       return baseLogin;
