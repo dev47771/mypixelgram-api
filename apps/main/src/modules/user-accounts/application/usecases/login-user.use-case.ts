@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { ExtractDeviceAndIpDto } from '../../api/input-dto/extract-device-ip.input-dto';
-import { UsersRepo } from '../../infrastructure/users.repo';
 import { v4 as uuidv4 } from 'uuid';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
