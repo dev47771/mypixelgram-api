@@ -36,7 +36,7 @@ export class ValidateUserUseCase
 
     const isPasswordValid = await this.cryptoService.comparePasswords(
       password,
-      user.passwordHash,
+      user.passwordHash!,
     );
 
     if (!isPasswordValid) {
