@@ -186,5 +186,20 @@ export class UsersRepo {
       },
     });
   }
+  async findUserAndProviderByEmail(email: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { providers: { some: { email } } }],
+      },
+      include: {
+        providers: true,
+      },
+    });
 
+    if (!user) return { user: null, provider: null };
+
+    const provider = user.providers.find(p => p.email === email);
+
+    return { user, provider };
+  }
 }

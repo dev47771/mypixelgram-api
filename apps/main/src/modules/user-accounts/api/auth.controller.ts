@@ -56,12 +56,15 @@ import { AuthGuard } from '@nestjs/passport';
 import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
 import { GithubInputDto } from './input-dto/githubInputDto';
 import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
+import { ConfigService } from '@nestjs/config';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private configService: ConfigService,
+
   ) {}
 
   @Post('register')
@@ -235,7 +238,7 @@ export class AuthController {
         new GoogleRegistrationUseCaseCommand(dto),
       );
     } catch (error) {
-      return res.redirect('http://localhost:3001/auth/error');
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
     }
   }
 }

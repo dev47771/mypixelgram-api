@@ -10,6 +10,7 @@ import { User as UserModel } from '.prisma/client';
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
 import { AuthProvider } from '../../dto/auth-provider';
 
+
 export class GoogleRegistrationUseCaseCommand {
   constructor(public dto: GoogleInputDto) {}
 }
@@ -24,76 +25,44 @@ export class GoogleRegistrationUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(
-    command: GoogleRegistrationUseCaseCommand,
-  ): Promise<{ accessToken: string }> {
-    const { googleId, email, ip, device, login } = command.dto;
+  async execute(command: GoogleRegistrationUseCaseCommand): Promise<{ accessToken: string }> {
+    const { googleId, email, ip, device } = command.dto;
 
     const providerClient = await this.usersRepo.findByGoogleId(googleId);
+    const { user, provider } = await this.usersRepo.findUserAndProviderByEmail(email);
 
-    if (providerClient) {
-      return this.handleProviderUserIdExists({
-        providerClient,
-        email,
-        ip,
-        device,
-      });
+
+    let userId: string;
+
+    switch (true) {
+      case !!providerClient:
+        userId = await this.handleProviderUserIdExists({ providerClient, email });
+        break;
+
+      case !user && !provider:
+        userId = await this.handleCreateUserAndProvider({ email, googleId });
+        break;
+
+      case !!user && !provider:
+        userId = await this.handleCreateProviderForExistingUser({ user, googleId, email });
+        break;
+
+      case !!user && !!provider:
+        userId = await this.handleCreateProviderForUserAndProvider({ user, provider, googleId, email });
+        break;
+
+      default:
+        if (!provider) throw new Error('Provider must be defined');
+        userId = await this.handleCreateProviderForEmailOnlyProvider({ provider, googleId, email });
+        break;
     }
 
-    const user = await this.usersRepo.findByEmail(email);
-    const provider = await this.usersRepo.checkEmailInUserProvider(email);
-
-    if (!user && !provider) {
-      return this.handleCreateUserAndProvider({
-        email,
-        login,
-        googleId,
-        ip,
-        device,
-      });
-    }
-
-    if (!user && provider) {
-      return this.handleCreateProviderForEmailOnlyProvider({
-        provider,
-        googleId,
-        email,
-        ip,
-        device,
-      });
-    }
-
-    if (user && !provider) {
-      return this.handleCreateProviderForExistingUser({
-        user,
-        googleId,
-        email,
-        ip,
-        device,
-      });
-    }
-
-    if (user && provider) {
-      return this.handleCreateProviderForUserAndProvider({
-        user,
-        provider,
-        googleId,
-        email,
-        ip,
-        device,
-      });
-    }
-
-    throw new Error('Unknown registration state');
+    const loginDto = { ip, device, userId };
+    return this.commandBus.execute(new LoginUserCommand(loginDto));
   }
 
-  private async handleProviderUserIdExists(params: {
-    providerClient: UserProvider;
-    email: string;
-    ip: string;
-    device: string;
-  }) {
-    const { providerClient, email, ip, device } = params;
+  private async handleProviderUserIdExists(params: { providerClient: UserProvider; email: string }) {
+    const { providerClient, email } = params;
 
     const user = await this.usersRepo.findById(providerClient.userId);
 
@@ -102,33 +71,20 @@ export class GoogleRegistrationUseCase
     }
 
     if (user.email === email) {
-      const loginDto = {
-        ip,
-        device,
-        userId: providerClient.userId,
-      };
-      return this.commandBus.execute(new LoginUserCommand(loginDto));
+      return providerClient.userId;
     }
 
     await this.usersRepo.updateEmailInUserProvider(providerClient.id, email);
 
-    const loginDto = {
-      ip,
-      device,
-      userId: providerClient.userId,
-    };
-    return this.commandBus.execute(new LoginUserCommand(loginDto));
+    return providerClient.userId;
   }
 
   private async handleCreateUserAndProvider(params: {
     email: string;
-    login: string;
     googleId: string;
-    ip: string;
-    device: string;
   }) {
-    const { email, login, googleId, ip, device } = params;
-    const uniqueLogin = await this.generateUniqueLogin(login);
+    const { email, googleId } = params;
+    const uniqueLogin = await this.generateUniqueLogin(email);
     const userDto: CreateUserRepoDto = {
       email,
       login: uniqueLogin,
@@ -142,14 +98,11 @@ export class GoogleRegistrationUseCase
       confirmationCode: null,
       isAgreeWithPrivacy: true,
     };
-    try {
-      await this.usersRepo.createUserConfirmationWithTrueFlag(
-        createdUser.id,
-        userConfirmation,
-      );
-    } catch (err) {
-      console.error(`Failed to update user confirmation for userId ${createdUser.id}:`, err);
-    }
+
+    await this.usersRepo.createUserConfirmationWithTrueFlag(
+      createdUser.id,
+      userConfirmation,
+    );
     const userProviderDto: UserProviderInputDto = {
       provider: AuthProvider.GOOGLE,
       providerUserId: googleId,
@@ -158,29 +111,19 @@ export class GoogleRegistrationUseCase
     };
     await this.usersRepo.createUserProvider(userProviderDto);
 
-    const loginDto = {
-      ip,
-      device,
-      userId: createdUser.id,
-    };
-    console.log("here2");
-    return this.commandBus.execute(new LoginUserCommand(loginDto));
+    return createdUser.id;
   }
 
   private async handleCreateProviderForEmailOnlyProvider(params: {
     provider: UserProvider;
     googleId: string;
     email: string;
-    ip: string;
-    device: string;
   }) {
-    const { provider, googleId, email, ip, device } = params;
+    const { provider, googleId, email } = params;
     const userId = provider.userId;
     const userExists = await this.usersRepo.findById(userId);
     if (!userExists) {
-      throw new Error(
-        `User with id ${userId} not found. Cannot create userProvider without a valid user.`,
-      );
+      throw new Error(`User with id ${userId} not found. Cannot create userProvider without a valid user.`);
     }
     const userProviderDto: UserProviderInputDto = {
       provider: AuthProvider.GOOGLE,
@@ -190,39 +133,25 @@ export class GoogleRegistrationUseCase
     };
     await this.usersRepo.createUserProvider(userProviderDto);
 
-    const loginDto = {
-      ip,
-      device,
-      userId,
-    };
-    return this.commandBus.execute(new LoginUserCommand(loginDto));
+    return userId;
   }
 
   private async handleCreateProviderForExistingUser(params: {
     user: UserModel;
     googleId: string;
     email: string;
-    ip: string;
-    device: string;
   }) {
-    const { user, googleId, email, ip, device } = params;
+    const { user, googleId, email } = params;
     const userProviderDto: UserProviderInputDto = {
       provider: AuthProvider.GOOGLE,
       providerUserId: googleId,
       email,
       userId: user.id,
     };
-    try {
-      await this.usersRepo.createUserProvider(userProviderDto);
-    } catch (err) {
-      console.error(`Failed to save user provider `, err);}
 
-    const loginDto = {
-      ip,
-      device,
-      userId: user.id,
-    };
-    return this.commandBus.execute(new LoginUserCommand(loginDto));
+    await this.usersRepo.createUserProvider(userProviderDto);
+
+    return user.id;
   }
 
   private async handleCreateProviderForUserAndProvider(params: {
@@ -230,28 +159,22 @@ export class GoogleRegistrationUseCase
     provider: UserProvider;
     googleId: string;
     email: string;
-    ip: string;
-    device: string;
   }) {
-    const { user, provider, googleId, email, ip, device } = params;
+    const { user, provider, googleId, email} = params;
     const userProviderDto: UserProviderInputDto = {
       provider: AuthProvider.GOOGLE,
       providerUserId: googleId,
       email,
       userId: provider.userId,
     };
-    try {
-      await this.usersRepo.createUserProvider(userProviderDto);
-    } catch (err) {
-      console.error(`Failed to save user provider `, err);}
-    const loginDto = {
-      ip,
-      device,
-      userId: provider.userId,
-    };
-    return this.commandBus.execute(new LoginUserCommand(loginDto));
+
+    await this.usersRepo.createUserProvider(userProviderDto);
+
+    return provider.userId;
   }
-  async generateUniqueLogin(baseLogin: string): Promise<string> {
+  async generateUniqueLogin(email: string): Promise<string> {
+    const baseLogin = email.split('@')[0];
+
     if (!(await this.usersRepo.findByLogin(baseLogin))) {
       return baseLogin;
     }
