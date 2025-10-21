@@ -7,7 +7,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "transformIgnorePatterns": [
-    "/node_modules/(?!(@paralleldrive/cuid2)/)"
+    "/node_modules/(?!(@paralleldrive/cuid2|@noble/hashes)/)"
   ],
   "globals": {
     "ts-jest": {
