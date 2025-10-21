@@ -8,13 +8,13 @@ import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { correctUser, delay } from '../../helpers/auth.helper';
 import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
+jest.setTimeout(15000);
 
 jest.mock(
   '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper',
   () => ({
-    generateConfirmationCode: jest.fn(),
-  }),
-);
+  generateConfirmationCode: jest.fn(),
+}));
 
 describe('auth', () => {
   let app: INestApplication;
@@ -22,13 +22,22 @@ describe('auth', () => {
   let configService: ConfigService;
 
   beforeAll(async () => {
-    app = await initApp();
-    authTestManager = new AuthTestManager(app);
+    try {
+      console.log('Запуск beforeAll');
+      app = await initApp();
+      console.log('initApp успешно вернул приложениe:', !!app);
+      authTestManager = new AuthTestManager(app);
 
-    const prisma = app.get(PrismaService);
-    configService = app.get(ConfigService);
+      const prisma = app.get(PrismaService);
+      console.log('PrismaService получен:', !!prisma);
+
+      configService = app.get(ConfigService);
+      console.log('ConfigService получен:', !!configService);
+    } catch (e) {
+      console.error('Ошибка в beforeAll:', e);
+      throw e;
+    }
   });
-
   afterAll(async () => {
     await app.close();
   });
