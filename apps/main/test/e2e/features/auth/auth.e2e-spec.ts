@@ -10,6 +10,7 @@ import { correctUser, delay } from '../../helpers/auth.helper';
 import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
 jest.setTimeout(15000);
 
+
 jest.mock(
   '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper',
   () => ({
