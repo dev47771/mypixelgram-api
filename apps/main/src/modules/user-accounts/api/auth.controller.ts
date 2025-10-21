@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -35,27 +36,35 @@ import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
 import { AccessToken } from './view-dto/access.token.dto';
 import {
-  CheckRecoveryCode,
-  GetUserAccounts,
-  Login,
-  Logout,
-  RecoverPassword,
-  RefreshToken,
   RegisterEmailResending,
   Registration,
   RegistrationConfirmation,
+  Login,
+  RecoverPassword,
+  CheckRecoveryCode,
   SetNewPassword,
+  Logout,
+  GetUserAccounts,
+  RefreshToken,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import { Recaptcha } from './decorators/recaptcha.decorators';
 import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
+import { AuthService } from '../application/auth.service';
+import { AuthGuard } from '@nestjs/passport';
+import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
+import { GithubInputDto } from './input-dto/githubInputDto';
+import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
+import { ConfigService } from '@nestjs/config';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private configService: ConfigService,
+
   ) {}
 
   @Post('register')
@@ -67,6 +76,42 @@ export class AuthController {
       new RegisterUserCommand(body),
     );
   }
+
+  @Get('github')
+  @UseGuards(AuthGuard('github'))
+  async githubAuth() {}
+
+  @Get('github/callback')
+  @UseGuards(AuthGuard('github'))
+  async githubAuthCallback(@Req() req: any, @Res() res: Response) {
+    console.log('1111');
+    const dto: GithubInputDto = {
+      ip: req.ip,
+      device: req.headers['user-agent'],
+      githubId: req.user.githubId,
+      login: req.user.username,
+      email: req.user.email,
+    };
+    console.log('dto', dto);
+    try {
+      const result = await this.commandBus.execute(
+        new GithubRegisterUseCaseCommand(dto),
+      );
+
+      // Здесь вы можете:
+      // 1. Установить JWT токен в cookie
+      // 2. Перенаправить на фронтенд с токеном
+      // 3. Вернуть JSON ответ
+
+      // Перенаправление на фронтенд с токеном
+      //return res.redirect(
+      //`http://localhost:3001/auth/success?token=${result.access_token}&user=${encodeURIComponent(JSON.stringify(result.user))}`,
+      // );
+    } catch (error) {
+      return res.redirect('http://localhost:3001/auth/error');
+    }
+  }
+
   @Post('recaptcha')
   @Recaptcha()
   @HttpCode(HttpStatus.OK)
@@ -171,5 +216,29 @@ export class AuthController {
   @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
+  }
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+    // Роут для редиректа на Google OAuth (ничего не возвращает)
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: any, @Res() res: Response) {
+    const dto = {
+      googleId: req.user.googleId,
+      email: req.user.email,
+      login: req.user.username,
+      ip: req.ip,
+      device: req.headers['user-agent'],
+    };
+    try {
+      const result = await this.commandBus.execute(
+        new GoogleRegistrationUseCaseCommand(dto),
+      );
+    } catch (error) {
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
   }
 }
