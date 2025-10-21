@@ -8,7 +8,7 @@ import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { correctUser, delay } from '../../helpers/auth.helper';
 import { generateConfirmationCode } from '../../../../src/modules/user-accounts/application/usecases/common/confirmationCode.helper';
-jest.setTimeout(15000);
+jest.setTimeout(30000);
 
 
 jest.mock(

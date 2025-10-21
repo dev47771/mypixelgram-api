@@ -5,5 +5,13 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "transformIgnorePatterns": [
+    "/node_modules/(?!(@paralleldrive/cuid2)/)"
+  ],
+  "globals": {
+    "ts-jest": {
+      "useESM": true
+    }
   }
 }
