@@ -220,12 +220,20 @@ export class AuthController {
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {
+    console.log('Google OAuth redirect endpoint called');
     // Роут для редиректа на Google OAuth (ничего не возвращает)
   }
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: any, @Res() res: Response) {
+    console.log('Google OAuth callback endpoint called');
+
+    if (!req.user) {
+      console.warn('No user data received from Google OAuth');
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
+
     const dto = {
       googleId: req.user.googleId,
       email: req.user.email,
@@ -233,11 +241,17 @@ export class AuthController {
       ip: req.ip,
       device: req.headers['user-agent'],
     };
+
+    console.log(`Google OAuth user data received: ${JSON.stringify(dto)}`);
+
     try {
       const result = await this.commandBus.execute(
         new GoogleRegistrationUseCaseCommand(dto),
       );
+      console.log('GoogleRegistrationUseCaseCommand executed successfully');
+      // Можно добавить редирект или другой ответ при успехе
     } catch (error) {
+      console.error('Error executing GoogleRegistrationUseCaseCommand', error);
       return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
     }
   }
