@@ -28,6 +28,7 @@ import { GetUserById } from './application/queries/get-user-by-id.query';
 import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
 import { AuthService } from './application/auth.service';
 import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
+import { LoginGenerateService } from './application/login.generate.service';
 import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
 import { GoogleRegistrationUseCase } from './application/usecases/google-authorization.use-case';
 
@@ -60,6 +61,7 @@ const commonProviders = [
   RecaptchaGuard,
   GitHubStrategy,
   AuthService,
+  LoginGenerateService,
   GoogleStrategy,
 ];
 

@@ -3,9 +3,8 @@ import { UsersRepo } from '../../infrastructure/users.repo';
 import { ConfigService } from '@nestjs/config';
 import { GithubInputDto } from '../../api/input-dto/githubInputDto';
 import { LoginUserCommand } from './login-user.use-case';
-import { ExtractDeviceAndIpDto } from '../../api/input-dto/extract-device-ip.input-dto';
-import { CreateUserRepoDto } from '../../infrastructure/dto/create-user.repo-dto';
-import { UserProviderInputDto } from '../../api/input-dto/user.provider.dto';
+import { LoginGenerateService } from '../login.generate.service';
+import { Logger } from '@nestjs/common';
 
 export class GithubRegisterUseCaseCommand {
   constructor(public dto: GithubInputDto) {}
@@ -15,94 +14,116 @@ export class GithubRegisterUseCaseCommand {
 export class GithubRegisterUseCase
   implements ICommandHandler<GithubRegisterUseCaseCommand>
 {
+  private readonly logger = new Logger(GithubRegisterUseCase.name);
   constructor(
     private usersRepo: UsersRepo,
     protected configService: ConfigService,
     protected commandBus: CommandBus,
+    protected loginGenerateService: LoginGenerateService,
   ) {}
 
-  async execute(command: GithubRegisterUseCaseCommand): Promise<{ accessToken: string }> {
+  async execute(command: GithubRegisterUseCaseCommand) {
     const { githubId, email, ip, device, login } = command.dto;
 
-    const githubUser = await this.usersRepo.findByGithubId(githubId);
+    const existingGithubUser = await this.handleExistingGithubUser(
+      githubId,
+      email,
+      ip,
+      device,
+    );
+    if (existingGithubUser) return existingGithubUser;
 
-    if (githubUser) {
-      //---- user с таким githubId уже есть в нашей системе
-      const userProvider = await this.usersRepo.checkEmailInUserProvider(email);
+    return await this.handleNewGithubUser(githubId, email, ip, device, login);
+  }
 
-      if (!userProvider) {
-        //---- user с таким githubId есть в системе но email отличается, меняем обновляем emaik и выдаем токены
-        await this.usersRepo.updateEmailInUserProvider(githubId, email); // обновляем почту
-        // выдаем токены
-        const loginDto: ExtractDeviceAndIpDto = {
-          ip: ip,
-          device: device,
-          userId: userProvider!.userId,
-        };
-        return await this.commandBus.execute(new LoginUserCommand(loginDto));
-      }
-      //---- user c таким githubId есть в системе и email сходится, выдаем токены
-      const loginDto: ExtractDeviceAndIpDto = {
-        ip: ip,
-        device: device,
-        userId: userProvider.userId,
-      };
-      return await this.commandBus.execute(new LoginUserCommand(loginDto));
+  private async handleExistingGithubUser(
+    githubId: string,
+    email: string,
+    ip: string,
+    device: string,
+  ): Promise<{ accessToken: string } | null> {
+    const githubProviderData =
+      await this.usersRepo.findDataByGithubId(githubId);
+    if (!githubProviderData) return null;
+    if (githubProviderData.email !== email) {
+      await this.usersRepo.updateEmailInUserProvider(githubId, email);
+    }
+    return this.loginUser(ip, device, githubProviderData.userId);
+  }
+
+  private async handleNewGithubUser(
+    githubId: string,
+    email: string,
+    ip: string,
+    device: string,
+    login: string,
+  ) {
+    const { user, provider } =
+      await this.usersRepo.findUserAndProviderByEmail(email);
+
+    if (!user && !provider) {
+      const uniqueLogin = await this.generateUniqueLogin(login);
+      const newUser = await this.usersRepo.createUser(
+        this.getUserDto(email, uniqueLogin),
+      );
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, newUser.email, newUser.id),
+      );
+      return this.loginUser(ip, device, newUser.id);
     }
 
-    const userProvider = await this.usersRepo.checkEmailInUserProvider(email);
-
-    const user = await this.usersRepo.findByEmail(email);
-
-    if (!user && !userProvider) {
-      const userDto: CreateUserRepoDto = {
-        email: email,
-        login: login,
-        passwordHash: null,
-      };
-
-      try {
-        const createUser = await this.usersRepo.createUser(userDto);
-
-
-        const userProviderDto: UserProviderInputDto = {
-          provider: 'github',
-          providerUserId: githubId,
-          login: createUser.login,
-          email: createUser.email,
-          userId: createUser.id,
-        };
-
-        const createUserProvider =
-          await this.usersRepo.createUserProvider(userProviderDto);
-
-        const loginDto = {
-          ip: ip,
-          device: device,
-          userId: createUser.id,
-        };
-
-        return await this.commandBus.execute(new LoginUserCommand(loginDto));
-      } catch (e) {
-        console.error(e);
-      }
+    if (provider && user.email !== email) {
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, email, user.id),
+      );
+      return this.loginUser(ip, device, provider.userId);
     }
 
-    //---- user c таким email есть в нашей системе создаем только учетную запись в user-provider и выдаем токены
-    const foundUser = await this.usersRepo.findByEmail(email);
-    const userProviderDto: UserProviderInputDto = {
+    if (user && user.email === email) {
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, email, user.id),
+      );
+      return this.loginUser(ip, device, user.id);
+    }
+  }
+
+  private async loginUser(
+    ip: string,
+    device: string,
+    userId: string,
+  ): Promise<{ accessToken: string }> {
+    return this.commandBus.execute(
+      new LoginUserCommand({
+        ip,
+        device,
+        userId,
+      }),
+    );
+  }
+
+  private async generateUniqueLogin(baseLogin: string): Promise<string> {
+    const isLoginTaken = await this.usersRepo.findByLogin(baseLogin);
+    if (!isLoginTaken) {
+      return baseLogin;
+    }
+    this.logger.log(`Login "${baseLogin}" is taken, generating unique login`);
+    return this.loginGenerateService.generateUniqueLogin(baseLogin);
+  }
+
+  getProviderDto(providerUserId: string, email: string, userId: string) {
+    return {
       provider: 'github',
-      providerUserId: githubId,
-      login: login,
-      email: email,
-      userId: foundUser!.id,
+      providerUserId,
+      email,
+      userId,
     };
-    await this.usersRepo.createUserProvider(userProviderDto);
-    const loginDto = {
-      ip: ip,
-      device: device,
-      userId: foundUser!.id,
+  }
+
+  getUserDto(email: string, login: string, passwordHash: string | null = null) {
+    return {
+      email,
+      login,
+      passwordHash,
     };
-    return await this.commandBus.execute(new LoginUserCommand(loginDto));
   }
 }
