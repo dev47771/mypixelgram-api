@@ -1,6 +1,5 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
-import { User, UserProvider } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { GithubInputDto } from '../../api/input-dto/githubInputDto';
 import { LoginUserCommand } from './login-user.use-case';
@@ -37,46 +36,6 @@ export class GithubRegisterUseCase
     return await this.handleNewGithubUser(githubId, email, ip, device, login);
   }
 
-  private async handleNewGithubUser(
-    githubId: string,
-    email: string,
-    ip: string,
-    device: string,
-    login: string,
-  ): Promise<{ accessToken: string } | undefined> {
-    const checkEmailInUser: User | null =
-      await this.usersRepo.findByEmail(email);
-    const checkEmailProvider: UserProvider | null =
-      await this.usersRepo.findProviderByEmail(email);
-
-    if (!checkEmailInUser && !checkEmailProvider) {
-      const uniqueLogin = await this.generateUniqueLogin(login);
-
-      const newUser = await this.usersRepo.createUser(
-        this.getUserDto(email, uniqueLogin),
-      );
-      await this.usersRepo.createUserProvider(
-        this.getProviderDto(githubId, newUser.login, newUser.email, newUser.id),
-      );
-
-      return this.loginUser(ip, device, newUser.id);
-    }
-
-    if (checkEmailInUser) {
-      await this.usersRepo.createUserProvider(
-        this.getProviderDto(githubId, login, email, checkEmailInUser.id),
-      );
-      return this.loginUser(ip, device, checkEmailInUser.id);
-    }
-
-    if (checkEmailProvider) {
-      await this.usersRepo.createUserProvider(
-        this.getProviderDto(githubId, login, email, checkEmailProvider.userId),
-      );
-      return this.loginUser(ip, device, checkEmailProvider.userId);
-    }
-  }
-
   private async handleExistingGithubUser(
     githubId: string,
     email: string,
@@ -86,13 +45,46 @@ export class GithubRegisterUseCase
     const githubProviderData =
       await this.usersRepo.findDataByGithubId(githubId);
     if (!githubProviderData) return null;
-
-    const existingUser = await this.usersRepo.findByEmail(email);
-    if (!existingUser) {
+    if (githubProviderData.email !== email) {
       await this.usersRepo.updateEmailInUserProvider(githubId, email);
-      return this.loginUser(ip, device, githubProviderData.userId);
     }
-    return this.loginUser(ip, device, existingUser.id);
+    return this.loginUser(ip, device, githubProviderData.userId);
+  }
+
+  private async handleNewGithubUser(
+    githubId: string,
+    email: string,
+    ip: string,
+    device: string,
+    login: string,
+  ) {
+    const { user, provider } =
+      await this.usersRepo.findUserAndProviderByEmail(email);
+
+    if (!user && !provider) {
+      const uniqueLogin = await this.generateUniqueLogin(login);
+      const newUser = await this.usersRepo.createUser(
+        this.getUserDto(email, uniqueLogin),
+      );
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, newUser.email, newUser.id),
+      );
+      return this.loginUser(ip, device, newUser.id);
+    }
+
+    if (provider && user.email !== email) {
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, email, user.id),
+      );
+      return this.loginUser(ip, device, provider.userId);
+    }
+
+    if (user && user.email === email) {
+      await this.usersRepo.createUserProvider(
+        this.getProviderDto(githubId, email, user.id),
+      );
+      return this.loginUser(ip, device, user.id);
+    }
   }
 
   private async loginUser(
@@ -118,20 +110,15 @@ export class GithubRegisterUseCase
     return this.loginGenerateService.generateUniqueLogin(baseLogin);
   }
 
-  getProviderDto(
-    providerUserId: string,
-    login: string,
-    email: string,
-    userId: string,
-  ) {
+  getProviderDto(providerUserId: string, email: string, userId: string) {
     return {
       provider: 'github',
       providerUserId,
-      login,
       email,
       userId,
     };
   }
+
   getUserDto(email: string, login: string, passwordHash: string | null = null) {
     return {
       email,

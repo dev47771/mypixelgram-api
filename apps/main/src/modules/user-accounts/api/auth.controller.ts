@@ -88,17 +88,23 @@ export class AuthController {
       login: req.user.username,
       email: req.user.email,
     };
-    const tokens = await this.commandBus.execute(
-      new GithubRegisterUseCaseCommand(dto),
-    );
-    res
-      .cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 3600_000,
-      })
-      .redirect(this.configService.get<string>('URL_TOKEN_SUCCESS')!);
+    try {
+      const tokens = await this.commandBus.execute(
+        new GithubRegisterUseCaseCommand(dto),
+      );
+
+      res
+        .cookie('refreshToken', tokens.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'none',
+          maxAge: 3600_000,
+        })
+        .redirect(this.configService.get<string>('URL_TOKEN_SUCCESS')!);
+    } catch (e) {
+      console.error(e);
+      res.redirect(this.configService.get<string>('URL_TOKEN_ERROR')!);
+    }
   }
 
   @Post('recaptcha')

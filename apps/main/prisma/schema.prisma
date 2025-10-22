@@ -57,8 +57,7 @@ model UserProvider {
   id             String     @id @default(uuid())
   provider       String
   providerUserId String     @unique
-  login          String?    @unique
-  email          String     @unique
+  email          String
   userId         String
 
   user User @relation(fields: [userId], references: [id])

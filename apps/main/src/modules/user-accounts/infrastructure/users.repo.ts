@@ -4,13 +4,11 @@ import {
   User as UserModel,
   PasswordRecovery as PasswordRecoveryModel,
   UserConfirmation,
-  UserProvider,
 } from '@prisma/client';
 import { CreateUserRepoDto } from './dto/create-user.repo-dto';
 import { CreateUserConfirmationRepoDto } from './dto/create-user-confirmation.repo-dto';
 import { ErrorConstants } from '../../../core/exceptions/errorConstants';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
-import { RegistrationUserDto } from '../api/input-dto/register-user.input-dto';
 import { UserProviderInputDto } from '../api/input-dto/user.provider.dto';
 
 @Injectable()
@@ -53,6 +51,23 @@ export class UsersRepo {
     return this.prisma.userConfirmation.findFirst({
       where: { userId },
     });
+  }
+
+  async findUserAndProviderByEmail(email: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { providers: { some: { email } } }],
+      },
+      include: {
+        providers: true,
+      },
+    });
+
+    if (!user) return { user: null, provider: null };
+
+    const provider = user.providers.find((p) => p.email === email);
+
+    return { user, provider };
   }
 
   async updateConfirm(
@@ -100,12 +115,6 @@ export class UsersRepo {
   async createUserProvider(dto: UserProviderInputDto) {
     return await this.prisma.userProvider.create({
       data: dto,
-    });
-  }
-
-  async checkEmailInUserProvider(email: string) {
-    return await this.prisma.user.findFirst({
-      where: { email: email },
     });
   }
 
