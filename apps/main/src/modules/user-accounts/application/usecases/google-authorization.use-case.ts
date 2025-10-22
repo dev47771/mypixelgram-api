@@ -25,7 +25,7 @@ export class GoogleRegistrationUseCase
     protected commandBus: CommandBus,
   ) {}
 
-  async execute(command: GoogleRegistrationUseCaseCommand): Promise<{ accessToken: string }> {
+  async execute(command: GoogleRegistrationUseCaseCommand): Promise<{ accessToken: string; refreshToken: string}> {
     const { googleId, email, ip, device } = command.dto;
 
     const providerClient = await this.usersRepo.findByGoogleId(googleId);

@@ -238,9 +238,15 @@ export class AuthController {
     };
 
     try {
-      await this.commandBus.execute(
-        new GoogleRegistrationUseCaseCommand(dto),
-      );
+      const { refreshToken } = await this.commandBus.execute(new GoogleRegistrationUseCaseCommand(dto));
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+      });
+      const redirectUrl = <string>this.configService.get<string>('FRONT_PROFILE_URL');
+      return res.redirect(redirectUrl);
     } catch (error) {
       return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
     }
