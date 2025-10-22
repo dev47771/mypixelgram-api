@@ -54,6 +54,7 @@ import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
 import { GithubInputDto } from './input-dto/githubInputDto';
+import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
 import { ConfigService } from '@nestjs/config';
 
 @Controller(AUTH_ROUTE)
@@ -62,6 +63,7 @@ export class AuthController {
     private commandBus: CommandBus,
     private queryBus: QueryBus,
     private configService: ConfigService,
+
   ) {}
 
   @Post('register')
@@ -211,5 +213,39 @@ export class AuthController {
   @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
+  }
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: any, @Res() res: Response) {
+    if (!req.user) {
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
+
+    const dto = {
+      googleId: req.user.googleId,
+      email: req.user.email,
+      login: req.user.username,
+      ip: req.ip,
+      device: req.headers['user-agent'],
+    };
+
+    try {
+      const { refreshToken } = await this.commandBus.execute(new GoogleRegistrationUseCaseCommand(dto));
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+      });
+      const redirectUrl = <string>this.configService.get<string>('FRONT_PROFILE_URL');
+      return res.redirect(redirectUrl);
+    } catch (error) {
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
   }
 }

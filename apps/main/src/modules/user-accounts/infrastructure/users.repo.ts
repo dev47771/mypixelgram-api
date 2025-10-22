@@ -45,6 +45,12 @@ export class UsersRepo {
     });
   }
 
+  async findByGoogleId(googleId: string) {
+    return this.prisma.userProvider.findFirst({
+      where: { providerUserId: googleId },
+    });
+  }
+
   async findUserConfirmationByUserId(
     userId: string,
   ): Promise<UserConfirmation | null> {
@@ -175,6 +181,26 @@ export class UsersRepo {
       where: { id: userId },
       data: {
         passwordHash,
+      },
+    });
+  }
+
+  async findById(userId: string): Promise<UserModel | null> {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
+  async createUserConfirmationWithTrueFlag(
+    userId: string,
+    dto: CreateUserConfirmationRepoDto,
+  ) {
+    return this.prisma.userConfirmation.create({
+      data: {
+        userId,
+        confirmationCode: dto.confirmationCode,
+        expirationDate: dto.expirationDate,
+        isConfirmed: dto.isConfirmed,
+        isAgreeWithPrivacy: dto.isAgreeWithPrivacy, // если у тебя есть это поле
       },
     });
   }

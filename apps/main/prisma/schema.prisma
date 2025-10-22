@@ -54,7 +54,7 @@ model PasswordRecovery {
 }
 
 model UserProvider {
-  id             String     @id @default(uuid())
+  id             String @id @default(uuid())
   provider       String
   providerUserId String     @unique
   email          String

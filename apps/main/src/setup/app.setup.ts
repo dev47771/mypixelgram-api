@@ -10,7 +10,7 @@ export function appSetup(app: INestApplication) {
   pipesSetup(app);
   app.use(cookieParser());
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://mypixelgram.ru'],
     credentials: true,
   });
 }
