@@ -4,7 +4,6 @@ import {
   IsEnum,
   IsNumber,
   IsString,
-  IsUrl,
   Max,
   Min,
   validateSync,
@@ -15,6 +14,8 @@ enum Environment {
   Production = 'production',
   Test = 'testing',
   Provision = 'provision',
+  DevelopmentHome = 'development.local',
+  TestHome = 'testing.local',
 }
 
 class EnvironmentVariables {
@@ -40,9 +41,6 @@ class EnvironmentVariables {
 
   @IsBoolean()
   INCLUDE_TESTING_MODULE: boolean;
-
-  @IsBoolean()
-  SKIP_PASSWORD_CHECK: boolean;
 
   @IsString()
   JWT_SECRET_KEY: string;
