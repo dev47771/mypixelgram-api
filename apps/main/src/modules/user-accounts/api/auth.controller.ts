@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { RegistrationUserDto } from './input-dto/register-user.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
@@ -46,6 +36,7 @@ import {
   Logout,
   GetUserAccounts,
   RefreshToken,
+  GithubAuthSwagger, GithubCallbackSwagger, GoogleAuthSwagger, GoogleCallbackSwagger,
 } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
@@ -77,10 +68,12 @@ export class AuthController {
   }
 
   @Get('github')
+  @GithubAuthSwagger()
   @UseGuards(AuthGuard('github'))
   async githubAuth() {}
 
   @Get('github/callback')
+  @GithubCallbackSwagger()
   @UseGuards(AuthGuard('github'))
   async githubAuthCallback(@Req() req: any, @Res() res: Response) {
     const dto: GithubInputDto = {
@@ -215,11 +208,13 @@ export class AuthController {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
   }
   @Get('google')
+  @GoogleAuthSwagger()
   @UseGuards(AuthGuard('google'))
   async googleAuth() {
   }
 
   @Get('google/callback')
+  @GoogleCallbackSwagger()
   @UseGuards(AuthGuard('google'))
   async googleAuthCallback(@Req() req: any, @Res() res: Response) {
     if (!req.user) {
