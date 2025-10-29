@@ -13,10 +13,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     });
   }
 
-  supabaseUrl = 'https://dhwhehzawbwpklwipdjg.supabase.co';
-  supabaseKey = this.configService.get('SUPABASE_KEY');
-  supabase = createClient(supabaseUrl, supabaseKey);
-
   async onModuleInit() {
     await this.$connect();
   }
