@@ -1,12 +1,10 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
+import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor(private configService: ConfigService) {
     super({
       //   log: configService.get('DB_LOGGING')
@@ -14,6 +12,10 @@ export class PrismaService
       //     : [],
     });
   }
+
+  supabaseUrl = 'https://dhwhehzawbwpklwipdjg.supabase.co';
+  supabaseKey = this.configService.get('SUPABASE_KEY');
+  supabase = createClient(supabaseUrl, supabaseKey);
 
   async onModuleInit() {
     await this.$connect();
