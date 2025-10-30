@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "build:main": "nest build main",
+    "build:files-api": "nest build files-api",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
@@ -28,7 +29,6 @@
     "main:prisma:deploy": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:deploy:dev": "npx dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:rollback": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate resolve --applied \"20251021133029_fix_email_user0provider\" --schema=./apps/main/prisma/schema.prisma",
-
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
     "prisma:migrate:test:local": "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma"
@@ -40,6 +40,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/cqrs": "^11.0.3",
     "@nestjs/jwt": "^11.0.0",
+    "@nestjs/microservices": "^11.1.8",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
