@@ -27,6 +27,7 @@ model User {
   passwordRecoveryInfo PasswordRecovery?
   providers            UserProvider[]
   Session              Session[]
+  Post                 Post[]
 
   @@map("users")
 }
@@ -56,7 +57,7 @@ model PasswordRecovery {
 model UserProvider {
   id             String @id @default(uuid())
   provider       String
-  providerUserId String     @unique
+  providerUserId String @unique
   email          String
   userId         String
 
@@ -77,4 +78,19 @@ model Session {
   user User @relation(fields: [userId], references: [id])
 
   @@map("session_user")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  location    String
+  description String
+  fileIds     String[]
+  userId      String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("posts")
 }
