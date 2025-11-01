@@ -37,7 +37,7 @@ pipeline {
 
       stage('Apply database migrations') {
           steps {
-            echo "Migration atarted..."
+            echo "Migration atarted"
                 script {
                     sh 'ls -ltr'
                     sh 'pwd'
