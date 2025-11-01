@@ -31,8 +31,10 @@ import { GithubRegisterUseCase } from './application/usecases/github-authorizati
 import { LoginGenerateService } from './application/login.generate.service';
 import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
 import { GoogleRegistrationUseCase } from './application/usecases/google-authorization.use-case';
+import { GetTotalConfirmedUsersHandler } from './application/queries/get-total-confirmed-users.query';
+import { PublicUsersController } from './api/public-users.controller';
 
-const queryHandlers = [GetUserById, GetMeUseCase];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
@@ -73,7 +75,7 @@ const commonProviders = [
       signOptions: { expiresIn: '20m' },
     }),
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, PublicUsersController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
   exports: [JwtService, JwtStrategy, AuthService],
 })

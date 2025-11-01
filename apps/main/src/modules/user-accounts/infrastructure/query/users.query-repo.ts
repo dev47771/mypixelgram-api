@@ -14,4 +14,9 @@ export class UsersQueryRepo {
 
     return user ? UserViewDto.mapToView(user) : null;
   }
+  async countConfirmed(): Promise<number> {
+    return this.prisma.userConfirmation.count({
+      where: { isConfirmed: true },
+    });
+  }
 }
