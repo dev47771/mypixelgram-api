@@ -19,3 +19,6 @@ export class UserViewDto {
     return dto;
   }
 }
+export class ViewTotalCountData {
+  totalCount: number;
+}
