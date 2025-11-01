@@ -39,7 +39,7 @@ pipeline {
           steps {
             echo "Migration atarted..."
                 script {
-                    sh 'ls =ltr'
+                    sh 'ls -ltr'
                     sh 'pwd'
                     sh 'prisma migrate deploy'
                 }
