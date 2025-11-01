@@ -28,7 +28,7 @@ COPY --chown=node . .
 
 # Генерируем Prisma Client
 RUN npx prisma generate --schema=./apps/main/prisma/schema.prisma
-
+RUN npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma
 RUN npm run build:${SERVICE}
 
 # Bind to all network interfaces so that it can be mapped to the host OS

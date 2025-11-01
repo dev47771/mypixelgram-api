@@ -41,7 +41,7 @@ pipeline {
                 script {
                     sh 'ls -ltr'
                     sh 'pwd'
-                    sh 'main:prisma:deploy'
+                    sh ''
                 }
             echo "Migration finished"
           }
