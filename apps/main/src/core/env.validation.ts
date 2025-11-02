@@ -1,13 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-  validateSync,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString, Max, Min, validateSync } from 'class-validator';
 
 enum Environment {
   Development = 'development',
@@ -32,12 +24,6 @@ class EnvironmentVariables {
 
   @IsNumber()
   EMAIL_CONFIRMATION_CODE_LIFETIME_SECS: number;
-
-  @IsString()
-  HTTP_BASIC_USER: string;
-
-  @IsString()
-  HTTP_BASIC_PASS: string;
 
   @IsBoolean()
   INCLUDE_TESTING_MODULE: boolean;
