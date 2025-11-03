@@ -3,7 +3,6 @@ import { PostInputDto } from '../api/input-dto/post.input.dto';
 import { PostsRepo } from '../infrastructure/post.repo';
 import { NotFoundDomainException } from '../../../core/exceptions/domain/domainException';
 import { ErrorConstants } from '../../../core/exceptions/errorConstants';
-import { log } from 'handlebars';
 
 export class UpdatePostCommand {
   constructor(
