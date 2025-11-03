@@ -1,20 +1,14 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ConfigService } from '@nestjs/config';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { POST_ROUTE } from '../../user-accounts/domain/constants';
 import { JwtAuthGuard } from '../../user-accounts/api/guards/jwt-strategy/jwt.strategy';
 import { PostInputDto } from './input-dto/post.input.dto';
-import { JwtService } from '@nestjs/jwt';
 import { UpdatePostCommand } from '../application/update-post.use-case';
-
 
 @Controller(POST_ROUTE)
 export class PostController {
-  constructor(
-    private commandBus: CommandBus,
-
-  ) {}
+  constructor(private commandBus: CommandBus) {}
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Post(':id')
