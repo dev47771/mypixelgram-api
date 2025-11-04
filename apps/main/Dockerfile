@@ -35,4 +35,4 @@ RUN npm run build:${SERVICE}
 
 EXPOSE ${PORT}
 
-CMD sh -c "npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma && npm run start:main"
+CMD npm run 'start:main'
