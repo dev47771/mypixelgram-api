@@ -35,17 +35,17 @@ pipeline {
             }
         }
 
-      stage('Apply database migrations') {
-          steps {
-            echo "Migration atarted"
-                script {
-                    sh 'ls -ltr'
-                    sh 'pwd'
-                    sh 'yarn run main:prisma:deploy'
-                }
-            echo "Migration finished"
-          }
-      }
+//       stage('Apply database migrations') {
+//           steps {
+//             echo "Migration atarted"
+//                 script {
+//                     sh 'ls -ltr'
+//                     sh 'pwd'
+//                     sh 'yarn run main:prisma:deploy'
+//                 }
+//             echo "Migration finished"
+//           }
+//       }
         stage('Unit tests') {
             steps {
                 script {
