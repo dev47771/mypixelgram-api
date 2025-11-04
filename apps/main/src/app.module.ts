@@ -12,6 +12,7 @@ import { MailModule } from './core/mailModule/mail.module';
 import { validate } from './core/env.validation';
 import { envFilePaths } from './env-file-paths';
 import { PresentationalHttpExceptionFilter } from './core/exceptions/presentational/presentationalExceptionFilter';
+import { PostModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PresentationalHttpExceptionFilter } from './core/exceptions/presentatio
     CoreModule,
     CqrsModule.forRoot(),
     UserAccountsModule,
+    PostModule,
     MailModule,
   ],
   providers: [

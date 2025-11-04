@@ -77,5 +77,6 @@ const commonProviders = [
   ],
   controllers: [UsersController, AuthController, PublicUsersController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
+  exports: [JwtService, JwtStrategy, AuthService],
 })
 export class UserAccountsModule {}

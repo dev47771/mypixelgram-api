@@ -54,7 +54,6 @@ export class AuthController {
     private commandBus: CommandBus,
     private queryBus: QueryBus,
     private configService: ConfigService,
-
   ) {}
 
   @Post('register')
