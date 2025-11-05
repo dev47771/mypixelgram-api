@@ -15,6 +15,7 @@ import { PresentationalHttpExceptionFilter } from './core/exceptions/presentatio
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.contoller';
 import { AppService } from './app.service';
+import { PostModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AppService } from './app.service';
     CoreModule,
     CqrsModule.forRoot(),
     UserAccountsModule,
+    PostModule,
     MailModule,
   ],
   controllers: [AppController],
