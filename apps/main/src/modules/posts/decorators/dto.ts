@@ -12,7 +12,7 @@ export class UserDto {
   @ApiProperty()
   userName: string;
 
-  @ApiProperty({ nullable: true })
+  @ApiProperty({ type: String, nullable: true })
   avatar: string | null;
 }
 

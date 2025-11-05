@@ -12,10 +12,20 @@ import { MailModule } from './core/mailModule/mail.module';
 import { validate } from './core/env.validation';
 import { envFilePaths } from './env-file-paths';
 import { PresentationalHttpExceptionFilter } from './core/exceptions/presentational/presentationalExceptionFilter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AppController } from './app.contoller';
+import { AppService } from './app.service';
 import { PostModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
+    ClientsModule.register([
+      {
+        name: 'FILES_API',
+        transport: Transport.TCP,
+        options: { port: 4001 },
+      },
+    ]),
     ConfigModule.forRoot({
       envFilePath: envFilePaths,
       validate,
@@ -27,6 +37,7 @@ import { PostModule } from './modules/posts/posts.module';
     PostModule,
     MailModule,
   ],
+  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,
@@ -40,6 +51,7 @@ import { PostModule } from './modules/posts/posts.module';
       provide: APP_FILTER,
       useClass: PresentationalHttpExceptionFilter,
     },
+    AppService,
   ],
 })
 export class AppModule {

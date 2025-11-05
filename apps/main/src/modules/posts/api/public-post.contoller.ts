@@ -17,7 +17,7 @@ export class PublicPostController {
     const posts = [
       {
         postId: '1',
-        description: 'First hardcoded post',
+        description: 'First public post: short.',
         location: 'Baku',
         file: files[0],
         createdAt: new Date().toISOString(),
@@ -29,7 +29,12 @@ export class PublicPostController {
       },
       {
         postId: '2',
-        description: 'Second hardcoded post',
+        description:
+          'Second long hardcoded post. This text is intentionally verbose and extensive to demonstrate how a description ' +
+          'in a social media post can contain much more detail, reflections, and personal impressions about the visited' +
+          ' location, weather, events that happened during the day, opinions about the local food, scenery, ' +
+          'and anecdotes about meeting new people. Overall, this post contains a full-fledged travel diary with' +
+          ' personal thoughts, experiences, and stories, making it five times longer than a generic caption.',
         location: 'Istanbul',
         file: files[1],
         createdAt: new Date().toISOString(),
@@ -41,7 +46,10 @@ export class PublicPostController {
       },
       {
         postId: '3',
-        description: 'Third hardcoded post',
+        description:
+          'Third post: sharing a few lines about my journey in Tbilisi. The old town, cobblestone streets, friendly atmosphere,' +
+          ' local food, and the majestic mountains around the city — all this creates a unique flavor. Spent the evening at a' +
+          ' cozy cafe overlooking the square. Lots of impressions!',
         location: 'Tbilisi',
         file: files[2],
         createdAt: new Date().toISOString(),
@@ -53,7 +61,11 @@ export class PublicPostController {
       },
       {
         postId: '4',
-        description: 'Fourth hardcoded post',
+        description:
+          'My fourth and longest post: Walking through the historic streets of London, admiring the blend of tradition' +
+          ' and modernity. Today’s walk included Big Ben, the London Eye, and a cup of tea at a local shop. ' +
+          'Met brilliant people, enjoyed wonderful weather, explored city parks, and finished the day at the ' +
+          'British Museum. Loved every minute — so much history here!',
         location: 'London',
         file: files[3],
         createdAt: new Date().toISOString(),
