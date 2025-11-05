@@ -17,7 +17,7 @@ class EnvironmentVariables {
   @IsNumber()
   @Min(0)
   @Max(65535)
-  PORT: number;
+  PORT_FILES_API: number;
 }
 
 export function validate(config: Record<string, unknown>) {

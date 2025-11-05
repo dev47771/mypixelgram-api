@@ -23,7 +23,7 @@ import { PostModule } from './modules/posts/posts.module';
       {
         name: 'FILES_API',
         transport: Transport.TCP,
-        options: { port: 4001 },
+        options: { port: Number(process.env.PORT_FILES_API) },
       },
     ]),
     ConfigModule.forRoot({
