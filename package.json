@@ -8,10 +8,13 @@
   "scripts": {
     "build": "nest build",
     "build:main": "nest build main",
+    "build:files-api": "nest build files-api",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
+
     "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
-    "start:dev:files-api": "cross-env NODE_ENV=development nest start files-api --watch",
+    "start:dev:files-api": "cross-env NODE_ENV=development.local nest start files-api --watch",
+
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "start:main": "cross-env NODE_ENV=production nest start main --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/apps/main/main",
@@ -26,7 +29,7 @@
     "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:migrate:dev": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
     "main:prisma:deploy:dev": "npx dotenv -e ./apps/main//env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
-    "main:prisma:deploy": "npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:deploy": "npx dotenv -e ./apps/main/src/env/.env.migration -- prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:rollback": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate resolve --applied \"20251021133029_fix_email_user0provider\" --schema=./apps/main/prisma/schema.prisma",
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
     "prisma:migrate:test:local": "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",

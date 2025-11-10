@@ -35,4 +35,5 @@ export const ErrorConstants = {
   RECAPTCHA_VERIFICATION_FAILED: 'reCAPTCHA verification failed',
   LOGIN_ALREADY_TAKEN: 'Login is already taken',
   EMAIL_ALREADY_TAKEN: 'Email is already in use',
+  POST_NOT_FOUND: 'Post not found',
 };

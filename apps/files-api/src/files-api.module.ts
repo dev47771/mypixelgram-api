@@ -1,3 +1,4 @@
+import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { FilesApiController } from './files-api.controller';
 import { FilesApiService } from './files-api.service';

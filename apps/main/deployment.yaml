@@ -27,11 +27,6 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-main-api-production-config-secret
                    key: SHADOW_DB_URL
-             - name: PORT
-               valueFrom:
-                 secretKeyRef:
-                   name: mypixelgram-main-api-production-config-secret
-                   key: PORT
              - name: EMAIL_CONFIRMATION_CODE_LIFETIME_SECS
                valueFrom:
                  secretKeyRef:
