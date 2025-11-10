@@ -4,7 +4,6 @@ import { FilesApiController } from './files-api.controller';
 import { FilesApiService } from './files-api.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './infrastructure/file.schema';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
