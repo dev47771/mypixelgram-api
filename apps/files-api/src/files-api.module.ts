@@ -4,10 +4,15 @@ import { FilesApiController } from './files-api.controller';
 import { FilesApiService } from './files-api.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './infrastructure/file.schema';
+import { envFilePaths } from './env-file-paths';
+import { validate } from './core/env.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: envFilePaths,
+      validate,
+    }),
     MongooseModule.forRoot(process.env.MONGO_URL!),
     MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
   ],
