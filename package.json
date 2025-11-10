@@ -11,10 +11,8 @@
     "build:files-api": "nest build files-api",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
-
     "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
     "start:dev:files-api": "cross-env NODE_ENV=development.local nest start files-api --watch",
-
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "start:main": "cross-env NODE_ENV=production nest start main --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/apps/main/main",
@@ -42,6 +40,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/cqrs": "^11.0.3",
     "@nestjs/jwt": "^11.0.0",
+    "@nestjs/microservices": "^11.1.8",
     "@nestjs/mongoose": "^11.0.3",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
