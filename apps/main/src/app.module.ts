@@ -1,4 +1,3 @@
-//import { configModule } from './dynamic-config-module';
 import { DynamicModule, Module } from '@nestjs/common';
 import { CoreModule } from './core/core.module';
 import { CqrsModule } from '@nestjs/cqrs';

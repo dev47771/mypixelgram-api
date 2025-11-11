@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { GLOBAL_PREFIX } from './setup/global-prefix.setup';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(AppModule);
@@ -15,7 +13,7 @@ async function bootstrap() {
 
   appSetup(app);
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT!);
   console.log(`main application started on port ${process.env.PORT}`);
 }
 bootstrap();
