@@ -18,6 +18,11 @@ import { PostModule } from './modules/posts/posts.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: envFilePaths,
+      validate,
+      isGlobal: true,
+    }),
     ClientsModule.register([
       {
         name: 'FILES_API',
@@ -25,11 +30,6 @@ import { PostModule } from './modules/posts/posts.module';
         options: { port: Number(process.env.PORT_FILES_API) },
       },
     ]),
-    ConfigModule.forRoot({
-      envFilePath: envFilePaths,
-      validate,
-      isGlobal: true,
-    }),
     CoreModule,
     CqrsModule.forRoot(),
     UserAccountsModule,
