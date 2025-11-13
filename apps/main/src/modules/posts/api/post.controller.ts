@@ -1,8 +1,8 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { POST_ROUTE } from '../../user-accounts/domain/constants';
-import { JwtAuthGuard } from '../../user-accounts/api/guards/jwt-strategy/jwt.strategy';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { CommandBus } from '@nestjs/cqrs';
+import { JwtAuthGuard } from '../../user-accounts/api/guards/jwt-strategy/jwt-auth.guard';
 import { PostInputDto } from './input-dto/post.input.dto';
 import { UpdatePostCommand } from '../application/update-post.use-case';
 
