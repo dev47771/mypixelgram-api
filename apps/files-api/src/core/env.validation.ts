@@ -18,6 +18,27 @@ class EnvironmentVariables {
   @Min(0)
   @Max(65535)
   PORT_FILES_API: number;
+
+  @IsString()
+  BUCKET_NAME: string;
+
+  @IsString()
+  BUCKET_SECRET_ACCESS_KEY: string;
+
+  @IsString()
+  BUCKET_ACCESS_KEY_ID: string;
+
+  @IsString()
+  BUCKET_ENDPOINT: string;
+
+  @IsString()
+  BUCKET_REGION: string;
+
+  @IsString()
+  DB_NAME: string;
+
+  @IsString()
+  MONGO_URL: string;
 }
 
 export function validate(config: Record<string, unknown>) {

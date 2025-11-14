@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-@Schema()
+@Schema({
+  timestamps: true,
+  collection: 'files',
+})
 export class File {
-  @Prop({ required: true })
-  _id: string;
-
   @Prop({ required: true })
   url: string;
 
@@ -18,16 +18,12 @@ export class File {
   @Prop({ required: true })
   fileId: string;
 
-  @Prop({ required: true })
-  createAt: Date;
+  @Prop({ type: Date, default: null })
+  deleteAt?: Date | null;
 
   @Prop()
-  deleteAt?: Date;
-
-  @Prop()
-  userId?: string;
+  userId: string;
 }
 
 export const FileSchema = SchemaFactory.createForClass(File);
-
 export type FileDocument = HydratedDocument<File>;
