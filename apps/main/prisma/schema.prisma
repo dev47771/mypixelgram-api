@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  login        String    @db.VarChar(100)
+  email        String    @db.VarChar(100)
+  passwordHash String?
+  createdAt    DateTime  @default(now()) @db.Timestamptz()
+  updatedAt    DateTime  @updatedAt @db.Timestamptz()
+  deletedAt    DateTime? @db.Timestamptz()
+
+  confirmationInfo     UserConfirmation?
+  passwordRecoveryInfo PasswordRecovery?
+  providers            UserProvider[]
+  Session              Session[]
+  Post                 Post[]
+
+  @@map("users")
+}
+
+model UserConfirmation {
+  confirmationCode   String?
+  expirationDate     DateTime? @db.Timestamptz()
+  isConfirmed        Boolean
+  userId             String    @id
+  isAgreeWithPrivacy Boolean?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_confirmations")
+}
+
+model PasswordRecovery {
+  recoveryCodeHash String?
+  expirationDate   DateTime @db.Timestamptz()
+  userId           String   @id
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("password_recoveries")
+}
+
+model UserProvider {
+  id             String @id @default(uuid())
+  provider       String
+  providerUserId String @unique
+  email          String
+  userId         String
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_providers")
+}
+
+model Session {
+  id         String @id @default(uuid())
+  userId     String
+  ip         String
+  iat        String
+  exp        String
+  deviceName String
+  deviceId   String
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("session_user")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  location    String
+  description String
+  fileIds     String[]
+  userId      String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("posts")
+}
