@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
 import { FilesApiController } from './files/api/files-api.controller';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { FilesApiController } from './files/api/files-api.controller';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
+    ScheduleModule.forRoot(),
     CqrsModule,
   ],
   controllers: [FilesApiController],
