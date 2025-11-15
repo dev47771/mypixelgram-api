@@ -2,7 +2,7 @@ import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { BucketFile } from '../files/api/dto/bucketFile';
-import { FileMongoType } from '../files/api/dto/fileMongoType';
+import { FileType } from '../files/domain/file.schema';
 
 export class S3StorageAdapter {
   s3Client: S3Client;
@@ -26,9 +26,7 @@ export class S3StorageAdapter {
       Body: buffer,
       ContentType: contentType,
     };
-
     const command = new PutObjectCommand(bucketParams);
-
     try {
       return await this.s3Client.send(command);
     } catch (error) {
@@ -37,30 +35,33 @@ export class S3StorageAdapter {
     }
   }
 
-  async uploadFiles(userId: string, files: BucketFile[]) {
+  async uploadFiles(userId: string, files: BucketFile[], type: FileType) {
     const uploadedKeys: string[] = [];
-    const uploadPromises: Promise<any>[] = [];
+    const filesDto: any[] = [];
+    const uploadPromises: any = [];
 
     try {
-      files.forEach((file: BucketFile, index: number) => {
+      for (const file of files) {
+        const index: number = files.indexOf(file);
         const key = `users/${userId}/${Date.now()}-${index}-${file.originalname}`;
 
-        const uploadPromise = this.uploadFile(key, file.buffer, file.mimetype).then(() => {
-          uploadedKeys.push(key);
-          return {
-            originalName: file.originalname,
-            url: `https://${this.bucketName}.storage.yandexcloud.net/${key}`,
-            fileId: uuidv4(),
-            type: file.mimetype,
-            userId: userId,
-            deletedAt: null,
-          };
-        });
+        uploadPromises.push(this.uploadFile(key, file.buffer, file.mimetype));
+        uploadedKeys.push(key);
+        const dtoMongo = {
+          originalName: file.originalname,
+          url: `https://${this.bucketName}.storage.yandexcloud.net/${key}`,
+          fileId: uuidv4(),
+          mimetype: file.mimetype,
+          type: type,
+          userId: userId,
+          deletedAt: null,
+        };
 
-        uploadPromises.push(uploadPromise);
-      });
+        await Promise.all(uploadPromises);
+        filesDto.push(dtoMongo);
+      }
 
-      return await Promise.all(uploadPromises);
+      return filesDto;
     } catch (error) {
       console.error('💥 One or more uploads failed, starting rollback...');
 

@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ImageCompressionAndValidationPipe } from '../../../core/pipes/file-size-validation.pipe';
 import { FILES_ROUTE } from '../domain/constants';
@@ -8,6 +8,8 @@ import { ExtractDeviceAndIpDto } from '../../user-accounts/api/input-dto/extract
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { FILE_FIELD_NAME, FILES_UPLOAD_LIMIT } from '../domain/file-upload.constants';
 import { TransportService } from '../../transport/transport.service';
+import { PayloadTypeDto } from './dto/payloadTypeDto';
+import { FileType } from './dto/typeFile.enum';
 
 @Controller(FILES_ROUTE)
 export class FilesController {
@@ -16,8 +18,8 @@ export class FilesController {
   @UseGuards(JwtAuthGuard)
   @Post('upload-file')
   @UseInterceptors(FilesInterceptor(FILE_FIELD_NAME, FILES_UPLOAD_LIMIT))
-  async uploadImages(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @UploadedFiles(ImageCompressionAndValidationPipe) files: Express.Multer.File[]) {
-    const payload = { userId: dto.userId, files };
+  async uploadImages(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @UploadedFiles(ImageCompressionAndValidationPipe) files: Express.Multer.File[], @Body() type: FileType) {
+    const payload: PayloadTypeDto = { userId: dto.userId, files, type: type };
     const res = await this.transportService.sendFilesForS3Upload(payload);
     return { data: res };
   }
