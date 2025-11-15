@@ -26,7 +26,7 @@
     "main:prisma:reset": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate reset --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:generate": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma generate --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:migrate:dev": "dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma --name",
-    "main:prisma:deploy:dev": "npx dotenv -e ./apps/main//env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
+    "main:prisma:deploy:dev": "npx dotenv -e ./apps/main/src/env/.env.development.local -- npx prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:deploy": "npx dotenv -e ./apps/main/src/env/.env.migration -- prisma migrate deploy --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:rollback": "npx dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate resolve --applied \"20251021133029_fix_email_user0provider\" --schema=./apps/main/prisma/schema.prisma",
     "main:reset:test-db": "node ./apps/main/scripts/reset-test-db.js",
