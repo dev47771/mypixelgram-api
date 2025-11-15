@@ -82,8 +82,8 @@ model Session {
 
 model Post {
   id          String   @id @default(uuid())
-  location    String
-  description String
+  location    String?
+  description String?
   fileIds     String[]
   userId      String
 
