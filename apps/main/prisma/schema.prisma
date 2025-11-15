@@ -9,15 +9,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
   id           String    @id @default(uuid())
   login        String    @db.VarChar(100)
   email        String    @db.VarChar(100)
-  passwordHash String
+  passwordHash String?
   createdAt    DateTime  @default(now()) @db.Timestamptz()
   updatedAt    DateTime  @updatedAt @db.Timestamptz()
   deletedAt    DateTime? @db.Timestamptz()
@@ -26,15 +27,17 @@ model User {
   passwordRecoveryInfo PasswordRecovery?
   providers            UserProvider[]
   Session              Session[]
+  Post                 Post[]
 
   @@map("users")
 }
 
 model UserConfirmation {
-  confirmationCode String?
-  expirationDate   DateTime? @db.Timestamptz()
-  isConfirmed      Boolean
-  userId           String    @id
+  confirmationCode   String?
+  expirationDate     DateTime? @db.Timestamptz()
+  isConfirmed        Boolean
+  userId             String    @id
+  isAgreeWithPrivacy Boolean?
 
   user User @relation(fields: [userId], references: [id])
 
@@ -54,8 +57,8 @@ model PasswordRecovery {
 model UserProvider {
   id             String @id @default(uuid())
   provider       String
-  providerUserId String
-  profile        Json?
+  providerUserId String @unique
+  email          String
   userId         String
 
   user User @relation(fields: [userId], references: [id])
@@ -72,8 +75,22 @@ model Session {
   deviceName String
   deviceId   String
 
-
   user User @relation(fields: [userId], references: [id])
 
   @@map("session_user")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  location    String?
+  description String?
+  fileIds     String[]
+  userId      String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("posts")
 }

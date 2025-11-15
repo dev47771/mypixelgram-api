@@ -1,20 +1,13 @@
 import { plainToInstance } from 'class-transformer';
-import {
-  IsBoolean,
-  IsEnum,
-  IsNumber,
-  IsString,
-  IsUrl,
-  Max,
-  Min,
-  validateSync,
-} from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString, Max, Min, validateSync } from 'class-validator';
 
 enum Environment {
   Development = 'development',
   Production = 'production',
   Test = 'testing',
   Provision = 'provision',
+  DevelopmentHome = 'development.local',
+  TestHome = 'testing.local',
 }
 
 class EnvironmentVariables {
@@ -26,23 +19,19 @@ class EnvironmentVariables {
   @Max(65535)
   PORT: number;
 
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  PORT_FILES_API: number;
+
   @IsString()
   DATABASE_URL: string;
 
   @IsNumber()
   EMAIL_CONFIRMATION_CODE_LIFETIME_SECS: number;
 
-  @IsString()
-  HTTP_BASIC_USER: string;
-
-  @IsString()
-  HTTP_BASIC_PASS: string;
-
   @IsBoolean()
   INCLUDE_TESTING_MODULE: boolean;
-
-  @IsBoolean()
-  SKIP_PASSWORD_CHECK: boolean;
 
   @IsString()
   JWT_SECRET_KEY: string;
