@@ -9,6 +9,7 @@ import { CreatePostCommand } from '../application/create-post.use-case';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { ExtractDeviceAndIpDto } from '../../user-accounts/api/input-dto/extract-device-ip.input-dto';
 import { PostsQueryRepo } from '../infrastructure/post-query.repo';
+import { PostViewDto } from './views/post-view.dto';
 
 @Controller(POST_ROUTE)
 export class PostController {
@@ -27,6 +28,7 @@ export class PostController {
   @Post()
   async createPost(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @Body() createPostDto: CreateInputDto) {
     const postId = await this.commandBus.execute(new CreatePostCommand(createPostDto, dto.userId));
-    return await this.postQueryRepo.findPostByIdView(postId);
+    const post = await this.postQueryRepo.findPostById(postId);
+    return PostViewDto.mapToView(post!);
   }
 }

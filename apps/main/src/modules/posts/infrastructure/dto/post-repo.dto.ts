@@ -1,6 +1,6 @@
 export type CreatePostData = {
   location: string | null;
   description: string | null;
-  fileIds: string[];
+  filesId: string[];
   userId: string;
 };

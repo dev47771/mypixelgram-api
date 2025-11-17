@@ -5,17 +5,13 @@ import { Injectable } from '@nestjs/common';
 export class PostsQueryRepo {
   constructor(private prisma: PrismaService) {}
 
-  async findPostByIdView(postId: string) {
+  async findPostById(postId: string) {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
     });
 
     if (!post) return null;
 
-    return {
-      description: post.description,
-      filesId: post.fileIds,
-      location: post.location,
-    };
+    return post;
   }
 }

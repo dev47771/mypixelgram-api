@@ -1,4 +1,4 @@
-import { IsArray, isArray, IsString } from 'class-validator';
+import { IsArray, isArray, IsOptional, IsString } from 'class-validator';
 
 export class PostInputDto {
   @IsString()
@@ -8,10 +8,14 @@ export class PostInputDto {
 }
 
 export class CreateInputDto {
+  @IsOptional()
   @IsString()
   description: string;
+
+  @IsOptional()
   @IsString()
   location: string;
+
   @IsArray()
   @IsString({ each: true })
   filesId: string[];
