@@ -51,6 +51,7 @@ export class S3StorageAdapter {
           originalName: file.originalname,
           url: `https://${this.bucketName}.storage.yandexcloud.net/${key}`,
           fileId: uuidv4(),
+          key: key,
           mimetype: file.mimetype,
           type: type,
           userId: userId,
