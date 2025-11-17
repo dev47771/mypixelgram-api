@@ -23,7 +23,7 @@ export class PublicPostController {
         createdAt: new Date().toISOString(),
         user: {
           userId: 'user-101',
-          userName: 'kozlov97',
+          login: 'kozlov97',
           avatar: null,
         },
       },
@@ -40,7 +40,7 @@ export class PublicPostController {
         createdAt: new Date().toISOString(),
         user: {
           userId: 'user-102',
-          userName: 'elchin234',
+          login: 'elchin234',
           avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
         },
       },
@@ -55,7 +55,7 @@ export class PublicPostController {
         createdAt: new Date().toISOString(),
         user: {
           userId: 'user-103',
-          userName: 'guliko',
+          login: 'guliko',
           avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
         },
       },
@@ -71,7 +71,7 @@ export class PublicPostController {
         createdAt: new Date().toISOString(),
         user: {
           userId: 'user-104',
-          userName: 'samirlondon',
+          login: 'samirlondon',
           avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
         },
       },
