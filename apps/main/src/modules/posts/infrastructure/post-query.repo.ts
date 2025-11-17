@@ -11,8 +11,6 @@ export class PostsQueryRepo {
       where: { id: postId },
     });
 
-    if (!post) return null;
-
-    return PostViewDto.mapToView(post);
+    return post ? PostViewDto.mapToView(post) : null;
   }
 }
