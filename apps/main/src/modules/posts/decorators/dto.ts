@@ -10,7 +10,7 @@ export class UserDto {
   userId: string;
 
   @ApiProperty()
-  userName: string;
+  login: string;
 
   @ApiProperty({ type: String, nullable: true })
   avatar: string | null;

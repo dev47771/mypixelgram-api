@@ -25,19 +25,7 @@ import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery
 import { EmailDto } from './input-dto/email.resending.dto';
 import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
 import { AccessToken } from './view-dto/access.token.dto';
-import {
-  RegisterEmailResending,
-  Registration,
-  RegistrationConfirmation,
-  Login,
-  RecoverPassword,
-  CheckRecoveryCode,
-  SetNewPassword,
-  Logout,
-  GetUserAccounts,
-  RefreshToken,
-  GithubAuthSwagger, GithubCallbackSwagger, GoogleAuthSwagger, GoogleCallbackSwagger,
-} from './decorators/auth.swagger.decorators';
+import { RegisterEmailResending, Registration, RegistrationConfirmation, Login, RecoverPassword, CheckRecoveryCode, SetNewPassword, Logout, GetUserAccounts, RefreshToken, GithubAuthSwagger, GithubCallbackSwagger, GoogleAuthSwagger, GoogleCallbackSwagger } from './decorators/auth.swagger.decorators';
 import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
 import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import { Recaptcha } from './decorators/recaptcha.decorators';
@@ -61,9 +49,7 @@ export class AuthController {
   @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
-    return await this.commandBus.execute<RegisterUserCommand, string>(
-      new RegisterUserCommand(body),
-    );
+    return await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
   }
 
   @Get('github')
@@ -79,13 +65,11 @@ export class AuthController {
       ip: req.ip,
       device: req.headers['user-agent'],
       githubId: req.user.githubId,
-      login: req.user.username,
+      login: req.user.login,
       email: req.user.email,
     };
     try {
-      const tokens = await this.commandBus.execute(
-        new GithubRegisterUseCaseCommand(dto),
-      );
+      const tokens = await this.commandBus.execute(new GithubRegisterUseCaseCommand(dto));
 
       res
         .cookie('refreshToken', tokens.refreshToken, {
@@ -112,9 +96,7 @@ export class AuthController {
   @RegisterEmailResending()
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(@Body() email: EmailDto) {
-    await this.commandBus.execute(
-      new RegistrationEmailResendingUseCaseCommand(email.email),
-    );
+    await this.commandBus.execute(new RegistrationEmailResendingUseCaseCommand(email.email));
     return;
   }
 
@@ -129,10 +111,7 @@ export class AuthController {
   @Post('login')
   @Login()
   @HttpCode(HttpStatus.OK)
-  async loginUser(
-    @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async loginUser(@ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
     const tokens = await this.commandBus.execute(new LoginUserCommand(dto));
 
     response.cookie('refreshToken', tokens.refreshToken, {
@@ -149,13 +128,8 @@ export class AuthController {
   @Post('refresh-token')
   @RefreshToken()
   @HttpCode(HttpStatus.OK)
-  async createNewTokensPair(
-    @ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<{ accessToken: string }> {
-    const tokenPair = await this.commandBus.execute(
-      new RefreshTokenCommand(payload),
-    );
+  async createNewTokensPair(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto, @Res({ passthrough: true }) response: Response): Promise<{ accessToken: string }> {
+    const tokenPair = await this.commandBus.execute(new RefreshTokenCommand(payload));
     response.cookie('refreshToken', tokenPair.refreshToken, {
       httpOnly: true,
       secure: true,
@@ -185,9 +159,7 @@ export class AuthController {
   @SetNewPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() body: NewPasswordInputDto): Promise<void> {
-    await this.commandBus.execute(
-      new SetNewPasswordCommand(body.newPassword, body.recoveryCode),
-    );
+    await this.commandBus.execute(new SetNewPasswordCommand(body.newPassword, body.recoveryCode));
   }
 
   @ApiCookieAuth('refreshToken')
@@ -209,8 +181,7 @@ export class AuthController {
   @Get('google')
   @GoogleAuthSwagger()
   @UseGuards(AuthGuard('google'))
-  async googleAuth() {
-  }
+  async googleAuth() {}
 
   @Get('google/callback')
   @GoogleCallbackSwagger()
