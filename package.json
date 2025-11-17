@@ -34,6 +34,7 @@
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.932.0",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
