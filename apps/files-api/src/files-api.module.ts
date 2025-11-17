@@ -10,6 +10,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
 import { FilesApiController } from './files/api/files-api.controller';
+import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fileId-owner.use-case';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FilesApiController } from './files/api/files-api.controller';
     FilesUploadUseCase,
     S3StorageAdapter,
     DeleteFilesUseCase,
+    CheckFileIdOwnerUseCase,
     {
       provide: S3StorageAdapter,
       useFactory: (configService: ConfigService) => {
