@@ -46,6 +46,11 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-files-api-production-config-secret
                    key: BUCKET_REGION
+             - name: DB_NAME
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-files-api-production-config-secret
+                   key: DB_NAME
              - name: MONGO_URL
                valueFrom:
                  secretKeyRef:
