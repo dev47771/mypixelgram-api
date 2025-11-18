@@ -77,7 +77,7 @@ export class S3StorageAdapter {
       Key: key,
     };
     try {
-      const data = this.s3Client.send(new DeleteObjectCommand(bucketParams));
+      const data = await this.s3Client.send(new DeleteObjectCommand(bucketParams));
       console.log(`✅ Successfully deleted: ${key}`);
       return data;
     } catch (deleteError) {

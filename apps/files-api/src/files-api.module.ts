@@ -11,6 +11,10 @@ import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
 import { FilesApiController } from './files/api/files-api.controller';
 import { ScheduleModule } from '@nestjs/schedule';
+import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
+import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
+
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, DeleteFilesUseCase];
 
 @Module({
   imports: [
@@ -33,9 +37,9 @@ import { ScheduleModule } from '@nestjs/schedule';
   controllers: [FilesApiController],
   providers: [
     FilesRepo,
-    FilesUploadUseCase,
     S3StorageAdapter,
-    DeleteFilesUseCase,
+    DeleteFilesScheduler,
+    ...commandHandlers,
     {
       provide: S3StorageAdapter,
       useFactory: (configService: ConfigService) => {

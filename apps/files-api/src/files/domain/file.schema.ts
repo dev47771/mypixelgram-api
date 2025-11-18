@@ -22,6 +22,9 @@ export class File {
   type: FileType;
 
   @Prop({ required: true })
+  key: string;
+
+  @Prop({ required: true })
   mimetype: string;
 
   @Prop({ required: true })
