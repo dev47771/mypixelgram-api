@@ -26,7 +26,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     if (post.userId !== command.userId) {
       throw ForbiddenDomainException.create(ErrorConstants.FORBIDDEN, 'DeletePostUseCase');
     }
-    const resultsoftDeleteFilesByPost = await this.transportService.deletePost(post.fileIds);
+    const resultsoftDeleteFilesByPost = await this.transportService.softDeleteFilesByPost(post.fileIds);
     if (!resultsoftDeleteFilesByPost) {
       throw BadRequestDomainException.create(ErrorConstants.FILE_ID_NOT_FOUND, 'DeletePostUseCase');
     }

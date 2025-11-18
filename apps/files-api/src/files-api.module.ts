@@ -13,9 +13,9 @@ import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fil
 import { ScheduleModule } from '@nestjs/schedule';
 import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
 import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
-import { DeletePostUseCase } from './files/application/use-cases/delete-post.use-case';
+import { DeleteFilePostUseCase } from './files/application/use-cases/delete-post.use-case';
 
-const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeletePostUseCase];
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeleteFilePostUseCase];
 
 @Module({
   imports: [

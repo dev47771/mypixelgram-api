@@ -5,6 +5,7 @@ import { ViewOutputFile } from '../../api/dto/viewOutputFile';
 import { BucketFile } from '../../api/dto/bucketFile';
 import { FileMongoType } from '../../api/dto/fileMongoType';
 import { PayloadTypeDto } from '../../api/dto/payloadTypeDto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class FilesUploadUseCase {
@@ -25,7 +26,7 @@ export class FilesUploadUseCase {
       await this.filesRepo.createFiles(loadedFiles);
     } catch (e) {
       console.error(e);
-      throw e;
+      throw new RpcException('Files Upload Failed');
     }
 
     return loadedFiles.map((file: FileMongoType) => ({
