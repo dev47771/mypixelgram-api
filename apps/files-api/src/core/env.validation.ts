@@ -35,6 +35,7 @@ class EnvironmentVariables {
   @IsString()
   BUCKET_REGION: string;
 
+  @IsOptional()
   @IsString()
   DB_NAME: string;
 
