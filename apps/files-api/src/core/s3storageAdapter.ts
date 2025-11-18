@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { BucketFile } from '../files/api/dto/bucketFile';
 import { FileType } from '../files/domain/file.schema';
+import { RpcException } from '@nestjs/microservices';
 
 export class S3StorageAdapter {
   s3Client: S3Client;
@@ -31,7 +32,7 @@ export class S3StorageAdapter {
       return await this.s3Client.send(command);
     } catch (error) {
       console.error(error);
-      throw new Error();
+      throw new RpcException('uploadFile error');
     }
   }
 
@@ -67,7 +68,7 @@ export class S3StorageAdapter {
       console.error('💥 One or more uploads failed, starting rollback...');
 
       await this.rollbackUploads(uploadedKeys);
-      throw new Error(`Upload failed: ${error.message}. Rollback completed.`);
+      throw new RpcException(`Upload failed: ${error.message}. Rollback completed.`);
     }
   }
 

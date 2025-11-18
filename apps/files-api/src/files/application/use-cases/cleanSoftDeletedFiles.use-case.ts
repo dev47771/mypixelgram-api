@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { S3StorageAdapter } from '../../../core/s3storageAdapter';
 import { FilesRepo } from '../../infrastructure/files.repo';
 import { FileDocument } from '../../domain/file.schema';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class CleanSoftDeletedFilesUseCase {
@@ -43,7 +44,7 @@ export class CleanSoftDeletedFilesUseCase {
       };
     } catch (error) {
       console.error(error);
-      throw error;
+      throw new RpcException('SoftDeletedFiles failed');
     }
   }
 }
