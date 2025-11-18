@@ -51,6 +51,11 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-files-api-production-config-secret
                    key: DB_NAME
+             - name: PORT_FILES_API
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-files-api-production-config-secret
+                   key: PORT_FILES_API
              - name: MONGO_URL
                valueFrom:
                  secretKeyRef:
