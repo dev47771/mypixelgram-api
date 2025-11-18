@@ -19,11 +19,6 @@ class EnvironmentVariables {
   @Max(65535)
   PORT: number;
 
-  @IsNumber()
-  @Min(0)
-  @Max(65535)
-  PORT_FILES_API: number;
-
   @IsString()
   DATABASE_URL: string;
 
