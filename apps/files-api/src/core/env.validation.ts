@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNumber, IsString, Max, Min, validateSync } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, Max, Min, validateSync } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 
 enum Environment {
@@ -14,6 +14,7 @@ class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(65535)
