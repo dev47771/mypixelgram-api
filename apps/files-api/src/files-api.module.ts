@@ -5,7 +5,6 @@ import { envFilePaths } from './env-file-paths';
 import { CqrsModule } from '@nestjs/cqrs';
 import { FilesUploadUseCase } from './files/application/use-cases/files-upload.use-case';
 import { S3StorageAdapter } from './core/s3storageAdapter';
-import { DeleteFilesUseCase } from './files/application/use-cases/delete-file.use-case';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
@@ -14,8 +13,9 @@ import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fil
 import { ScheduleModule } from '@nestjs/schedule';
 import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
 import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
+import { DeletePostUseCase } from './files/application/use-cases/delete-post.use-case';
 
-const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, DeleteFilesUseCase, CheckFileIdOwnerUseCase];
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeletePostUseCase];
 
 @Module({
   imports: [

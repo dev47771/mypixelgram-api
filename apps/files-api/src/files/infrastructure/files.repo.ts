@@ -12,7 +12,7 @@ export class FilesRepo {
   }
 
   async softDeleteFiles(fileIds: string[]) {
-    return this.fileModel.updateMany({ fileId: { $in: fileIds } }, { $set: { deletedAt: new Date() } });
+    return await this.fileModel.updateMany({ fileId: { $in: fileIds } }, { $set: { deletedAt: new Date() } });
   }
 
   async findSoftDeletedFiles(): Promise<FileDocument[]> {
@@ -32,6 +32,7 @@ export class FilesRepo {
       fileId: { $in: fileIds },
     });
   }
+
   async validateFilesOwnership(dto: ValidFileIdDto): Promise<boolean> {
     const { filesId, userId } = dto;
     const count = await this.fileModel.countDocuments({

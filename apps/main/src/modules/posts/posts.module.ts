@@ -7,8 +7,9 @@ import { PublicPostController } from './api/public-post.contoller';
 import { CreatePostUseCase } from './application/create-post.use-case';
 import { TransportModule } from '../transport/transport.module';
 import { PostsQueryRepo } from './infrastructure/post-query.repo';
+import { DeletePostUseCase } from './application/delete-post.use-case';
 
-const commandHandlers = [UpdatePostUseCase, CreatePostUseCase];
+const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
 const commonProviders = [PostsRepo, PostsQueryRepo];
 
 @Module({

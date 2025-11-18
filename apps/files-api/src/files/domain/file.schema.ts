@@ -34,7 +34,7 @@ export class File {
   fileId: string;
 
   @Prop({ type: Date, default: null })
-  deleteAt?: Date | null;
+  deletedAt?: Date | null;
 
   @Prop()
   userId: string;

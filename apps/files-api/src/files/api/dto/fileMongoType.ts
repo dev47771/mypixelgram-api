@@ -5,5 +5,5 @@ export class FileMongoType {
   key: string;
   type: string;
   userId: string;
-  deleteAt: Date | null = null;
+  deletedAt: Date | null = null;
 }

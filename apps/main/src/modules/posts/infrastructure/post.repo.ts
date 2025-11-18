@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { CreatePostData } from './dto/post-repo.dto';
+import { Post } from '@prisma/client';
 
 @Injectable()
 export class PostsRepo {
   constructor(private prisma: PrismaService) {}
 
-  async findById(postId: string) {
-    return this.prisma.post.findUnique({
+  async findById(postId: string): Promise<Post | null> {
+    return await this.prisma.post.findUnique({
       where: { id: postId },
     });
   }
@@ -38,5 +39,11 @@ export class PostsRepo {
     } catch (error) {
       throw new Error(error?.message || 'Ошибка при создании поста');
     }
+  }
+
+  async deletePost(postId: string) {
+    await this.prisma.post.delete({
+      where: { id: postId },
+    });
   }
 }
