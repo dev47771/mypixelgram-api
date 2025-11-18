@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import { BucketFile } from '../files/api/dto/bucketFile';
 import { FileType } from '../files/domain/file.schema';
+import { RpcException } from '@nestjs/microservices';
 
 export class S3StorageAdapter {
   s3Client: S3Client;
@@ -31,7 +32,7 @@ export class S3StorageAdapter {
       return await this.s3Client.send(command);
     } catch (error) {
       console.error(error);
-      throw new Error();
+      throw new RpcException('uploadFile error');
     }
   }
 
@@ -51,6 +52,7 @@ export class S3StorageAdapter {
           originalName: file.originalname,
           url: `https://${this.bucketName}.storage.yandexcloud.net/${key}`,
           fileId: uuidv4(),
+          key: key,
           mimetype: file.mimetype,
           type: type,
           userId: userId,
@@ -66,7 +68,7 @@ export class S3StorageAdapter {
       console.error('💥 One or more uploads failed, starting rollback...');
 
       await this.rollbackUploads(uploadedKeys);
-      throw new Error(`Upload failed: ${error.message}. Rollback completed.`);
+      throw new RpcException(`Upload failed: ${error.message}. Rollback completed.`);
     }
   }
 
@@ -76,7 +78,7 @@ export class S3StorageAdapter {
       Key: key,
     };
     try {
-      const data = this.s3Client.send(new DeleteObjectCommand(bucketParams));
+      const data = await this.s3Client.send(new DeleteObjectCommand(bucketParams));
       console.log(`✅ Successfully deleted: ${key}`);
       return data;
     } catch (deleteError) {

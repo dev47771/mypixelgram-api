@@ -23,4 +23,9 @@ export class TransportService {
       await this.filesApiClient.close();
     }
   }
+  async softDeleteFilesByPost(filesId: string[]) {
+    const resultDeleted = await firstValueFrom(this.filesApiClient.send({ cmd: 'deleteFiles' }, filesId));
+    await this.filesApiClient.close();
+    return resultDeleted;
+  }
 }

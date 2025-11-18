@@ -5,12 +5,17 @@ import { envFilePaths } from './env-file-paths';
 import { CqrsModule } from '@nestjs/cqrs';
 import { FilesUploadUseCase } from './files/application/use-cases/files-upload.use-case';
 import { S3StorageAdapter } from './core/s3storageAdapter';
-import { DeleteFilesUseCase } from './files/application/use-cases/delete-file.use-case';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
 import { FilesApiController } from './files/api/files-api.controller';
 import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fileId-owner.use-case';
+import { ScheduleModule } from '@nestjs/schedule';
+import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
+import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
+import { DeleteFilePostUseCase } from './files/application/use-cases/delete-post.use-case';
+
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeleteFilePostUseCase];
 
 @Module({
   imports: [
@@ -27,15 +32,15 @@ import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fil
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: File.name, schema: FileSchema }]),
+    ScheduleModule.forRoot(),
     CqrsModule,
   ],
   controllers: [FilesApiController],
   providers: [
     FilesRepo,
-    FilesUploadUseCase,
     S3StorageAdapter,
-    DeleteFilesUseCase,
-    CheckFileIdOwnerUseCase,
+    DeleteFilesScheduler,
+    ...commandHandlers,
     {
       provide: S3StorageAdapter,
       useFactory: (configService: ConfigService) => {

@@ -1,15 +1,15 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { S3StorageAdapter } from '../../../core/s3storageAdapter';
+import { Injectable } from '@nestjs/common';
 import { FilesRepo } from '../../infrastructure/files.repo';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
-export class DeleteFilesUseCase {
+export class DeleteFilePostUseCase {
   constructor(private filesRepo: FilesRepo) {}
   async execute(filesId: string[]) {
     const resultDeleted = await this.filesRepo.softDeleteFiles(filesId);
     if (!resultDeleted.acknowledged) {
-      throw Error('Unable to delete files from the database');
+      throw new RpcException('Unable to delete files from the database');
     }
-    return resultDeleted;
+    return resultDeleted.acknowledged;
   }
 }

@@ -22,6 +22,9 @@ export class File {
   type: FileType;
 
   @Prop({ required: true })
+  key: string;
+
+  @Prop({ required: true })
   mimetype: string;
 
   @Prop({ required: true })
@@ -31,7 +34,7 @@ export class File {
   fileId: string;
 
   @Prop({ type: Date, default: null })
-  deleteAt?: Date | null;
+  deletedAt?: Date | null;
 
   @Prop()
   userId: string;
