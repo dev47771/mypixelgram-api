@@ -25,18 +25,14 @@ export class PostsRepo {
     });
   }
   async createPost(data: CreatePostData): Promise<string> {
-    try {
-      const post = await this.prisma.post.create({
-        data: {
-          location: data.location ? data.location : null,
-          description: data.description ? data.description : null,
-          fileIds: data.filesId,
-          userId: data.userId,
-        },
-      });
-      return post.id;
-    } catch (error) {
-      throw new Error(error?.message || 'Ошибка при создании поста');
-    }
+    const post = await this.prisma.post.create({
+      data: {
+        location: data.location ? data.location : null,
+        description: data.description ? data.description : null,
+        fileIds: data.filesId,
+        userId: data.userId,
+      },
+    });
+    return post.id;
   }
 }
