@@ -20,9 +20,9 @@ export class UsersQueryRepo {
     });
   }
 
-  async findByIdRow(id: string): Promise<UserModel | null> {
+  async findByLogin(login: string): Promise<UserModel | null> {
     return await this.prisma.user.findFirst({
-      where: { id, deletedAt: null },
+      where: { login, deletedAt: null },
     });
   }
 }

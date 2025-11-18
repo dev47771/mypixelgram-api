@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User as UserModel } from '@prisma/client';
-import { UserViewDto } from './user.view-dto';
 
 export class ProfileViewDto {
   @ApiProperty()

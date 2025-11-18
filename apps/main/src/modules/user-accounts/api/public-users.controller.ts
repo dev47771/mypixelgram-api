@@ -16,8 +16,8 @@ export class PublicUsersController {
     return { totalCount };
   }
 
-  @Get('profile/:userId')
-  async getProfileById(@Param('userId') id: string): Promise<ProfileViewDto> {
-    return this.queryBus.execute(new GetProfileByIdQuery(id));
+  @Get('profile/:login')
+  async getProfileById(@Param('login') login: string): Promise<ProfileViewDto> {
+    return this.queryBus.execute(new GetProfileByIdQuery(login));
   }
 }
