@@ -4,12 +4,15 @@ import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 import { UpdatePostUseCase } from './application/update-post.use-case';
 import { PostsRepo } from './infrastructure/post.repo';
 import { PublicPostController } from './api/public-post.contoller';
+import { CreatePostUseCase } from './application/create-post.use-case';
+import { TransportModule } from '../transport/transport.module';
+import { PostsQueryRepo } from './infrastructure/post-query.repo';
 
-const commandHandlers = [UpdatePostUseCase];
-const commonProviders = [PostsRepo];
+const commandHandlers = [UpdatePostUseCase, CreatePostUseCase];
+const commonProviders = [PostsRepo, PostsQueryRepo];
 
 @Module({
-  imports: [UserAccountsModule],
+  imports: [UserAccountsModule, TransportModule],
   controllers: [PostController, PublicPostController],
   providers: [...commandHandlers, ...commonProviders],
 })

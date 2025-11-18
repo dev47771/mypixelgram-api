@@ -10,11 +10,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
 import { FilesApiController } from './files/api/files-api.controller';
+import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fileId-owner.use-case';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
 import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
 
-const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, DeleteFilesUseCase];
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, DeleteFilesUseCase, CheckFileIdOwnerUseCase];
 
 @Module({
   imports: [

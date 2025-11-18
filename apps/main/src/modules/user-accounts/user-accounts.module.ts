@@ -26,7 +26,6 @@ import { RecaptchaService } from './application/recaptcha.service';
 import { RecaptchaGuard } from './api/guards/recaptcha-guard/recaptcha.guard';
 import { GetUserById } from './application/queries/get-user-by-id.query';
 import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
-import { AuthService } from './application/auth.service';
 import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
 import { LoginGenerateService } from './application/login.generate.service';
 import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
@@ -50,22 +49,7 @@ const commandHandlers = [
   GithubRegisterUseCase,
   GoogleRegistrationUseCase,
 ];
-const commonProviders = [
-  CryptoService,
-  UsersRepo,
-  UsersQueryRepo,
-  JwtStrategy,
-  LocalStrategy,
-  JwtService,
-  SessionRepo,
-  MailService,
-  RecaptchaService,
-  RecaptchaGuard,
-  GitHubStrategy,
-  AuthService,
-  LoginGenerateService,
-  GoogleStrategy,
-];
+const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy];
 
 @Module({
   imports: [
@@ -77,6 +61,6 @@ const commonProviders = [
   ],
   controllers: [UsersController, AuthController, PublicUsersController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
-  exports: [JwtService, JwtStrategy, AuthService],
+  exports: [JwtService, JwtStrategy],
 })
 export class UserAccountsModule {}
