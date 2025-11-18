@@ -21,10 +21,10 @@ WORKDIR /home/node/dist/${SERVICE}
 
 COPY --chown=node package*.json ./
 
-RUN npm install
+RUN npm install --frozen-lockfile
 
 # Bundle app source code
-COPY --chown=node ../../../../Users/oblak/OneDrive/Рабочий%20стол/files%20files%20api .
+COPY --chown=node . .
 
 RUN npm run build:${SERVICE}
 
