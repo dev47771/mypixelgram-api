@@ -19,4 +19,10 @@ export class UsersQueryRepo {
       where: { isConfirmed: true },
     });
   }
+
+  async findByIdRow(id: string): Promise<UserModel | null> {
+    return await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
+    });
+  }
 }
