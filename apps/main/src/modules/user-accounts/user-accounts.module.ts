@@ -32,9 +32,9 @@ import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
 import { GoogleRegistrationUseCase } from './application/usecases/google-authorization.use-case';
 import { GetTotalConfirmedUsersHandler } from './application/queries/get-total-confirmed-users.query';
 import { PublicUsersController } from './api/public-users.controller';
-import { GetProfileById, GetProfileByIdQuery } from './application/queries/getProfileByUserId';
+import { GetProfileByLogin } from './application/queries/getProfileByLogin';
 
-const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileById];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
