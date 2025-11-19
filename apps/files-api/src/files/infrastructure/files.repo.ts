@@ -21,6 +21,10 @@ export class FilesRepo {
     });
   }
 
+  async findFilesByFilesIds(fileIds: string[]): Promise<FileDocument[]> {
+    return await this.fileModel.find({ fileId: { $in: fileIds, deletedAt: null } });
+  }
+
   async hardDeleteFiles(fileIds: string[]) {
     return this.fileModel.deleteMany({
       fileId: { $in: fileIds },

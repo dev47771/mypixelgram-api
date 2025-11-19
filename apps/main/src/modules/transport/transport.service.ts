@@ -28,4 +28,8 @@ export class TransportService {
     await this.filesApiClient.close();
     return resultDeleted;
   }
+
+  async getFiles(arrayFilesId: string[]): Promise<string[]> {
+    return await firstValueFrom(this.filesApiClient.send({ cmd: 'getFiles' }, arrayFilesId));
+  }
 }
