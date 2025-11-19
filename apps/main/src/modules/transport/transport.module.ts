@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TransportService } from './transport.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import { FILES_API_HOST, FILES_API_PORT } from './constants';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { ConfigService } from '@nestjs/config';
         useFactory: async (configService: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            port: configService.get('PORT_FILES_API'),
+            port: FILES_API_PORT,
+            host: FILES_API_HOST,
           },
         }),
         inject: [ConfigService],
