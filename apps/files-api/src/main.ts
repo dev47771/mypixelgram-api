@@ -8,6 +8,7 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       port: Number(process.env.PORT_FILES_API),
+      host: '0.0.0.0',
       retryAttempts: 5,
       retryDelay: 3000,
       maxBufferSize: 1024 * 1024 * 50,
