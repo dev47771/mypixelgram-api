@@ -4,6 +4,7 @@ ARG port
 ARG service
 ENV SERVICE=$service
 ENV PORT=$port
+ENV PORT_FILES_API=$port
 # Set to a non-root built-in user `node`
 
 USER node
