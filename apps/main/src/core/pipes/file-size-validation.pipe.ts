@@ -8,7 +8,6 @@ export class ImageCompressionAndValidationPipe implements PipeTransform {
   constructor(private readonly imageProcessingService: ImageProcessingService) {}
 
   async transform(files: Express.Multer.File[]) {
-    console.log('files', files);
     const maxBytes = IMAGE_MAX_SIZE_MB * BYTES_IN_MB;
     const processedFiles: Express.Multer.File[] = [];
 
