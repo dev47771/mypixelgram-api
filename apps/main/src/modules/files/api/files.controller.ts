@@ -21,6 +21,7 @@ export class FilesController {
   @UseInterceptors(FilesInterceptor(FILE_FIELD_NAME, FILES_UPLOAD_LIMIT))
   async uploadImages(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @UploadedFiles(ImageCompressionAndValidationPipe) files: Express.Multer.File[], @Body('type') type: FileType) {
     const payload: PayloadTypeDto = { userId: dto.userId, files, type: type };
+    console.log('payload', payload);
     const res = await this.transportService.sendFilesForS3Upload(payload);
     return { data: res };
   }

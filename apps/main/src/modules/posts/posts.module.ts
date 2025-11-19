@@ -8,13 +8,15 @@ import { CreatePostUseCase } from './application/create-post.use-case';
 import { TransportModule } from '../transport/transport.module';
 import { PostsQueryRepo } from './infrastructure/post-query.repo';
 import { DeletePostUseCase } from './application/delete-post.use-case';
+import { GetPostsByUserIdPublicQuery } from './application/queryBus/getPostsByUserIdPublicQuery';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
+const queryHundlers = [GetPostsByUserIdPublicQuery];
 const commonProviders = [PostsRepo, PostsQueryRepo];
 
 @Module({
   imports: [UserAccountsModule, TransportModule],
   controllers: [PostController, PublicPostController],
-  providers: [...commandHandlers, ...commonProviders],
+  providers: [...commandHandlers, ...commonProviders, ...queryHundlers],
 })
 export class PostModule {}
