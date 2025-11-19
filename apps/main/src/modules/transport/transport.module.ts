@@ -6,17 +6,14 @@ import { FILES_API_HOST, FILES_API_PORT } from './constants';
 
 @Module({
   imports: [
-    ClientsModule.registerAsync([
+    ClientsModule.register([
       {
         name: 'FILES_API',
-        useFactory: async (configService: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            port: FILES_API_PORT,
-            host: FILES_API_HOST,
-          },
-        }),
-        inject: [ConfigService],
+        transport: Transport.TCP,
+        options: {
+          port: FILES_API_PORT,
+          host: FILES_API_HOST,
+        },
       },
     ]),
   ],
