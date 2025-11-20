@@ -13,7 +13,6 @@ import { FILES_API_HOST, FILES_API_PORT } from './constants';
           transport: Transport.TCP,
           options: {
             port: FILES_API_PORT,
-            host: FILES_API_HOST,
           },
         }),
         inject: [ConfigService],

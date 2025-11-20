@@ -1,6 +1,6 @@
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { PostViewDto } from '../api/views/post-view.dto';
+import { PostByUserIdViewDto } from '../api/views/postByUserId-view.dto';
 import { Post } from '@prisma/client';
 import { DictFilesService } from './dictFilesService';
 
@@ -16,7 +16,7 @@ export class PostsQueryRepo {
       where: { id: postId },
     });
     const dictFiles: Record<string, string> = await this.dictService.getDictFiles(post);
-    return post ? post.map((post: Post) => PostViewDto.mapToView(post, dictFiles)) : null;
+    return post ? post.map((post: Post) => PostByUserIdViewDto.mapToView(post, dictFiles)) : null;
   }
 
   async getPostByUserIdPublic(userId: string) {
@@ -28,5 +28,14 @@ export class PostsQueryRepo {
       take: 8,
     });
     return posts ? posts : null;
+  }
+
+  async getPostById(id: string) {
+    return await this.prisma.post.findUnique({
+      where: { id: id },
+      include: {
+        user: true,
+      },
+    });
   }
 }

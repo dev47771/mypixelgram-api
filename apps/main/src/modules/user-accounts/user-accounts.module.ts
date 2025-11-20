@@ -62,6 +62,6 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
   ],
   controllers: [UsersController, AuthController, PublicUsersController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
-  exports: [JwtService, JwtStrategy],
+  exports: [JwtService, JwtStrategy, GetProfileByLogin, UsersRepo],
 })
 export class UserAccountsModule {}
