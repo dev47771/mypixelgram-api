@@ -6,7 +6,7 @@ import * as process from 'node:process';
 async function bootstrap() {
   const isLocal = process.env.NODE_ENV === 'development.local';
 
-  const port = isLocal ? Number(process.env.FILES_API_MICROSERVICE_PORT) : Number(process.env.FILES_API_PORT);
+  const port = isLocal ? Number(process.env.FILES_API_MICROSERVICE_PORT) : Number(process.env.PORT_FILES_API);
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesApiModule, {
     transport: Transport.TCP,
