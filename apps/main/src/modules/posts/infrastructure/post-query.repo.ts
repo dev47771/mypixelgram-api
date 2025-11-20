@@ -2,21 +2,21 @@ import { PrismaService } from '../../../core/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { PostViewDto } from '../api/views/post-view.dto';
 import { Post } from '@prisma/client';
-import { DictPostsService } from './dictPostsService';
+import { DictFilesService } from './dictFilesService';
 
 @Injectable()
 export class PostsQueryRepo {
   constructor(
     private prisma: PrismaService,
-    private dictService: DictPostsService,
+    private dictService: DictFilesService,
   ) {}
 
   async getPostViewById(postId: string) {
     const post: Post[] = await this.prisma.post.findMany({
       where: { id: postId },
     });
-    const dict: Record<string, string> = await this.dictService.getDictPosts(post);
-    return post ? post.map((post: Post) => PostViewDto.mapToView(post, dict)) : null;
+    const dictFiles: Record<string, string> = await this.dictService.getDictFiles(post);
+    return post ? post.map((post: Post) => PostViewDto.mapToView(post, dictFiles)) : null;
   }
 
   async getPostByUserIdPublic(userId: string) {

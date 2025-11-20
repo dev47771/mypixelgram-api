@@ -8,7 +8,7 @@ import { PostsQueryRepo } from '../../infrastructure/post-query.repo';
 import { TransportService } from '../../../transport/transport.service';
 import { id } from 'date-fns/locale';
 import { PostViewDto } from '../../api/views/post-view.dto';
-import { DictPostsService } from '../../infrastructure/dictPostsService';
+import { DictFilesService } from '../../infrastructure/dictFilesService';
 
 export class GetPostsByUserIdPublicCommand {
   constructor(public userId: string) {}
@@ -18,7 +18,7 @@ export class GetPostsByUserIdPublicCommand {
 export class GetPostsByUserIdPublicQuery implements IQueryHandler<GetPostsByUserIdPublicCommand> {
   constructor(
     private postQueryRepo: PostsQueryRepo,
-    private dictService: DictPostsService,
+    private dictFilesService: DictFilesService,
   ) {}
 
   async execute({ userId }: GetPostsByUserIdPublicCommand): Promise<PostViewDto[]> {
@@ -26,7 +26,7 @@ export class GetPostsByUserIdPublicQuery implements IQueryHandler<GetPostsByUser
     if (!posts) {
       throw NotFoundDomainException.create(`Posts user ${userId} not exist`, 'GetPostsByUserIdPublicQuery');
     }
-    const dict: Record<string, string> = await this.dictService.getDictPosts(posts);
-    return posts.map((post: Post) => PostViewDto.mapToView(post, dict));
+    const dictFiles: Record<string, string> = await this.dictFilesService.getDictFiles(posts);
+    return posts.map((post: Post) => PostViewDto.mapToView(post, dictFiles));
   }
 }

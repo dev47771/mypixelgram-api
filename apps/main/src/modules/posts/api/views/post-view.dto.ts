@@ -10,11 +10,11 @@ export class PostViewDto {
   location: string | null;
   files: FilesType[];
 
-  static mapToView = (post: Post, dict: Record<string, string>): PostViewDto => {
+  static mapToView = (post: Post, dictFiles: Record<string, string>): PostViewDto => {
     const dto = new PostViewDto();
     const ids: FilesType[] = post.fileIds.map((fileId: string) => {
       return {
-        url: dict[fileId],
+        url: dictFiles[fileId],
         fileId: fileId,
       };
     });
