@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesApiModule, {
     transport: Transport.TCP,
     options: {
-      port: Number(process.env.PORT_FILES_API),
+      port: 4112,
       host: '0.0.0.0',
       retryAttempts: 5,
       retryDelay: 3000,
