@@ -6,6 +6,7 @@ import { FileType } from '../domain/file.schema';
 import { CheckFileIdOwnerUseCase } from '../application/use-cases/check-fileId-owner.use-case';
 import { ValidFileIdDto } from './dto/inputPayloadFileDto';
 import { DeleteFilePostUseCase } from '../application/use-cases/delete-post.use-case';
+import { GetFilesUseCase } from '../application/use-cases/getFiles.use-case';
 
 @Controller()
 export class FilesApiController {
@@ -13,6 +14,7 @@ export class FilesApiController {
     private filesUploadUseCase: FilesUploadUseCase,
     private checkIsUserOwner: CheckFileIdOwnerUseCase,
     private deleteFilePostUseCase: DeleteFilePostUseCase,
+    private getFilesUseCase: GetFilesUseCase,
   ) {}
 
   @MessagePattern({ cmd: 'filesUpload' })
@@ -31,5 +33,10 @@ export class FilesApiController {
   @MessagePattern({ cmd: 'checkFileOwner' })
   async handleFileOwnershipCheck(payload: ValidFileIdDto) {
     return await this.checkIsUserOwner.execute(payload);
+  }
+
+  @MessagePattern({ cmd: 'getFiles' })
+  async getFiles(arrayFilesId: string[]) {
+    return await this.getFilesUseCase.execute(arrayFilesId);
   }
 }

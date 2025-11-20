@@ -1,9 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { PUBLIC_POST_ROUTE } from '../../user-accounts/domain/constants';
 import { LastPostsSwagger } from '../decorators/post.swagger.decorators';
+import { PostsQueryRepo } from '../infrastructure/post-query.repo';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetPostsByUserIdPublicCommand } from '../application/queryBus/getPostsByUserIdPublicQuery';
 
 @Controller(PUBLIC_POST_ROUTE)
 export class PublicPostController {
+  constructor(
+    private postQueryRepo: PostsQueryRepo,
+    private queryBus: QueryBus,
+  ) {}
   @Get('last-posts')
   @LastPostsSwagger()
   async getLastPosts() {
@@ -80,5 +87,10 @@ export class PublicPostController {
     return {
       posts,
     };
+  }
+
+  @Get('users/:userId')
+  async getPostsByUserIdPublic(@Param('userId') userId: string) {
+    return await this.queryBus.execute(new GetPostsByUserIdPublicCommand(userId));
   }
 }
