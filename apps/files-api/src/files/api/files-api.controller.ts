@@ -37,7 +37,6 @@ export class FilesApiController {
 
   @MessagePattern({ cmd: 'getFiles' })
   async getFiles(arrayFilesId: string[]) {
-    console.log(arrayFilesId, 'arrayFilesIdooooooooooooooo', arrayFilesId.length);
     return await this.getFilesUseCase.execute(arrayFilesId);
   }
 }

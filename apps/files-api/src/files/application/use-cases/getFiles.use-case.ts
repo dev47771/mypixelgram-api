@@ -6,12 +6,17 @@ import { FileDocument } from '../../domain/file.schema';
 @Injectable()
 export class GetFilesUseCase {
   constructor(private filesRepo: FilesRepo) {}
-  async execute(filesId: string[]) {
-    const result: FileDocument[] = await this.filesRepo.findFilesByFilesIds(filesId);
-
+  async execute(arrayFilesId: string[]) {
+    const result: FileDocument[] = await this.filesRepo.findFilesByFilesIds(arrayFilesId);
+    const files = result.map((file: FileDocument) => {
+      return {
+        fileId: file.fileId,
+        url: file.url,
+      };
+    });
     if (!result) {
       throw new RpcException('Unable to delete files from the database');
     }
-    return result;
+    return files;
   }
 }

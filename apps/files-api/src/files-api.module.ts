@@ -14,8 +14,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
 import { CleanSoftDeletedFilesUseCase } from './files/application/use-cases/cleanSoftDeletedFiles.use-case';
 import { DeleteFilePostUseCase } from './files/application/use-cases/delete-post.use-case';
+import { GetFilesUseCase } from './files/application/use-cases/getFiles.use-case';
 
-const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeleteFilePostUseCase];
+const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, CheckFileIdOwnerUseCase, DeleteFilePostUseCase, GetFilesUseCase];
 
 @Module({
   imports: [

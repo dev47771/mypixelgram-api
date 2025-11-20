@@ -22,7 +22,10 @@ export class FilesRepo {
   }
 
   async findFilesByFilesIds(fileIds: string[]): Promise<FileDocument[]> {
-    return await this.fileModel.find({ fileId: { $in: fileIds, deletedAt: null } });
+    return this.fileModel.find({
+      fileId: { $in: fileIds },
+      deletedAt: null,
+    });
   }
 
   async hardDeleteFiles(fileIds: string[]) {

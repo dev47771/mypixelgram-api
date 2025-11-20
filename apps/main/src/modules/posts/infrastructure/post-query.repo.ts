@@ -2,17 +2,21 @@ import { PrismaService } from '../../../core/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { PostViewDto } from '../api/views/post-view.dto';
 import { Post } from '@prisma/client';
+import { DictPostsService } from './dictPostsService';
 
 @Injectable()
 export class PostsQueryRepo {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private dictService: DictPostsService,
+  ) {}
 
   async getPostViewById(postId: string) {
-    const post = await this.prisma.post.findUnique({
+    const post: Post[] = await this.prisma.post.findMany({
       where: { id: postId },
     });
-
-    return post ? PostViewDto.mapToView(post) : null;
+    const dict: Record<string, string> = await this.dictService.getDictPosts(post);
+    return post ? post.map((post: Post) => PostViewDto.mapToView(post, dict)) : null;
   }
 
   async getPostByUserIdPublic(userId: string) {

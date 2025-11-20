@@ -9,10 +9,11 @@ import { TransportModule } from '../transport/transport.module';
 import { PostsQueryRepo } from './infrastructure/post-query.repo';
 import { DeletePostUseCase } from './application/delete-post.use-case';
 import { GetPostsByUserIdPublicQuery } from './application/queryBus/getPostsByUserIdPublicQuery';
+import { DictPostsService } from './infrastructure/dictPostsService';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
 const queryHundlers = [GetPostsByUserIdPublicQuery];
-const commonProviders = [PostsRepo, PostsQueryRepo];
+const commonProviders = [PostsRepo, PostsQueryRepo, DictPostsService];
 
 @Module({
   imports: [UserAccountsModule, TransportModule],

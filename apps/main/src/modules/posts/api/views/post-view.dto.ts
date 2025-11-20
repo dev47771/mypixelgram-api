@@ -1,17 +1,27 @@
 import { Post } from '@prisma/client';
-type PostViewSource = Omit<Post, 'createdAt' | 'updatedAt' | 'id'>;
+
+class FilesType {
+  url: string;
+  fileId: string;
+}
 
 export class PostViewDto {
   description: string | null;
-  filesId: string[];
   location: string | null;
-  userId: string;
+  files: FilesType[];
 
-  static mapToView(post: PostViewSource): PostViewDto {
+  static mapToView = (post: Post, dict: Record<string, string>): PostViewDto => {
     const dto = new PostViewDto();
-    dto.description = post.description!;
-    dto.filesId = post.fileIds;
-    dto.location = post.location!;
+    const ids: FilesType[] = post.fileIds.map((fileId: string) => {
+      return {
+        url: dict[fileId],
+        fileId: fileId,
+      };
+    });
+    dto.description = post.description;
+    dto.location = post.location;
+    dto.files = ids;
+
     return dto;
-  }
+  };
 }
