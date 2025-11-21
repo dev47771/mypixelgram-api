@@ -1,12 +1,7 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { UserViewDto } from '../../../user-accounts/api/view-dto/user.view-dto';
-import { UsersQueryRepo } from '../../../user-accounts/infrastructure/query/users.query-repo';
 import { NotFoundDomainException } from '../../../../core/exceptions/domain/domainException';
-import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 import { Post } from '@prisma/client';
 import { PostsQueryRepo } from '../../infrastructure/post-query.repo';
-import { TransportService } from '../../../transport/transport.service';
-import { id } from 'date-fns/locale';
 import { PostViewDto } from '../../api/views/post-view.dto';
 import { DictFilesService } from '../../infrastructure/dictFilesService';
 
