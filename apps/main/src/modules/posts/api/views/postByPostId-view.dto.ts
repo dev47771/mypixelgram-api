@@ -1,5 +1,3 @@
-import { Post } from '@prisma/client';
-
 class FilesType {
   url: string;
   fileId: string;
