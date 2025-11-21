@@ -3,6 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class FileDto {
   @ApiProperty()
   url: string;
+  @ApiProperty()
+  fileId: string;
 }
 
 export class UserDto {
@@ -26,8 +28,8 @@ export class PostDto {
   @ApiProperty()
   location: string;
 
-  @ApiProperty()
-  file: FileDto;
+  @ApiProperty({ type: FileDto, isArray: true })
+  file: FileDto[];
 
   @ApiProperty()
   createdAt: string;

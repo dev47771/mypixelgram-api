@@ -11,10 +11,10 @@ import { DeletePostUseCase } from './application/delete-post.use-case';
 import { GetPostsByUserIdQueryPublic } from './application/queryBus/getPostsByUserIdQuery.public';
 import { DictFilesService } from './infrastructure/dictFilesService';
 import { GetPostByPostIdQueryPublic } from './application/queryBus/getPostByPostIdQuery.public';
-import { GetProfileByLogin } from '../user-accounts/application/queries/getProfileByLogin';
+import { GetLastPostPublicQuery } from './application/queryBus/getLastPostsPublicQuery';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
-const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic];
+const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery];
 const commonProviders = [PostsRepo, PostsQueryRepo, DictFilesService];
 
 @Module({
