@@ -8,12 +8,13 @@ import { CreatePostUseCase } from './application/create-post.use-case';
 import { TransportModule } from '../transport/transport.module';
 import { PostsQueryRepo } from './infrastructure/post-query.repo';
 import { DeletePostUseCase } from './application/delete-post.use-case';
-import { GetPostsByUserIdPublicQuery } from './application/queryBus/getPostsByUserIdPublicQuery';
+import { GetPostsByUserIdQueryPublic } from './application/queryBus/getPostsByUserIdQuery.public';
 import { DictFilesService } from './infrastructure/dictFilesService';
+import { GetPostByPostIdQueryPublic } from './application/queryBus/getPostByPostIdQuery.public';
 import { GetLastPostPublicQuery } from './application/queryBus/getLastPostsPublicQuery';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
-const queryHundlers = [GetPostsByUserIdPublicQuery, GetLastPostPublicQuery];
+const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery];
 const commonProviders = [PostsRepo, PostsQueryRepo, DictFilesService];
 
 @Module({
