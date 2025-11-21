@@ -29,4 +29,17 @@ export class PostsQueryRepo {
     });
     return posts ? posts : null;
   }
+  async getLastPosts() {
+    const posts = await this.prisma.post.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 4,
+      include: {
+        user: true,
+      },
+    });
+
+    return posts.length > 0 ? posts : null;
+  }
 }
