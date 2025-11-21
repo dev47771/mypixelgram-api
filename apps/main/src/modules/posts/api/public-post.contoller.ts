@@ -3,7 +3,8 @@ import { PUBLIC_POST_ROUTE } from '../../user-accounts/domain/constants';
 import { LastPostsSwagger } from '../decorators/post.swagger.decorators';
 import { PostsQueryRepo } from '../infrastructure/post-query.repo';
 import { QueryBus } from '@nestjs/cqrs';
-import { GetPostsByUserIdPublicCommand } from '../application/queryBus/getPostsByUserIdPublicQuery';
+import { GetPostsByUserIdPublicCommand } from '../application/queryBus/getPostsByUserIdQuery.public';
+import { GetPostByPostIdPublicCommand } from '../application/queryBus/getPostByPostIdQuery.public';
 
 @Controller(PUBLIC_POST_ROUTE)
 export class PublicPostController {
@@ -92,5 +93,10 @@ export class PublicPostController {
   @Get('users/:userId')
   async getPostsByUserIdPublic(@Param('userId') userId: string) {
     return await this.queryBus.execute(new GetPostsByUserIdPublicCommand(userId));
+  }
+
+  @Get(':postId')
+  async getPostByPostIdPublic(@Param('postId') postId: string) {
+    return await this.queryBus.execute(new GetPostByPostIdPublicCommand(postId));
   }
 }
