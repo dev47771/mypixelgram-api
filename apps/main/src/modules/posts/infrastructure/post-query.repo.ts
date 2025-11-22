@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PostByUserIdViewDto } from '../api/views/postByUserId-view.dto';
 import { Post } from '@prisma/client';
 import { DictFilesService } from './dictFilesService';
+import { PAGE_SIZE, PostsPage } from './dto/post-repo.dto';
 
 @Injectable()
 export class PostsQueryRepo {
@@ -50,5 +51,36 @@ export class PostsQueryRepo {
     });
 
     return posts.length > 0 ? posts : null;
+  }
+
+  async getUserPostsFirstPage(userId: string): Promise<PostsPage> {
+    const posts = await this.prisma.post.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: PAGE_SIZE + 1,
+    });
+
+    const hasMore: boolean = posts.length > PAGE_SIZE;
+    const items: Post[] = hasMore ? posts.slice(0, PAGE_SIZE) : posts;
+    const lastItem: Post | null = items[items.length - 1] ?? null;
+    const nextCursor: string | null = lastItem ? lastItem.id : null;
+
+    return { posts: items, nextCursor, hasMore };
+  }
+  async getUserPostsNextPage(userId: string, cursor: string): Promise<PostsPage> {
+    const posts = await this.prisma.post.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: PAGE_SIZE + 1,
+      cursor: { id: cursor },
+      skip: 1,
+    });
+
+    const hasMore: boolean = posts.length > PAGE_SIZE;
+    const items: Post[] = hasMore ? posts.slice(0, PAGE_SIZE) : posts;
+    const lastItem: Post | null = items[items.length - 1] ?? null;
+    const nextCursor: string | null = lastItem ? lastItem.id : null;
+
+    return { posts: items, nextCursor, hasMore };
   }
 }

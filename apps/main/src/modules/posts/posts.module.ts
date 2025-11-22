@@ -12,9 +12,10 @@ import { GetPostsByUserIdQueryPublic } from './application/queryBus/getPostsByUs
 import { DictFilesService } from './infrastructure/dictFilesService';
 import { GetPostByPostIdQueryPublic } from './application/queryBus/getPostByPostIdQuery.public';
 import { GetLastPostPublicQuery } from './application/queryBus/getLastPostsPublicQuery';
+import { GetUserPostsWithInfinityPaginationPrivateQuery } from './application/queryBus/getUserPostsInfinityScrollPrivateQuery';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
-const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery];
+const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery, GetUserPostsWithInfinityPaginationPrivateQuery];
 const commonProviders = [PostsRepo, PostsQueryRepo, DictFilesService];
 
 @Module({
