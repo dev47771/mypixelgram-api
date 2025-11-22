@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { POST_ROUTE } from '../../user-accounts/domain/constants';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { JwtAuthGuard } from '../../user-accounts/api/guards/jwt-strategy/jwt-auth.guard';
 import { CreateInputDto, PostInputDto } from './input-dto/post.input.dto';
 import { UpdatePostCommand } from '../application/update-post.use-case';
@@ -10,12 +10,16 @@ import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-fr
 import { ExtractDeviceAndIpDto } from '../../user-accounts/api/input-dto/extract-device-ip.input-dto';
 import { PostsQueryRepo } from '../infrastructure/post-query.repo';
 import { DeletePostCommand } from '../application/delete-post.use-case';
+import { GetUserPostsWithInfinityPaginationPrivateCommand } from '../application/queryBus/getUserPostsInfinityScrollPrivateQuery';
+import { GetMyPostsDto } from './input-dto/get-my-posts-query.input.dto';
+import { MyPostsInfinitySwagger } from '../decorators/post.swagger.decorators';
 
 @Controller(POST_ROUTE)
 export class PostController {
   constructor(
     private commandBus: CommandBus,
     private postQueryRepo: PostsQueryRepo,
+    private queryBus: QueryBus,
   ) {}
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
@@ -35,5 +39,12 @@ export class PostController {
   @Delete(':id')
   async deletedPostById(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @Param('id') postId: string) {
     return await this.commandBus.execute(new DeletePostCommand(postId, dto.userId));
+  }
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  @MyPostsInfinitySwagger()
+  async getMyPosts(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @Query() query: GetMyPostsDto) {
+    return await this.queryBus.execute(new GetUserPostsWithInfinityPaginationPrivateCommand(dto.userId, query));
   }
 }
