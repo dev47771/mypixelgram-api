@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { appSetup } from '../../../src/setup/app.setup';
 import { INestApplication } from '@nestjs/common';
 import { EmailServiceMock } from '../mock/email-service.mock';
-import { PrismaService } from '../../../src/core/prisma/prisma.service';
 import { MailService } from '../../../src/core/mailModule/mail.service';
 import { deleteAllData } from './delete-all-data';
 
