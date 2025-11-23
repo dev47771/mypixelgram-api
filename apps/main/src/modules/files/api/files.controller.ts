@@ -10,6 +10,7 @@ import { FILE_FIELD_NAME, FILES_UPLOAD_LIMIT } from '../domain/file-upload.const
 import { TransportService } from '../../transport/transport.service';
 import { PayloadTypeDto } from './dto/payloadTypeDto';
 import { FileType, InputFileType } from './dto/typeFile.enum';
+import { UploadFilesSwagger } from '../decorators/files.swagger.decorators';
 
 @Controller(FILES_ROUTE)
 export class FilesController {
@@ -18,6 +19,7 @@ export class FilesController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Post('upload-file')
+  @UploadFilesSwagger()
   @UseInterceptors(FilesInterceptor(FILE_FIELD_NAME, FILES_UPLOAD_LIMIT))
   async uploadImages(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @UploadedFiles(ImageCompressionAndValidationPipe) files: Express.Multer.File[], @Body('type') type: FileType) {
     const payload: PayloadTypeDto = { userId: dto.userId, files, type: type };
