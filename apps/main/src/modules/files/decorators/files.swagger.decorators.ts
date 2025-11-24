@@ -24,10 +24,12 @@ export function UploadFilesSwagger() {
             enum: Object.values(FileType),
             example: FileType.POST,
           },
-          // поле для файлов
           [FILE_FIELD_NAME]: {
-            type: 'string',
-            format: 'binary',
+            type: 'array',
+            items: {
+              type: 'string',
+              format: 'binary',
+            },
           },
         },
       },
