@@ -35,6 +35,7 @@ import { GithubRegisterUseCaseCommand } from '../application/usecases/github-aut
 import { GithubInputDto } from './input-dto/githubInputDto';
 import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
 import { ConfigService } from '@nestjs/config';
+import { GetLoginByRefreshTokenQueryCommand } from '../application/queries/get-user-login.outh2';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
@@ -70,15 +71,18 @@ export class AuthController {
     };
     try {
       const tokens = await this.commandBus.execute(new GithubRegisterUseCaseCommand(dto));
+      const login: string = await this.queryBus.execute(new GetLoginByRefreshTokenQueryCommand(tokens.refreshToken));
 
-      res
-        .cookie('refreshToken', tokens.refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'none',
-          maxAge: 3600_000,
-        })
-        .redirect(this.configService.get<string>('URL_TOKEN_SUCCESS')!);
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+      });
+      const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}`;
+
+      return res.redirect(redirectUrl);
     } catch (e) {
       console.error(e);
       res.redirect(this.configService.get<string>('URL_TOKEN_ERROR')!);
@@ -201,13 +205,17 @@ export class AuthController {
 
     try {
       const { refreshToken } = await this.commandBus.execute(new GoogleRegistrationUseCaseCommand(dto));
+      const login: string = await this.queryBus.execute(new GetLoginByRefreshTokenQueryCommand(refreshToken));
+
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
         maxAge: 3600_000,
       });
-      const redirectUrl = <string>this.configService.get<string>('FRONT_PROFILE_URL');
+      const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}`;
+
       return res.redirect(redirectUrl);
     } catch (error) {
       return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));

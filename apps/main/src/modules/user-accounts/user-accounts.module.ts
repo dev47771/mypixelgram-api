@@ -33,8 +33,9 @@ import { GoogleRegistrationUseCase } from './application/usecases/google-authori
 import { GetTotalConfirmedUsersHandler } from './application/queries/get-total-confirmed-users.query';
 import { PublicUsersController } from './api/public-users.controller';
 import { GetProfileByLogin } from './application/queries/getProfileByLogin';
+import { GetLoginByRefreshTokenUseCase } from './application/queries/get-user-login.outh2';
 
-const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
