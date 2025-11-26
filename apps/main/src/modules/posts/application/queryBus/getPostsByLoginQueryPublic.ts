@@ -5,21 +5,21 @@ import { PostsQueryRepo } from '../../infrastructure/post-query.repo';
 import { PostByUserIdViewDto } from '../../api/views/postByUserId-view.dto';
 import { DictFilesService } from '../../infrastructure/dictFilesService';
 
-export class GetPostsByUserIdPublicCommand {
-  constructor(public userId: string) {}
+export class GetPostsByLoginPublicCommand {
+  constructor(public login: string) {}
 }
 
-@QueryHandler(GetPostsByUserIdPublicCommand)
-export class GetPostsByUserIdQueryPublic implements IQueryHandler<GetPostsByUserIdPublicCommand> {
+@QueryHandler(GetPostsByLoginPublicCommand)
+export class GetPostsByLoginQueryPublic implements IQueryHandler<GetPostsByLoginPublicCommand> {
   constructor(
     private postQueryRepo: PostsQueryRepo,
     private dictFilesService: DictFilesService,
   ) {}
 
-  async execute({ userId }: GetPostsByUserIdPublicCommand): Promise<PostByUserIdViewDto[]> {
-    const posts: Post[] | null = await this.postQueryRepo.getPostByUserIdPublic(userId);
+  async execute({ login }: GetPostsByLoginPublicCommand): Promise<PostByUserIdViewDto[]> {
+    const posts: Post[] | null = await this.postQueryRepo.getPostByLoginPublic(login);
     if (!posts) {
-      throw NotFoundDomainException.create(`Posts user ${userId} not exist`, 'GetPostsByUserIdQueryPublic');
+      throw NotFoundDomainException.create(`Posts user with ${login} not exist`, 'GetPostsByLoginQueryPublic');
     }
     const dictFiles: Record<string, string> = await this.dictFilesService.getDictFiles(posts);
     return posts.map((post: Post) => PostByUserIdViewDto.mapToView(post, dictFiles));

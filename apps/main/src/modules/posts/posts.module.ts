@@ -8,14 +8,14 @@ import { CreatePostUseCase } from './application/create-post.use-case';
 import { TransportModule } from '../transport/transport.module';
 import { PostsQueryRepo } from './infrastructure/post-query.repo';
 import { DeletePostUseCase } from './application/delete-post.use-case';
-import { GetPostsByUserIdQueryPublic } from './application/queryBus/getPostsByUserIdQuery.public';
+import { GetPostsByLoginQueryPublic } from './application/queryBus/getPostsByLoginQueryPublic';
 import { DictFilesService } from './infrastructure/dictFilesService';
 import { GetPostByPostIdQueryPublic } from './application/queryBus/getPostByPostIdQuery.public';
 import { GetLastPostPublicQuery } from './application/queryBus/getLastPostsPublicQuery';
 import { GetUserPostsWithInfinityPaginationPrivateQuery } from './application/queryBus/getUserPostsInfinityScrollPrivateQuery';
 
 const commandHandlers = [UpdatePostUseCase, CreatePostUseCase, DeletePostUseCase];
-const queryHundlers = [GetPostsByUserIdQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery, GetUserPostsWithInfinityPaginationPrivateQuery];
+const queryHundlers = [GetPostsByLoginQueryPublic, GetPostByPostIdQueryPublic, GetLastPostPublicQuery, GetUserPostsWithInfinityPaginationPrivateQuery];
 const commonProviders = [PostsRepo, PostsQueryRepo, DictFilesService];
 
 @Module({

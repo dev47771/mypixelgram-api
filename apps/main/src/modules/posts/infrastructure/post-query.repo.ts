@@ -20,9 +20,11 @@ export class PostsQueryRepo {
     return post ? post.map((post: Post) => PostByUserIdViewDto.mapToView(post, dictFiles)) : null;
   }
 
-  async getPostByUserIdPublic(userId: string) {
+  async getPostByLoginPublic(login: string) {
     const posts: Post[] = await this.prisma.post.findMany({
-      where: { userId: userId },
+      where: {
+        user: { login },
+      },
       orderBy: {
         createdAt: 'desc',
       },
@@ -53,9 +55,13 @@ export class PostsQueryRepo {
     return posts.length > 0 ? posts : null;
   }
 
-  async getUserPostsFirstPage(userId: string): Promise<PostsPage> {
+  async getUserPostsFirstPage(login: string): Promise<PostsPage> {
     const posts = await this.prisma.post.findMany({
-      where: { userId },
+      where: {
+        user: {
+          login,
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: PAGE_SIZE + 1,
     });
@@ -67,9 +73,13 @@ export class PostsQueryRepo {
 
     return { posts: items, nextCursor, hasMore };
   }
-  async getUserPostsNextPage(userId: string, cursor: string): Promise<PostsPage> {
+  async getUserPostsNextPage(login: string, cursor: string): Promise<PostsPage> {
     const posts = await this.prisma.post.findMany({
-      where: { userId },
+      where: {
+        user: {
+          login,
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: PAGE_SIZE + 1,
       cursor: { id: cursor },

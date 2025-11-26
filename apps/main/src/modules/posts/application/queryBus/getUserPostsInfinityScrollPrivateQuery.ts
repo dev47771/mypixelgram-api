@@ -6,7 +6,7 @@ import { UserPostsInfiniteResponse } from '../../api/views/publication.view.dto'
 
 export class GetUserPostsWithInfinityPaginationPrivateCommand {
   constructor(
-    public userId: string,
+    public login: string,
     public query: GetMyPostsDto,
   ) {}
 }
@@ -19,10 +19,10 @@ export class GetUserPostsWithInfinityPaginationPrivateQuery implements IQueryHan
   ) {}
 
   async execute(command: GetUserPostsWithInfinityPaginationPrivateCommand) {
-    const { userId, query } = command;
+    const { login, query } = command;
     const { cursor } = query;
 
-    const page = cursor ? await this.postQueryRepo.getUserPostsNextPage(userId, cursor) : await this.postQueryRepo.getUserPostsFirstPage(userId);
+    const page = cursor ? await this.postQueryRepo.getUserPostsNextPage(login, cursor) : await this.postQueryRepo.getUserPostsFirstPage(login);
 
     const { posts, hasMore, nextCursor } = page;
 
