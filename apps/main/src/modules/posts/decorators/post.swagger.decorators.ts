@@ -57,11 +57,17 @@ export function LastPostsSwagger() {
 
 export function MyPostsInfinitySwagger() {
   return applyDecorators(
-    ApiBearerAuth('JWT-auth'),
     ApiOperation({
       summary: DESCRIPT_HEAD_MY_POSTS,
       description: DESCRIPT_DESC_MY_POSTS,
     }),
+
+    ApiParam({
+      name: 'login',
+      description: 'User login whose posts should be returned',
+      example: 'frontend_guy',
+    }),
+
     ApiQuery({
       name: 'cursor',
       required: false,
@@ -69,15 +75,18 @@ export function MyPostsInfinitySwagger() {
       type: String,
       example: 'c3c829a4-9f2c-4e2f-9e4b-9f6d1320d1a3',
     }),
+
     ApiResponse({
-      status: HttpStatus.OK,
+      status: 200,
       description: DESCRIPT_SUCCESS_MY_POSTS,
       type: UserPostsInfiniteResponseDto,
     }),
+
     ApiBadRequestResponse({
       description: DESCRIPT_BAD_REQUEST_MY_POSTS,
       type: DomainExceptionDto,
     }),
+
     ApiUnauthorizedResponse({
       description: DESCRIPT_UNAUTHORIZED_MY_POSTS,
     }),
@@ -183,9 +192,9 @@ export function GetUserPostsPublicSwagger() {
       description: DESCRIPT_DESC_GET_USER_POSTS_PUBLIC,
     }),
     ApiParam({
-      name: 'userId',
-      description: 'User ID whose public posts should be returned',
-      example: 'c7e1b8e3-3d7f-4a9a-b2f1-8d2c5b4f9a10',
+      name: 'login',
+      description: 'User login whose public posts should be returned',
+      example: 'frontend_guy',
     }),
     ApiOkResponse({
       description: DESCRIPT_SUCCESS_GET_USER_POSTS_PUBLIC,

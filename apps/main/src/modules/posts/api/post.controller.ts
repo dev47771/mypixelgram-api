@@ -45,9 +45,9 @@ export class PostController {
   }
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
-  @Get('my')
+  @Get(':login')
   @MyPostsInfinitySwagger()
-  async getMyPosts(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto, @Query() query: GetMyPostsDto) {
-    return await this.queryBus.execute(new GetUserPostsWithInfinityPaginationPrivateCommand(dto.userId, query));
+  async getMyPosts(@Query() query: GetMyPostsDto, @Param('login') login: string) {
+    return await this.queryBus.execute(new GetUserPostsWithInfinityPaginationPrivateCommand(login, query));
   }
 }
