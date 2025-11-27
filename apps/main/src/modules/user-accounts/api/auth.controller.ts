@@ -80,7 +80,7 @@ export class AuthController {
         maxAge: 3600_000,
       });
       const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
-      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}`;
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
 
       return res.redirect(redirectUrl);
     } catch (e) {
@@ -214,7 +214,7 @@ export class AuthController {
         maxAge: 3600_000,
       });
       const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
-      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}`;
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
 
       return res.redirect(redirectUrl);
     } catch (error) {
