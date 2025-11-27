@@ -4,13 +4,17 @@ import { createHash } from 'node:crypto';
 
 @Injectable()
 export class CryptoService {
-  createPasswordHash(password: string): Promise<string> {
+  async createPasswordHash(password: string): Promise<string> {
     const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
+    const hash = await bcrypt.hash(password, saltRounds);
+    return hash;
   }
 
-  comparePasswords(password: string, passwordHash: string): Promise<boolean> {
-    return bcrypt.compare(password, passwordHash);
+  async comparePasswords(
+    password: string,
+    passwordHash: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, passwordHash);
   }
 
   createPasswordRecoveryCodeHash(recoveryCode: string): string {
