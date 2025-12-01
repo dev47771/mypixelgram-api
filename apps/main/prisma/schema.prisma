@@ -16,7 +16,7 @@ datasource db {
 
 model User {
   id           String    @id @default(uuid())
-  login        String    @db.VarChar(100)
+  login        String    @unique @db.VarChar(100)
   email        String    @db.VarChar(100)
   passwordHash String?
   createdAt    DateTime  @default(now()) @db.Timestamptz()
@@ -28,6 +28,7 @@ model User {
   providers            UserProvider[]
   Session              Session[]
   Post                 Post[]
+  profile              Profile?
 
   @@map("users")
 }
@@ -93,4 +94,19 @@ model Post {
   user User @relation(fields: [userId], references: [id])
 
   @@map("posts")
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String   @unique
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime @db.Timestamptz()
+  country     String?  @db.VarChar(100)
+  city        String?  @db.VarChar(100)
+  aboutMe     String?  @db.VarChar(1000)
+  avatarUrl   String?  @db.VarChar(500)
+
+  @@map("profiles")
 }
