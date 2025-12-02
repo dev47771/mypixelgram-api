@@ -15,7 +15,7 @@ export function UploadFilesSwagger() {
     }),
     ApiConsumes('multipart/form-data'),
     ApiBody({
-      description: 'Multipart form with up to 10 image files (' + 'field name: "post images") and a required "type" field ' + 'that specifies how the files will be used (post/avatar).',
+      description: 'Multipart form. For type="post" you can send up to 10 images ' + '(field name: "post images"). For type="avatar" only the first image ' + 'will be used as avatar and previous avatar (if exists) will be deleted.',
       schema: {
         type: 'object',
         properties: {
@@ -60,7 +60,7 @@ export function UploadFilesSwagger() {
     }),
     ApiBadRequestResponse({
       description: DESCRIPT_BAD_REQUEST_UPLOAD_FILES,
-      type: DomainExceptionDto, // или твой BadRequestPresentationalException DTO
+      type: DomainExceptionDto,
     }),
     ApiUnauthorizedResponse({
       description: DESCRIPT_UNAUTHORIZED_UPLOAD_FILES,

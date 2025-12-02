@@ -82,3 +82,13 @@ export const DESCRIPT_TEXT_GOOGLE_CALLBACK =
   'Handles the callback from Google after successful user authorization. Extracts user data (Google ID, email, login, avatar, tokens) and completes registration or login in the system. On success, sets an HttpOnly refresh token cookie and redirects to the profile page. On error, redirects to the error page.';
 export const DESCRIPT_SUCCESS_GOOGLE_CALLBACK = 'Successful OAuth callback. The refresh token is set as a secure cookie, and the user is redirected to the success page.';
 export const DESCRIPT_ERROR_GOOGLE_CALLBACK = 'Registration or token error during callback processing. The user is redirected to the error page.';
+
+export const DESCRIPT_HEAD_DELETE_AVATAR = 'Delete current user avatar';
+
+export const DESCRIPT_DESC_DELETE_AVATAR = 'Deletes the current user avatar: removes the file from storage and clears avatar URL in the profile. ' + 'If the user has no avatar, the operation completes without changes. Requires JWT.';
+
+export const DESCRIPT_SUCCESS_DELETE_AVATAR = 'Avatar was successfully deleted or was not set.';
+
+export const DESCRIPT_UNAUTHORIZED_DELETE_AVATAR = 'JWT token is missing or invalid.';
+
+export const DESCRIPT_NOT_FOUND_DELETE_AVATAR = 'User or user profile was not found.';

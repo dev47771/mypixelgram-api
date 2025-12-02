@@ -6,3 +6,11 @@ export enum FileType {
 export class InputFileType {
   type: FileType;
 }
+export class UploadedFileInfo {
+  url: string;
+  fileId: string;
+}
+
+export class UploadFilesResponse {
+  data: UploadedFileInfo[];
+}

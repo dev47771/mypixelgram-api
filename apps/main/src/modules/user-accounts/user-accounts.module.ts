@@ -34,6 +34,10 @@ import { GetTotalConfirmedUsersHandler } from './application/queries/get-total-c
 import { PublicUsersController } from './api/public-users.controller';
 import { GetProfileByLogin } from './application/queries/getProfileByLogin';
 import { GetLoginByRefreshTokenUseCase } from './application/queries/get-user-login.outh2';
+import { CreateOrUpdateUseCase } from './application/usecases/profiles/create-or-update-profile.use-case';
+import { DeleteAvatarFileUseCase } from './application/usecases/profiles/delete-avatar-file.use-case';
+import { DeleteUserAvatarUseCase } from './application/usecases/profiles/delete-user-avatar.use-case';
+import { TransportModule } from '../transport/transport.module';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase];
 const commandHandlers = [
@@ -50,6 +54,9 @@ const commandHandlers = [
   RefreshTokenUseCase,
   GithubRegisterUseCase,
   GoogleRegistrationUseCase,
+  CreateOrUpdateUseCase,
+  DeleteAvatarFileUseCase,
+  DeleteUserAvatarUseCase,
 ];
 const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy];
 
@@ -60,6 +67,7 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
       secret: jwtConstraints.secret,
       signOptions: { expiresIn: '20m' },
     }),
+    TransportModule,
   ],
   controllers: [UsersController, AuthController, PublicUsersController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],

@@ -3,12 +3,13 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { PayloadTypeDto } from '../files/api/dto/payloadTypeDto';
 import { ValidFileIdDto } from './trasport-dto';
+import { UploadedFileInfo, UploadFilesResponse } from '../files/api/dto/typeFile.enum';
 
 @Injectable()
 export class TransportService {
   constructor(@Inject('FILES_API') private readonly filesApiClient: ClientProxy) {}
 
-  async sendFilesForS3Upload(payload: PayloadTypeDto): Promise<void> {
+  async sendFilesForS3Upload(payload: PayloadTypeDto): Promise<UploadedFileInfo[]> {
     try {
       const res = await firstValueFrom(this.filesApiClient.send({ cmd: 'filesUpload' }, payload));
       await this.filesApiClient.close();

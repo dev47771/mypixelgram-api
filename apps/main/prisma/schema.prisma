@@ -107,6 +107,7 @@ model Profile {
   city        String?  @db.VarChar(100)
   aboutMe     String?  @db.VarChar(1000)
   avatarUrl   String?  @db.VarChar(500)
+  fileId      String?  @db.VarChar(500)
 
   @@map("profiles")
 }
