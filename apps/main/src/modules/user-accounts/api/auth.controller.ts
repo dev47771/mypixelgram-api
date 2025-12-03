@@ -78,6 +78,7 @@ export class AuthController {
         secure: true,
         sameSite: 'none',
         maxAge: 3600_000,
+        domain: '.mypixelgram.ru',
       });
       const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
       const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
@@ -123,6 +124,7 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
       maxAge: 3600_000,
+      domain: '.mypixelgram.ru',
     });
     return { accessToken: tokens.accessToken } as AccessToken;
   }
@@ -139,6 +141,7 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
       maxAge: 3600_000,
+      domain: '.mypixelgram.ru',
     });
     return {
       accessToken: tokenPair.accessToken,
@@ -212,6 +215,7 @@ export class AuthController {
         secure: true,
         sameSite: 'none',
         maxAge: 3600_000,
+        domain: '.mypixelgram.ru',
       });
       const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
       const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
