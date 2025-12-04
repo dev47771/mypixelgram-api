@@ -174,8 +174,14 @@ export class AuthController {
   @Post('logout')
   @Logout()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
+  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto, @Res({ passthrough: true }) res: Response) {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.mypixelgram.ru',
+    });
   }
 
   @ApiBearerAuth('JWT-auth')

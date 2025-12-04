@@ -1,5 +1,5 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { CreateOrUpdateProfileDto } from '../input-dto/create-or-update-profile.input-dto';
 import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { DESCRIPT_DESC_DELETE_AVATAR, DESCRIPT_HEAD_DELETE_AVATAR, DESCRIPT_NOT_FOUND_DELETE_AVATAR, DESCRIPT_SUCCESS_DELETE_AVATAR, DESCRIPT_UNAUTHORIZED_DELETE_AVATAR } from './constants';
@@ -69,6 +69,28 @@ export function DeleteUserAvatarSwagger() {
     ApiNotFoundResponse({
       description: DESCRIPT_NOT_FOUND_DELETE_AVATAR,
       type: DomainExceptionDto,
+    }),
+  );
+}
+export function GetCountriesWithCitiesSwagger() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get countries with cities',
+      description: 'Returns an object where each key is a country name and the value is an array of its city names. ' + 'The result is cached for some time, so repeated requests may be served from cache without hitting the database.',
+    }),
+    ApiOkResponse({
+      description: 'Successfully retrieved list of countries with their cities.',
+      schema: {
+        type: 'object',
+        additionalProperties: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        example: {
+          Azerbaijan: ['Baku', 'Ganja', 'Sumqayit'],
+          Germany: ['Berlin', 'Munich', 'Hamburg'],
+        },
+      },
     }),
   );
 }

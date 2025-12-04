@@ -111,3 +111,25 @@ model Profile {
 
   @@map("profiles")
 }
+
+model Country {
+  id   Int    @id @default(autoincrement())
+  code String @unique @db.VarChar(2)
+  name String @db.VarChar(150)
+
+  cities City[]
+
+  @@map("countries")
+}
+
+model City {
+  id         Int    @id @default(autoincrement())
+  name       String @db.VarChar(200)
+  population Int?
+
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+
+  @@index([countryId])
+  @@map("cities")
+}

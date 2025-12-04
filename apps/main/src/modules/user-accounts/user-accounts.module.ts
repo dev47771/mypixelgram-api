@@ -38,8 +38,11 @@ import { CreateOrUpdateUseCase } from './application/usecases/profiles/create-or
 import { DeleteAvatarFileUseCase } from './application/usecases/profiles/delete-avatar-file.use-case';
 import { DeleteUserAvatarUseCase } from './application/usecases/profiles/delete-user-avatar.use-case';
 import { TransportModule } from '../transport/transport.module';
+import { GetCountriesWithCitiesHandler } from './application/queries/get-countries-with-cities.query';
+import { LocationsQueryRepo } from './infrastructure/query/locations-query.repo';
+import { CacheModule } from '@nestjs/cache-manager';
 
-const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
@@ -58,10 +61,14 @@ const commandHandlers = [
   DeleteAvatarFileUseCase,
   DeleteUserAvatarUseCase,
 ];
-const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy];
+const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo];
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 30000,
+      isGlobal: true,
+    }),
     PassportModule,
     JwtModule.register({
       secret: jwtConstraints.secret,
