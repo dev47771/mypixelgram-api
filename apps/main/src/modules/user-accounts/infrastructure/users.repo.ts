@@ -220,4 +220,10 @@ export class UsersRepo {
       },
     });
   }
+  async updateUserLogin(userId: string, newLogin: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { login: newLogin },
+    });
+  }
 }

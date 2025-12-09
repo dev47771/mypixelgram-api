@@ -3,7 +3,7 @@ import { UserViewDto } from './view-dto/user.view-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { IntValidationTransformationPipe } from '../../../core/pipes/int-validation-transformation.pipe';
 import { USERS_ROUTE } from '../domain/constants';
-import { ApiGetById, CreateOrUpdateProfileSwagger, DeleteUserAvatarSwagger } from './decorators/user.swagger.decorators';
+import { ApiGetById, CreateOrUpdateProfileSwagger, DeleteUserAvatarSwagger, GetUserProfileSwagger } from './decorators/user.swagger.decorators';
 import { GetUserByIdQuery } from '../application/queries/get-user-by-id.query';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
@@ -14,6 +14,8 @@ import { CreateOrUpdateProfileUseCaseCommand } from '../application/usecases/pro
 import { DeletePostSwagger } from '../../posts/decorators/post.swagger.decorators';
 import { DeletePostCommand } from '../../posts/application/delete-post.use-case';
 import { DeleteUserAvatarCommand } from '../application/usecases/profiles/delete-user-avatar.use-case';
+import { GetUserProfileQuery } from '../infrastructure/query/get-profile.query.handler';
+import { GetProfileOutputDto } from './view-dto/profile-view.dto';
 
 @Controller(USERS_ROUTE)
 export class UsersController {
@@ -21,6 +23,15 @@ export class UsersController {
     private queryBus: QueryBus,
     private commandBus: CommandBus,
   ) {}
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  @HttpCode(HttpStatus.OK)
+  @GetUserProfileSwagger()
+  async getUserProfile(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto): Promise<GetProfileOutputDto | null> {
+    return await this.queryBus.execute(new GetUserProfileQuery(dto.userId));
+  }
 
   @Get(':id')
   @ApiGetById('Return user by id', UserViewDto)

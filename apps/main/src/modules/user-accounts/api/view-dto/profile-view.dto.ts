@@ -35,3 +35,52 @@ export class ProfileViewDto {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 }
+export class GetProfileOutputDto {
+  @ApiProperty({
+    description: 'User login',
+    example: 'frontend_guy',
+  })
+  login: string;
+
+  @ApiProperty({
+    description: 'First name',
+    example: 'John',
+  })
+  firstName: string;
+
+  @ApiProperty({
+    description: 'Last name',
+    example: 'Doe',
+  })
+  lastName: string;
+
+  @ApiProperty({
+    description: 'Date of birth in ISO string format',
+    example: '1999-04-20T00:00:00.000Z',
+  })
+  dateOfBirth: string;
+
+  @ApiProperty({
+    description: 'Country',
+    example: 'Azerbaijan',
+    nullable: true,
+    required: false,
+  })
+  country?: string | null;
+
+  @ApiProperty({
+    description: 'City',
+    example: 'Baku',
+    nullable: true,
+    required: false,
+  })
+  city?: string | null;
+
+  @ApiProperty({
+    description: 'Short bio/about me',
+    example: 'Full‑stack developer and football fan.',
+    nullable: true,
+    required: false,
+  })
+  aboutMe?: string | null;
+}

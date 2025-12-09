@@ -1,8 +1,9 @@
 import { applyDecorators, HttpStatus } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiProperty, ApiResponse, ApiUnauthorizedResponse, getSchemaPath } from '@nestjs/swagger';
 import { CreateOrUpdateProfileDto } from '../input-dto/create-or-update-profile.input-dto';
 import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { DESCRIPT_DESC_DELETE_AVATAR, DESCRIPT_HEAD_DELETE_AVATAR, DESCRIPT_NOT_FOUND_DELETE_AVATAR, DESCRIPT_SUCCESS_DELETE_AVATAR, DESCRIPT_UNAUTHORIZED_DELETE_AVATAR } from './constants';
+import { GetProfileOutputDto } from '../view-dto/profile-view.dto';
 
 export function ApiGetById(description: string, entity: any) {
   return applyDecorators(ApiOperation({ summary: description }), ApiParam({ name: 'id', type: 'string' }), ApiResponse({ status: 200, description: 'Success', type: entity }), ApiResponse({ status: 404, description: 'Not Found' }));
@@ -30,7 +31,7 @@ export function CreateOrUpdateProfileSwagger() {
     ApiBearerAuth('JWT-auth'),
     ApiOperation({
       summary: 'Create or update user profile',
-      description: 'Creates a new profile or updates existing one for the current user. ' + 'Login in the body must belong to the authenticated user; otherwise 403 is returned.',
+      description: 'Creates a new profile or updates the existing one. If login is provided in the body, it will be updated as well, as long as it is unique. ' + 'If the provided login is already taken, a 403 error is returned.',
     }),
     ApiBody({
       description: 'Profile data to create or update',
@@ -44,7 +45,27 @@ export function CreateOrUpdateProfileSwagger() {
       type: DomainExceptionDto,
     }),
     ApiForbiddenResponse({
-      description: 'User is not allowed to use provided login (FORBIDDEN).',
+      description: 'Provided login is already taken by another user.',
+      type: DomainExceptionDto,
+    }),
+    ApiUnauthorizedResponse({
+      description: 'JWT token is missing or invalid.',
+    }),
+  );
+}
+export function GetUserProfileSwagger() {
+  return applyDecorators(
+    ApiBearerAuth('JWT-auth'),
+    ApiOperation({
+      summary: 'Get current user profile',
+      description: 'Returns profile data (first name, last name, date of birth, country, city, about me) for the authenticated user. ' + 'If profile does not exist, 404 is returned.',
+    }),
+    ApiOkResponse({
+      description: 'Successfully retrieved user profile.',
+      type: GetProfileOutputDto,
+    }),
+    ApiNotFoundResponse({
+      description: 'Profile for the current user was not found.',
       type: DomainExceptionDto,
     }),
     ApiUnauthorizedResponse({

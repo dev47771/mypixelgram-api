@@ -7,8 +7,8 @@ export class CreateOrUpdateProfileDto {
     description: 'Login of the current user. Must match the login in their account.',
   })
   @IsString()
-  @MinLength(3)
-  @MaxLength(100)
+  @MinLength(6)
+  @MaxLength(30)
   @IsNotEmpty()
   login: string;
 

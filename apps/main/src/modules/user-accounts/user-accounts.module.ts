@@ -41,8 +41,9 @@ import { TransportModule } from '../transport/transport.module';
 import { GetCountriesWithCitiesHandler } from './application/queries/get-countries-with-cities.query';
 import { LocationsQueryRepo } from './infrastructure/query/locations-query.repo';
 import { CacheModule } from '@nestjs/cache-manager';
+import { GetUserProfileQuery, GetUserProfileUseCase } from './infrastructure/query/get-profile.query.handler';
 
-const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,

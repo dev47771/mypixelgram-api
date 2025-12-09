@@ -21,10 +21,21 @@ export class CreateOrUpdateUseCase implements ICommandHandler<CreateOrUpdateProf
 
   async execute(command: CreateOrUpdateProfileUseCaseCommand) {
     const { userId, dto } = command;
-    const userByLogin = await this.usersRepo.findByLogin(dto.login);
-    if (!userByLogin || userByLogin.id !== userId) {
+
+    const user = await this.usersRepo.findByIdWithProfile(userId);
+    if (!user) {
       throw ForbiddenDomainException.create(ErrorConstants.FORBIDDEN, 'CreateOrUpdateProfileUseCase');
     }
+
+    if (dto.login && dto.login !== user.login) {
+      const candidate = await this.usersRepo.findByLogin(dto.login);
+      if (candidate) {
+        throw ForbiddenDomainException.create(ErrorConstants.LOGIN_ALREADY_TAKEN, 'CreateOrUpdateProfileUseCase');
+      }
+
+      await this.usersRepo.updateUserLogin(userId, dto.login);
+    }
+
     return this.usersRepo.createOrUpdateProfile(userId, dto);
   }
 }
