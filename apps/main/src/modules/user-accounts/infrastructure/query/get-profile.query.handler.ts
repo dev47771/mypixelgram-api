@@ -11,18 +11,18 @@ export class GetUserProfileUseCase implements IQueryHandler<GetUserProfileQuery>
 
   async execute(query: GetUserProfileQuery) {
     const user = await this.usersRepo.findByIdWithProfile(query.userId);
-    if (!user || !user.profile) {
-      throw NotFoundDomainException.create(`Profile with user ${user!.id} not exist`, 'GetUserProfileQuery');
-    }
+
+    const profile = user?.profile;
 
     return {
-      login: user.login,
-      firstName: user.profile.firstName,
-      lastName: user.profile.lastName,
-      dateOfBirth: user.profile.dateOfBirth.toISOString(),
-      country: user.profile.country,
-      city: user.profile.city,
-      aboutMe: user.profile.aboutMe,
+      login: user?.login ?? null,
+
+      firstName: profile?.firstName ?? null,
+      lastName: profile?.lastName ?? null,
+      dateOfBirth: profile?.dateOfBirth ? profile.dateOfBirth.toISOString() : null,
+      country: profile?.country ?? null,
+      city: profile?.city ?? null,
+      aboutMe: profile?.aboutMe ?? null,
     };
   }
 }

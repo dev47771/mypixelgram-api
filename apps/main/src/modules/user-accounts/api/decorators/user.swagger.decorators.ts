@@ -58,15 +58,11 @@ export function GetUserProfileSwagger() {
     ApiBearerAuth('JWT-auth'),
     ApiOperation({
       summary: 'Get current user profile',
-      description: 'Returns profile data (first name, last name, date of birth, country, city, about me) for the authenticated user. ' + 'If profile does not exist, 404 is returned.',
+      description: 'Returns profile data (first name, last name, date of birth, country, city, about me) for the authenticated user. ',
     }),
     ApiOkResponse({
       description: 'Successfully retrieved user profile.',
       type: GetProfileOutputDto,
-    }),
-    ApiNotFoundResponse({
-      description: 'Profile for the current user was not found.',
-      type: DomainExceptionDto,
     }),
     ApiUnauthorizedResponse({
       description: 'JWT token is missing or invalid.',
