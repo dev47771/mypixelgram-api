@@ -83,4 +83,11 @@ export class GetProfileOutputDto {
     required: false,
   })
   aboutMe?: string | null;
+  @ApiProperty({
+    description: 'avatar url',
+    example: 'https://pixels.storage.yandexcloud.net/users/b58a4b97-f7ba-4a5e-86c0-f27aa9919a51/1765453356602-0-Screenshot 2025-04-03 142814.png',
+    nullable: true,
+    required: false,
+  })
+  avatar?: string | null;
 }

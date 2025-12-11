@@ -23,6 +23,7 @@ export class GetUserProfileUseCase implements IQueryHandler<GetUserProfileQuery>
       country: profile?.country ?? null,
       city: profile?.city ?? null,
       aboutMe: profile?.aboutMe ?? null,
+      avatar: profile?.avatarUrl ?? null,
     };
   }
 }
