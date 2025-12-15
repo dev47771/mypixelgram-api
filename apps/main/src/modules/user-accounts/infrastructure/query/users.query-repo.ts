@@ -23,9 +23,12 @@ export class UsersQueryRepo {
     });
   }
 
-  async findByLogin(login: string): Promise<UserModel | null> {
-    return await this.prisma.user.findFirst({
+  async findByLogin(login: string) {
+    return this.prisma.user.findFirst({
       where: { login, deletedAt: null },
+      include: {
+        profile: true,
+      },
     });
   }
 }

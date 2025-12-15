@@ -3,7 +3,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, Ap
 import { CreateOrUpdateProfileDto } from '../input-dto/create-or-update-profile.input-dto';
 import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { DESCRIPT_DESC_DELETE_AVATAR, DESCRIPT_HEAD_DELETE_AVATAR, DESCRIPT_NOT_FOUND_DELETE_AVATAR, DESCRIPT_SUCCESS_DELETE_AVATAR, DESCRIPT_UNAUTHORIZED_DELETE_AVATAR } from './constants';
-import { GetProfileOutputDto } from '../view-dto/profile-view.dto';
+import { GetProfileOutputDto, ProfileViewDto } from '../view-dto/profile-view.dto';
 
 export function ApiGetById(description: string, entity: any) {
   return applyDecorators(ApiOperation({ summary: description }), ApiParam({ name: 'id', type: 'string' }), ApiResponse({ status: 200, description: 'Success', type: entity }), ApiResponse({ status: 404, description: 'Not Found' }));
@@ -108,6 +108,27 @@ export function GetCountriesWithCitiesSwagger() {
           Germany: ['Berlin', 'Munich', 'Hamburg'],
         },
       },
+    }),
+  );
+}
+export function GetProfileByLoginSwagger() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get public user profile by login',
+      description: 'Returns public profile information for the specified user login. ' + 'If the user has an avatar, its URL is returned; otherwise avatar is null.',
+    }),
+    ApiParam({
+      name: 'login',
+      description: 'User login',
+      example: 'frontend_guy',
+    }),
+    ApiOkResponse({
+      description: 'User profile was successfully retrieved.',
+      type: ProfileViewDto,
+    }),
+    ApiNotFoundResponse({
+      description: 'User with the given login was not found.',
+      type: DomainExceptionDto,
     }),
   );
 }

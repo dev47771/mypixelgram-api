@@ -1,31 +1,48 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User as UserModel } from '@prisma/client';
+export class ProfileUserViewDto {
+  @ApiProperty({ example: 'uuid' })
+  id: string;
 
+  @ApiProperty({ example: 'frontend_guy' })
+  login: string;
+
+  @ApiProperty({
+    example: 'https://pixels.storage.yandexcloud.net/users/avatar.png',
+    nullable: true,
+  })
+  avatar: string | null;
+}
 export class ProfileViewDto {
-  @ApiProperty()
-  user: {
-    id: string;
-    login: string;
-    avatar: string | null;
-  };
-  @ApiProperty()
-  publicationCount: number;
-  followers: number;
-  following: number;
-  description: string | null;
+  @ApiProperty({ type: ProfileUserViewDto })
+  user: ProfileUserViewDto;
 
-  static mapToView(profile: UserModel): ProfileViewDto {
+  @ApiProperty({ example: 23 })
+  publicationCount: number;
+
+  @ApiProperty({ example: 120 })
+  followers: number;
+
+  @ApiProperty({ example: 87 })
+  following: number;
+
+  @ApiProperty({
+    example: 'About me text',
+    nullable: true,
+  })
+  description: string | null;
+  static mapToView(user: UserModel & { profile?: { avatarUrl: string | null; aboutMe: string | null } }): ProfileViewDto {
     const dto = new ProfileViewDto();
 
     dto.user = {
-      id: profile.id,
-      login: profile.login,
-      avatar: null,
+      id: user.id,
+      login: user.login,
+      avatar: user.profile?.avatarUrl ?? null,
     };
     dto.publicationCount = this.getRandomInt(10, 50);
     dto.followers = this.getRandomInt(10, 50);
     dto.following = this.getRandomInt(10, 50);
-    dto.description = null;
+    dto.description = user.profile?.aboutMe ?? null;
     return dto;
   }
 
@@ -35,6 +52,7 @@ export class ProfileViewDto {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 }
+
 export class GetProfileOutputDto {
   @ApiProperty({
     description: 'User login',
