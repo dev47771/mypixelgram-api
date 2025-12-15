@@ -53,5 +53,9 @@ export class UserViewDto {
   }
 }
 export class ViewTotalCountData {
+  @ApiProperty({
+    description: 'Total number of confirmed users',
+    example: 1523,
+  })
   totalCount: number;
 }

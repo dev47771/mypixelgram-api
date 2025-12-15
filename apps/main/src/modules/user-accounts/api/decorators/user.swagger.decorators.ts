@@ -4,6 +4,7 @@ import { CreateOrUpdateProfileDto } from '../input-dto/create-or-update-profile.
 import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { DESCRIPT_DESC_DELETE_AVATAR, DESCRIPT_HEAD_DELETE_AVATAR, DESCRIPT_NOT_FOUND_DELETE_AVATAR, DESCRIPT_SUCCESS_DELETE_AVATAR, DESCRIPT_UNAUTHORIZED_DELETE_AVATAR } from './constants';
 import { GetProfileOutputDto, ProfileViewDto } from '../view-dto/profile-view.dto';
+import { ViewTotalCountData } from '../view-dto/user.view-dto';
 
 export function ApiGetById(description: string, entity: any) {
   return applyDecorators(ApiOperation({ summary: description }), ApiParam({ name: 'id', type: 'string' }), ApiResponse({ status: 200, description: 'Success', type: entity }), ApiResponse({ status: 404, description: 'Not Found' }));
@@ -129,6 +130,18 @@ export function GetProfileByLoginSwagger() {
     ApiNotFoundResponse({
       description: 'User with the given login was not found.',
       type: DomainExceptionDto,
+    }),
+  );
+}
+export function GetTotalConfirmedUsersSwagger() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get total count of confirmed users',
+      description: 'Returns the total number of users with confirmed accounts.',
+    }),
+    ApiOkResponse({
+      description: 'Total confirmed users count',
+      type: ViewTotalCountData,
     }),
   );
 }
