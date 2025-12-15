@@ -34,7 +34,7 @@ export class LastPostViewDto {
     dto.user = {
       userId: post.userId,
       login: post.user.login,
-      avatar: null,
+      avatar: post.user.profile?.avatarUrl ?? null,
     };
 
     return dto;

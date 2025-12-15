@@ -48,7 +48,11 @@ export class PostsQueryRepo {
       },
       take: 4,
       include: {
-        user: true,
+        user: {
+          include: {
+            profile: true,
+          },
+        },
       },
     });
 
