@@ -1,38 +1,31 @@
-# Check out https://hub.docker.com/_/node to select a new base image
 FROM node:20.11-alpine
+
 ARG port
 ARG service
+
 ENV SERVICE=$service
 ENV PORT=$port
-# Set to a non-root built-in user `node`
 
 USER node
 
-# Create app directory (with user `node`)
-RUN mkdir -p /home/node/dist/${SERVICE}
+# 1️⃣ Корень приложения
+WORKDIR /home/node/app
 
-WORKDIR /home/node/dist/${SERVICE}
-
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-
-
-
+# 2️⃣ Устанавливаем зависимости
 COPY --chown=node package*.json ./
-
 RUN npm install --frozen-lockfile
 
-# Bundle app source code
+# 3️⃣ Копируем весь проект
 COPY --chown=node . .
 
-# Генерируем Prisma Client
+# 4️⃣ Генерируем Prisma Client
 RUN npx prisma generate --schema=./apps/main/prisma/schema.prisma
 
+# 5️⃣ Собираем нужный сервис (main / files-api)
 RUN npm run build:${SERVICE}
 
-# Bind to all network interfaces so that it can be mapped to the host OS
-
+# 6️⃣ Пробрасываем порт
 EXPOSE ${PORT}
 
-CMD ["node", "dist/apps/main/main.js"]
+# 7️⃣ Проверка + запуск (ВАЖНО)
+CMD ["sh", "-c", "echo 'PWD:' && pwd && echo 'DIST CONTENT:' && ls -la dist/apps/main && echo 'STARTING APP' && node dist/apps/main/main.js"]
