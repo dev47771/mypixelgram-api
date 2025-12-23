@@ -31,4 +31,10 @@ export class UsersQueryRepo {
       },
     });
   }
+  async findSessionsByUserId(userId: string) {
+    return this.prisma.session.findMany({
+      where: { userId },
+      orderBy: { exp: 'desc' },
+    });
+  }
 }
