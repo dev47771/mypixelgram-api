@@ -5,8 +5,6 @@ ARG service
 
 ENV SERVICE=$service
 ENV PORT=$port
-ENV NODE_ENV=production
-
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node
 
@@ -26,6 +24,7 @@ RUN npx prisma generate --schema=./apps/main/prisma/schema.prisma
 
 # 4️⃣ build нужного сервиса
 RUN npm run build:${SERVICE}
+ENV NODE_ENV=production
 
 EXPOSE ${PORT}
 
