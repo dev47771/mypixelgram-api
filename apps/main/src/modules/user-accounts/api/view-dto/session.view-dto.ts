@@ -3,6 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class SessionViewDto {
   @ApiProperty({ example: 'uuid' })
   sessionId: string;
+  @ApiProperty({ example: 'uuid' })
+  deviceId: string;
 
   @ApiProperty({
     description: 'Device name / model from user-agent',
@@ -60,6 +62,7 @@ export class SessionViewDto {
     if (device.type === 'tablet') deviceType = 'tablet';
 
     return {
+      deviceId: session.deviceId,
       sessionId: session.id,
       deviceName,
       deviceType,
