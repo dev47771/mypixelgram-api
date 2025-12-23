@@ -10,24 +10,22 @@ RUN mkdir -p /home/node/app && chown -R node:node /home/node
 
 USER node
 
-# 1️⃣ Корень приложения
 WORKDIR /home/node/app
 
-# 2️⃣ Устанавливаем зависимости
+# 1️⃣ зависимости
 COPY --chown=node package*.json ./
 RUN npm install --frozen-lockfile
 
-# 3️⃣ Копируем весь проект
+# 2️⃣ код
 COPY --chown=node . .
 
-# 4️⃣ Генерируем Prisma Client
+# 3️⃣ prisma
 RUN npx prisma generate --schema=./apps/main/prisma/schema.prisma
 
-# 5️⃣ Собираем нужный сервис (main / files-api)
+# 4️⃣ build нужного сервиса
 RUN npm run build:${SERVICE}
 
-# 6️⃣ Пробрасываем порт
 EXPOSE ${PORT}
 
-# 7️⃣ Проверка + запуск (ВАЖНО)
-CMD ["sh", "-c", "echo 'PWD:' && pwd && echo 'DIST CONTENT:' && ls -la dist/apps/main && echo 'STARTING APP' && node dist/apps/main/main.js"]
+# 5️⃣ запуск
+CMD ["sh", "-c", "set -x; node dist/apps/main/main.js; echo EXIT_CODE=$?; sleep 30"]
