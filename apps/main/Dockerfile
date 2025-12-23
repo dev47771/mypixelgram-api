@@ -6,6 +6,8 @@ ARG service
 ENV SERVICE=$service
 ENV PORT=$port
 
+RUN mkdir -p /home/node/app && chown -R node:node /home/node
+
 USER node
 
 # 1️⃣ Корень приложения
