@@ -5,6 +5,8 @@ ARG service
 
 ENV SERVICE=$service
 ENV PORT=$port
+ENV NODE_ENV=production
+
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node
 
