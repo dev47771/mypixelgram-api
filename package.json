@@ -14,7 +14,7 @@
     "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
     "start:dev:files-api": "cross-env NODE_ENV=development.local nest start files-api --watch",
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
-    "start:main": "cross-env NODE_ENV=production nest start main --watch",
+    "start:main": "cross-env NODE_ENV=production nest start main",
     "start:files-api": "cross-env NODE_ENV=production nest start files-api --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/apps/main/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
