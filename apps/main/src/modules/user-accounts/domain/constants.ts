@@ -4,4 +4,3 @@ export const PUBLIC_USERS_ROUTE = 'public/users';
 
 export const POST_ROUTE = 'posts';
 export const PUBLIC_POST_ROUTE = 'public/posts';
-export const SECURITY_ROUTE = 'security/devices';
