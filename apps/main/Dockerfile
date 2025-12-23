@@ -35,4 +35,4 @@ RUN npm run build:${SERVICE}
 
 EXPOSE ${PORT}
 
-CMD npm run 'start:main'
+CMD ["node", "dist/apps/main/main.js"]
