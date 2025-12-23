@@ -5,7 +5,8 @@ export class SessionViewDto {
   sessionId: string;
 
   @ApiProperty({
-    description: 'Raw user-agent string',
+    description: 'Device name / model from user-agent',
+    example: 'iPhone 14 Pro Max',
   })
   deviceName: string;
 
@@ -22,10 +23,10 @@ export class SessionViewDto {
   browser: string;
 
   @ApiProperty({
-    description: 'Operating system name',
-    example: 'Windows',
+    description: 'IP address of the session',
+    example: '192.168.0.1',
   })
-  os: string;
+  ip: string;
 
   @ApiProperty({
     description: 'Last activity time (ISO 8601)',
@@ -36,26 +37,34 @@ export class SessionViewDto {
     description: 'Is this the current session',
   })
   isCurrent: boolean;
+
   static mapToView(
     session: {
       id: string;
-      deviceName: string;
+      deviceName: string; // raw user-agent
       deviceId: string;
       iat: string;
+      ip: string;
     },
     currentDeviceId: string,
   ): SessionViewDto {
     const UAParser = require('ua-parser-js');
-
     const parser = new UAParser(session.deviceName);
-    const result = parser.getResult();
+
+    const { device, browser } = parser.getResult();
+
+    const deviceName = device.model || session.deviceName;
+
+    let deviceType: 'mobile' | 'desktop' | 'tablet' = 'desktop';
+    if (device.type === 'mobile') deviceType = 'mobile';
+    if (device.type === 'tablet') deviceType = 'tablet';
 
     return {
       sessionId: session.id,
-      deviceName: session.deviceName,
-      deviceType: (result.device.type ?? 'desktop') as 'mobile' | 'desktop' | 'tablet',
-      browser: result.browser.name ?? 'Unknown',
-      os: result.os.name ?? 'Unknown',
+      deviceName,
+      deviceType,
+      browser: browser.name || 'Unknown',
+      ip: session.ip,
       lastActiveAt: session.iat,
       isCurrent: session.deviceId === currentDeviceId,
     };
