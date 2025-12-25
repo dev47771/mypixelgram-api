@@ -7,7 +7,7 @@ export class SessionViewDto {
   deviceId: string;
 
   @ApiProperty({
-    description: 'Device name / model from user-agent',
+    description: 'Device model or OS name ',
     example: 'iPhone 14 Pro Max',
   })
   deviceName: string;
@@ -43,7 +43,7 @@ export class SessionViewDto {
   static mapToView(
     session: {
       id: string;
-      deviceName: string; // raw user-agent
+      deviceName: string;
       deviceId: string;
       iat: string;
       ip: string;
@@ -53,9 +53,9 @@ export class SessionViewDto {
     const UAParser = require('ua-parser-js');
     const parser = new UAParser(session.deviceName);
 
-    const { device, browser } = parser.getResult();
+    const { device, browser, os } = parser.getResult();
 
-    const deviceName = device.model || session.deviceName;
+    const deviceName = (device.model || os.name) ?? 'Unknown';
 
     let deviceType: 'mobile' | 'desktop' | 'tablet' = 'desktop';
     if (device.type === 'mobile') deviceType = 'mobile';
