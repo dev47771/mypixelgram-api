@@ -11,7 +11,6 @@ export class S3StorageAdapter {
   constructor(private configService: ConfigService) {
     this.s3Client = new S3Client({
       region: this.configService.get<string>('BUCKET_REGION'),
-      endpoint: this.configService.get<string>('BUCKET_ENDPOINT'),
       credentials: {
         secretAccessKey: this.configService.get<string>('BUCKET_SECRET_ACCESS_KEY')!,
         accessKeyId: this.configService.get<string>('BUCKET_ACCESS_KEY_ID')!,
@@ -50,7 +49,7 @@ export class S3StorageAdapter {
         uploadedKeys.push(key);
         const dtoMongo = {
           originalName: file.originalname,
-          url: `https://${this.bucketName}.storage.yandexcloud.net/${key}`,
+          url: `https://${this.bucketName}.s3.eu-north-1.amazonaws.com/${key}`,
           fileId: uuidv4(),
           key: key,
           mimetype: file.mimetype,

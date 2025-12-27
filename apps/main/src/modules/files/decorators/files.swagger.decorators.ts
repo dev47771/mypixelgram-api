@@ -15,7 +15,10 @@ export function UploadFilesSwagger() {
     }),
     ApiConsumes('multipart/form-data'),
     ApiBody({
-      description: 'Multipart form. For type="post" you can send up to 10 images ' + '(field name: "post images"). For type="avatar" only the first image ' + 'will be used as avatar and previous avatar (if exists) will be deleted.',
+      description:
+        'Multipart form. For type="post" you can send up to 10 images (field name: "post images"). ' +
+        'For type="avatar" only the first image will be used as avatar and previous avatar (if exists) will be deleted. ' +
+        'If the profile entity has not been created yet, the user will not be able to upload an avatar.',
       schema: {
         type: 'object',
         properties: {

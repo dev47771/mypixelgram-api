@@ -3,7 +3,8 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiForbiddenResponse, Ap
 import { CreateOrUpdateProfileDto } from '../input-dto/create-or-update-profile.input-dto';
 import { DomainExceptionDto } from '../../../../core/exceptions/domain/domainException.dto';
 import { DESCRIPT_DESC_DELETE_AVATAR, DESCRIPT_HEAD_DELETE_AVATAR, DESCRIPT_NOT_FOUND_DELETE_AVATAR, DESCRIPT_SUCCESS_DELETE_AVATAR, DESCRIPT_UNAUTHORIZED_DELETE_AVATAR } from './constants';
-import { GetProfileOutputDto } from '../view-dto/profile-view.dto';
+import { GetProfileOutputDto, ProfileViewDto } from '../view-dto/profile-view.dto';
+import { ViewTotalCountData } from '../view-dto/user.view-dto';
 
 export function ApiGetById(description: string, entity: any) {
   return applyDecorators(ApiOperation({ summary: description }), ApiParam({ name: 'id', type: 'string' }), ApiResponse({ status: 200, description: 'Success', type: entity }), ApiResponse({ status: 404, description: 'Not Found' }));
@@ -58,15 +59,11 @@ export function GetUserProfileSwagger() {
     ApiBearerAuth('JWT-auth'),
     ApiOperation({
       summary: 'Get current user profile',
-      description: 'Returns profile data (first name, last name, date of birth, country, city, about me) for the authenticated user. ' + 'If profile does not exist, 404 is returned.',
+      description: 'Returns profile data (first name, last name, date of birth, country, city, about me) for the authenticated user. ',
     }),
     ApiOkResponse({
       description: 'Successfully retrieved user profile.',
       type: GetProfileOutputDto,
-    }),
-    ApiNotFoundResponse({
-      description: 'Profile for the current user was not found.',
-      type: DomainExceptionDto,
     }),
     ApiUnauthorizedResponse({
       description: 'JWT token is missing or invalid.',
@@ -112,6 +109,39 @@ export function GetCountriesWithCitiesSwagger() {
           Germany: ['Berlin', 'Munich', 'Hamburg'],
         },
       },
+    }),
+  );
+}
+export function GetProfileByLoginSwagger() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get public user profile by login',
+      description: 'Returns public profile information for the specified user login. ' + 'If the user has an avatar, its URL is returned; otherwise avatar is null.',
+    }),
+    ApiParam({
+      name: 'login',
+      description: 'User login',
+      example: 'frontend_guy',
+    }),
+    ApiOkResponse({
+      description: 'User profile was successfully retrieved.',
+      type: ProfileViewDto,
+    }),
+    ApiNotFoundResponse({
+      description: 'User with the given login was not found.',
+      type: DomainExceptionDto,
+    }),
+  );
+}
+export function GetTotalConfirmedUsersSwagger() {
+  return applyDecorators(
+    ApiOperation({
+      summary: 'Get total count of confirmed users',
+      description: 'Returns the total number of users with confirmed accounts.',
+    }),
+    ApiOkResponse({
+      description: 'Total confirmed users count',
+      type: ViewTotalCountData,
     }),
   );
 }
