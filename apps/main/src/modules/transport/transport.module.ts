@@ -24,6 +24,25 @@ import { ConfigService } from '@nestjs/config';
         },
         inject: [ConfigService],
       },
+      {
+        name: 'PAYMENT',
+        useFactory: async (configService: ConfigService) => {
+          const isLocal = process.env.NODE_ENV === 'development.local';
+
+          return {
+            transport: Transport.TCP,
+            options: isLocal
+              ? {
+                  port: Number(configService.get('PAYMENT_API_PORT')),
+                }
+              : {
+                  port: Number(configService.get('PAYMENT_API_PORT')),
+                  host: configService.get('PAYMENT_API_HOST'),
+                },
+          };
+        },
+        inject: [ConfigService],
+      },
     ]),
   ],
   providers: [TransportService],

@@ -16,14 +16,20 @@ import { DeletePostCommand } from '../../posts/application/delete-post.use-case'
 import { DeleteUserAvatarCommand } from '../application/usecases/profiles/delete-user-avatar.use-case';
 import { GetUserProfileQuery } from '../infrastructure/query/get-profile.query.handler';
 import { GetProfileOutputDto } from './view-dto/profile-view.dto';
+import { TransportService } from '../../transport/transport.service';
 
 @Controller(USERS_ROUTE)
 export class UsersController {
   constructor(
     private queryBus: QueryBus,
     private commandBus: CommandBus,
+    private transport: TransportService,
   ) {}
-
+  @Get('rabbit')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async sendPing() {
+    return this.transport.pingPayment('lalalaaaa');
+  }
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('profile')
@@ -56,3 +62,4 @@ export class UsersController {
     return await this.commandBus.execute(new DeleteUserAvatarCommand(dto.userId));
   }
 }
+//pingPayment
