@@ -4,7 +4,7 @@ import { PaymentApiModule } from './payment-api.module';
 async function bootstrap() {
   const isLocal = process.env.NODE_ENV === 'development.local';
 
-  const microservicePort = Number(process.env.PAYMENT_API_MICROSERVICE_PORT);
+  const microservicePort = isLocal ? process.env.PAYMENT_API_MICROSERVICE_PORT : Number(process.env.PORT);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
   const app = await NestFactory.create(PaymentApiModule);
 
