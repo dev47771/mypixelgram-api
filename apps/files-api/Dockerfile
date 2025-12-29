@@ -6,7 +6,6 @@ ARG service
 ENV SERVICE=$service
 ENV PORT=$port
 ENV PORT_FILES_API=$port
-ENV NODE_ENV=production
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node
 
@@ -23,7 +22,9 @@ COPY --chown=node . .
 # build
 RUN npm run build:${SERVICE}
 
-EXPOSE ${PORT}
+# runtime
+ENV NODE_ENV=production
 
+EXPOSE ${PORT}
 
 CMD ["node", "dist/apps/files-api/main.js"]
