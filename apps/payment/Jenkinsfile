@@ -73,15 +73,9 @@ pipeline {
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             nvm use --lts
 
-            export DATABASE_URL="${DATABASE_URL}"
-
-            echo "=== DEBUG DATABASE_URL via shell ==="
-            echo "$DATABASE_URL"
-
-            echo "=== DEBUG DATABASE_URL via node ==="
+            echo "=== DATABASE_URL ==="
             node -e "console.log(process.env.DATABASE_URL)"
 
-            echo "=== Running sequelize migrations ==="
             yarn payment:migrate
           '''
         }
