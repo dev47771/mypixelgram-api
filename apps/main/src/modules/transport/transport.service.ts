@@ -7,7 +7,10 @@ import { UploadedFileInfo, UploadFilesResponse } from '../files/api/dto/typeFile
 
 @Injectable()
 export class TransportService {
-  constructor(@Inject('FILES_API') private readonly filesApiClient: ClientProxy) {}
+  constructor(
+    @Inject('FILES_API') private readonly filesApiClient: ClientProxy,
+    @Inject('PAYMENT') private readonly paymentApiClient: ClientProxy,
+  ) {}
 
   async sendFilesForS3Upload(payload: PayloadTypeDto): Promise<UploadedFileInfo[]> {
     try {
@@ -40,5 +43,8 @@ export class TransportService {
 
   async getFiles(arrayFilesId: string[]) {
     return await firstValueFrom(this.filesApiClient.send({ cmd: 'getFiles' }, arrayFilesId));
+  }
+  async pingPayment(data: string) {
+    return await firstValueFrom(this.paymentApiClient.send({ cmd: 'ping' }, data));
   }
 }
