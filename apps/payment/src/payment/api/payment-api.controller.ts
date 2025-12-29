@@ -5,7 +5,7 @@ import { MessagePattern } from '@nestjs/microservices';
 export class PaymentApiController {
   @MessagePattern({ cmd: 'ping' })
   async ping(data: string) {
-    console.log('PING RECEIVED:', data);
-    return 'pong from files-api 🚀';
+    console.log('[PAYMENT] PING RECEIVED:', data);
+    return 'pong from payment-api';
   }
 }

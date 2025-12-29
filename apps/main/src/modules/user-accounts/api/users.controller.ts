@@ -28,7 +28,10 @@ export class UsersController {
   @Post('rabbit')
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendPing() {
-    return this.transport.pingPayment('lalalaaaa');
+    console.log('[HTTP] /users/rabbit CALLED');
+    const res = await this.transport.pingPayment('lalalaaaa');
+    console.log('[HTTP] pingPayment RESULT:', res);
+    return res;
   }
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)

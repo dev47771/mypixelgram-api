@@ -45,6 +45,12 @@ export class TransportService {
     return await firstValueFrom(this.filesApiClient.send({ cmd: 'getFiles' }, arrayFilesId));
   }
   async pingPayment(data: string) {
-    return await firstValueFrom(this.paymentApiClient.send({ cmd: 'ping' }, data));
+    try {
+      console.log('[TRANSPORT] pingPayment START', data);
+      return await firstValueFrom(this.paymentApiClient.send({ cmd: 'ping' }, data));
+    } catch (e) {
+      console.error('[TRANSPORT] pingPayment ERROR', e);
+      throw e;
+    }
   }
 }
