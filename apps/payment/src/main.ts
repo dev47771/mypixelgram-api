@@ -30,5 +30,6 @@ async function bootstrap() {
   console.log(`payment application started on port ${port}`);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
   console.log('rabbitmq ', process.env.RABBITMQ_URL);
+  console.log('DATABASE URL ', process.env.DATABASE_URL);
 }
 bootstrap();
