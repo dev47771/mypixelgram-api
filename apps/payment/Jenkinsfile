@@ -65,22 +65,28 @@ pipeline {
                  echo "Push image finished..."
              }
        }
-      stage('Run DB migrations') {
-        steps {
-          script {
-            sh '''
-              export NVM_DIR="$HOME/.nvm"
-              [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-              nvm use --lts
+    stage('Run DB migrations') {
+      steps {
+        script {
+          sh '''
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            nvm use --lts
 
-              yarn install --frozen-lockfile
+            export DATABASE_URL="${DATABASE_URL}"
 
-              echo "Running sequelize migrations..."
-              yarn payment:migrate
-            '''
-          }
+            echo "=== DEBUG DATABASE_URL via shell ==="
+            echo "$DATABASE_URL"
+
+            echo "=== DEBUG DATABASE_URL via node ==="
+            node -e "console.log(process.env.DATABASE_URL)"
+
+            echo "=== Running sequelize migrations ==="
+            yarn payment:migrate
+          '''
         }
       }
+    }
        stage('Delete image local') {
              steps {
                  script {
