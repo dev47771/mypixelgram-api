@@ -1,36 +1,29 @@
-# Check out https://hub.docker.com/_/node to select a new base image
 FROM node:20.11-alpine
+
 ARG port
 ARG service
+
 ENV SERVICE=$service
 ENV PORT=$port
 ENV PORT_FILES_API=$port
-# Set to a non-root built-in user `node`
+ENV NODE_ENV=production
+
+RUN mkdir -p /home/node/app && chown -R node:node /home/node
 
 USER node
+WORKDIR /home/node/app
 
-# Create app directory (with user `node`)
-RUN mkdir -p /home/node/dist/${SERVICE}
-
-WORKDIR /home/node/dist/${SERVICE}
-
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-
-
-
+# deps
 COPY --chown=node package*.json ./
-
 RUN npm install --frozen-lockfile
 
-# Bundle app source code
+# code
 COPY --chown=node . .
 
+# build
 RUN npm run build:${SERVICE}
-
-# Bind to all network interfaces so that it can be mapped to the host OS
 
 EXPOSE ${PORT}
 
-CMD npm run 'start:files-api'
+
+CMD ["node", "dist/apps/files-api/main.js"]
