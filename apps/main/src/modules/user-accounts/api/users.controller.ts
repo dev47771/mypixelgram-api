@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { UserViewDto } from './view-dto/user.view-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { IntValidationTransformationPipe } from '../../../core/pipes/int-validation-transformation.pipe';
@@ -25,7 +25,7 @@ export class UsersController {
     private commandBus: CommandBus,
     private transport: TransportService,
   ) {}
-  @Get('rabbit')
+  @Post('rabbit')
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendPing() {
     return this.transport.pingPayment('lalalaaaa');
