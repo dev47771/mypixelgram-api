@@ -29,5 +29,7 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`payment application started on port ${port}`);
+  console.log('[PAYMENT] TCP PORT:', microservicePort);
+  console.log('rabbitmq ', process.env.RABBITMQ_URL);
 }
 bootstrap();
