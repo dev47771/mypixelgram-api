@@ -36,8 +36,8 @@
     "prisma:migrate:test:local": "dotenv -e ./apps/main/src/env/.env.testing.local -- npx prisma migrate dev --schema=./apps/main/prisma/schema.prisma",
     "main:prisma:status": "dotenv -e ./apps/main/src/env/.env.production -- npx prisma migrate status --schema=./apps/main/prisma/schema.prisma",
     "main:import:locations": "dotenv -e ./apps/main/src/env/.env.development.local -- npx ts-node apps/main/scripts/import-locations",
-    "payment:migrate": "sequelize-cli db:migrate --env production",
-    "payment:migrate:undo": "sequelize-cli db:migrate:undo --env production"
+    "payment:migrate": "sequelize-cli db:migrate --env production --config apps/payment/config/config.js --migrations-path apps/payment/migrations",
+    "payment:migrate:undo": "sequelize-cli db:migrate:undo --env production --config apps/payment/config/config.js --migrations-path apps/payment/migrations"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.932.0",
