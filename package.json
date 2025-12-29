@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "build:main": "nest build main",
-    "build:files-api":  "npx nest build files-api",
+    "build:files-api": "npx nest build files-api",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "cross-env NODE_ENV=development.local nest start main --watch",
@@ -83,7 +83,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
+    "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.1.6",
     "@types/bcrypt": "^6.0.0",
