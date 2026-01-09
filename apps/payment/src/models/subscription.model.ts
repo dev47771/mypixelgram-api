@@ -9,12 +9,7 @@ export enum SubscriptionStatus {
   REPLACED = 'replaced',
 }
 
-@Table({
-  tableName: 'subscriptions',
-  timestamps: true,
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-})
+@Table({ tableName: 'subscriptions', timestamps: true })
 export class SubscriptionModel extends Model<SubscriptionModel> {
   @PrimaryKey
   @AutoIncrement
@@ -23,40 +18,48 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
 
   @AllowNull(false)
   @Column(DataType.UUID)
-  userId: string;
+  declare userId: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  planId: string;
+  declare planId: string;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  planName: string;
+  declare planName: string;
 
   @AllowNull(false)
   @Column(DataType.INTEGER)
-  priceCents: number;
+  declare priceCents: number;
 
   @AllowNull(false)
   @Column(DataType.ENUM(...Object.values(SubscriptionStatus)))
-  status: SubscriptionStatus;
+  declare status: SubscriptionStatus;
 
   @AllowNull(true)
   @Column(DataType.STRING)
-  stripeSubscriptionId?: string;
+  declare stripeSubscriptionId?: string;
 
   @AllowNull(true)
   @Column(DataType.STRING)
-  stripeCustomerId?: string;
+  declare stripeCustomerId?: string;
 
   @AllowNull(true)
   @Column(DataType.DATE)
-  startedAt?: Date;
+  declare startedAt?: Date;
 
   @AllowNull(true)
   @Column(DataType.DATE)
-  expiresAt?: Date;
+  declare expiresAt?: Date;
 
   @HasMany(() => PaymentModel)
-  payments: PaymentModel[];
+  declare payments?: PaymentModel[];
+
+  @AllowNull(true)
+  @Column(DataType.JSON)
+  declare outboxEvents?: Array<{
+    type: string;
+    payload: any;
+    createdAt: Date;
+  }>;
 }

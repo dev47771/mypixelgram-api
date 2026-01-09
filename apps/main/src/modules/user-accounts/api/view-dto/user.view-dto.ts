@@ -1,4 +1,4 @@
-import { User as UserModel, Profile } from '@prisma/client';
+import { User as UserModel, Profile, AccountType } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserViewDto {
@@ -40,6 +40,28 @@ export class UserViewDto {
   })
   dateOfBirth: string | null;
 
+  @ApiProperty({
+    enum: AccountType,
+    example: 'BUSINESS',
+    default: 'PERSONAL',
+  })
+  accountType: AccountType;
+
+  @ApiProperty({
+    description: 'Current subscription info',
+    nullable: true,
+    example: {
+      planName: 'YEAR',
+      expiresAt: '2026-12-31T23:59:59.000Z',
+      nextPayment: '2027-01-01T00:00:00.000Z',
+    },
+  })
+  currentSubscription: {
+    planName: string;
+    expiresAt: string;
+    nextPayment: string;
+  } | null;
+
   static mapToView(user: UserModel & { profile: Profile | null }): UserViewDto {
     const dto = new UserViewDto();
 
@@ -49,6 +71,16 @@ export class UserViewDto {
     dto.avatar = user.profile?.avatarUrl ?? null;
     dto.userId = user.id;
     dto.dateOfBirth = user.profile?.dateOfBirth ? user.profile.dateOfBirth.toISOString() : null;
+    dto.accountType = user.accountType;
+
+    dto.currentSubscription =
+      user.planName && user.subscriptionExpiresAt
+        ? {
+            planName: user.planName,
+            expiresAt: user.subscriptionExpiresAt.toISOString(),
+            nextPayment: user.subscriptionExpiresAt.toISOString(), // упрощённо
+          }
+        : null;
     return dto;
   }
 }

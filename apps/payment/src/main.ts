@@ -1,12 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { PaymentApiModule } from './payment-api.module';
+import * as bodyParser from 'body-parser';
+
 async function bootstrap() {
   const isLocal = process.env.NODE_ENV === 'development.local';
+  console.log('is local', isLocal, process.env.NODE_ENV);
 
   const microservicePort = isLocal ? process.env.PAYMENT_API_MICROSERVICE_PORT : Number(process.env.PORT);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
   const app = await NestFactory.create(PaymentApiModule);
+  app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
 
   app.connectMicroservice({
     transport: Transport.TCP,
@@ -16,20 +20,13 @@ async function bootstrap() {
     },
   });
 
-  app.connectMicroservice({
-    transport: Transport.RMQ,
-    options: {
-      urls: [process.env.RABBITMQ_URL],
-      queue: 'payments_events',
-    },
-  });
+  await app.init();
 
   await app.startAllMicroservices();
   const port = Number(process.env.PORT ?? 3002);
+  await app.listen(port);
 
   console.log(`payment application started on port ${port}`);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
-  console.log('rabbitmq ', process.env.RABBITMQ_URL);
-  console.log('DATABASE URL ', process.env.DATABASE_URL);
 }
 bootstrap();
