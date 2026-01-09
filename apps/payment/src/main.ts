@@ -7,7 +7,7 @@ async function bootstrap() {
   const isLocal = process.env.NODE_ENV === 'development.local';
   console.log('is local', isLocal, process.env.NODE_ENV);
 
-  const microservicePort = isLocal ? process.env.PAYMENT_API_MICROSERVICE_PORT : Number(process.env.PORT);
+  const microservicePort = isLocal ? process.env.PAYMENT_API_MICROSERVICE_PORT : Number(process.env.PAYMENT_TCP_PROD_PORT);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
   const app = await NestFactory.create(PaymentApiModule);
   app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
@@ -23,7 +23,7 @@ async function bootstrap() {
   await app.init();
 
   await app.startAllMicroservices();
-  const port = Number(process.env.PAYMENT_APPLICATION_PORT ?? 3002);
+  const port = Number(process.env.PORT ?? 3002);
   await app.listen(port);
 
   console.log(`payment application started on port ${port}`);

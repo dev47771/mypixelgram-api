@@ -51,11 +51,11 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-payment-api-production-config-secret
                    key: STRIPE_WEBHOOK_SECRET
-             - name: PAYMENT_APPLICATION_PORT
+             - name: PAYMENT_TCP_PROD_PORT
                valueFrom:
                  secretKeyRef:
                    name: mypixelgram-payment-api-production-config-secret
-                   key: PAYMENT_APPLICATION_PORT
+                   key: PAYMENT_TCP_PROD_PORT
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
