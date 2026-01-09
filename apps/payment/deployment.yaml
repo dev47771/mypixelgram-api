@@ -31,6 +31,26 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-payment-api-production-config-secret
                    key: PAYMENT_API_MICROSERVICE_PORT
+             - name: STRIPE_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_SECRET_KEY
+             - name: PAYMENT_SUCCESS_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_SUCCESS_URL
+             - name: PAYMENT_ERROR_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_ERROR_URL
+             - name: STRIPE_WEBHOOK_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_WEBHOOK_SECRET
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
