@@ -23,7 +23,7 @@ async function bootstrap() {
   await app.init();
 
   await app.startAllMicroservices();
-  const port = Number(process.env.PORT ?? 3002);
+  const port = Number(process.env.PAYMENT_APPLICATION_PORT ?? 3002);
   await app.listen(port);
 
   console.log(`payment application started on port ${port}`);
