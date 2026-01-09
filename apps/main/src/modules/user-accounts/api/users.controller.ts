@@ -23,16 +23,7 @@ export class UsersController {
   constructor(
     private queryBus: QueryBus,
     private commandBus: CommandBus,
-    private transport: TransportService,
   ) {}
-  @Post('rabbit')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async sendPing() {
-    console.log('[HTTP] /users/rabbit CALLED');
-    const res = await this.transport.pingPayment('lalalaaaa');
-    console.log('[HTTP] pingPayment RESULT:', res);
-    return res;
-  }
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('profile')
@@ -65,4 +56,3 @@ export class UsersController {
     return await this.commandBus.execute(new DeleteUserAvatarCommand(dto.userId));
   }
 }
-//pingPayment

@@ -7,10 +7,7 @@ export enum PaymentStatus {
   FAILED = 'failed',
 }
 
-@Table({
-  tableName: 'payments',
-  timestamps: false,
-})
+@Table({ tableName: 'payments', timestamps: false })
 export class PaymentModel extends Model<PaymentModel> {
   @PrimaryKey
   @AutoIncrement
@@ -19,39 +16,39 @@ export class PaymentModel extends Model<PaymentModel> {
 
   @AllowNull(false)
   @Column(DataType.UUID)
-  userId: string;
+  declare userId: string;
 
   @ForeignKey(() => SubscriptionModel)
   @AllowNull(false)
   @Column(DataType.BIGINT)
-  subscriptionId: number;
+  declare subscriptionId: number;
 
   @BelongsTo(() => SubscriptionModel)
-  subscription: SubscriptionModel;
+  declare subscription?: SubscriptionModel;
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  provider: string;
+  declare provider: string;
 
   @AllowNull(false)
   @Column(DataType.INTEGER)
-  amountCents: number;
+  declare amountCents: number;
 
   @AllowNull(false)
   @Column(DataType.STRING(3))
-  currency: string;
+  declare currency: string;
 
   @AllowNull(false)
   @Column(DataType.ENUM(...Object.values(PaymentStatus)))
-  status: PaymentStatus;
+  declare status: PaymentStatus;
 
   @AllowNull(true)
   @Column(DataType.STRING)
-  stripePaymentIntentId?: string;
+  declare stripePaymentIntentId?: string;
 
   @AllowNull(true)
   @Column(DataType.STRING)
-  stripeInvoiceId?: string;
+  declare stripeInvoiceId?: string;
 
   @AllowNull(false)
   @Column(DataType.DATE)

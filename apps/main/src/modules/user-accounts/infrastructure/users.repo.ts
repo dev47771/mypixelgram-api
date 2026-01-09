@@ -226,4 +226,14 @@ export class UsersRepo {
       data: { login: newLogin },
     });
   }
+  async updateSubscription(userId: string, planName: string, expiresAt: Date, accountType: 'PERSONAL' | 'BUSINESS' = 'BUSINESS') {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        accountType,
+        planName,
+        subscriptionExpiresAt: expiresAt,
+      },
+    });
+  }
 }

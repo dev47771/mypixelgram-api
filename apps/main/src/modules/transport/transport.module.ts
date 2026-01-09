@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TransportService } from './transport.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
+import { PaymentEventsController } from './payment-events.controller';
+import { UsersRepo } from '../user-accounts/infrastructure/users.repo';
 @Module({
   imports: [
     ClientsModule.registerAsync([
@@ -44,8 +46,8 @@ import { ConfigService } from '@nestjs/config';
       },
     ]),
   ],
-  providers: [TransportService],
-  controllers: [],
+  providers: [TransportService, UsersRepo],
+  controllers: [PaymentEventsController],
   exports: [TransportService],
 })
 export class TransportModule {}

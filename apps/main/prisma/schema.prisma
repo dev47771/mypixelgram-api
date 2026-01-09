@@ -30,7 +30,16 @@ model User {
   Post                 Post[]
   profile              Profile?
 
+  accountType           AccountType @default(PERSONAL)
+  planName              String?
+  subscriptionExpiresAt DateTime?   @db.Timestamptz()
+
   @@map("users")
+}
+
+enum AccountType {
+  PERSONAL
+  BUSINESS
 }
 
 model UserConfirmation {
