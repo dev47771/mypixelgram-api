@@ -14,6 +14,7 @@ export class PaymentApiController {
 
   @MessagePattern({ cmd: 'createSubscriptionCheckout' })
   async createCheckout(payload: CreateCheckoutPayload) {
+    console.log('here get message:  ', payload);
     return this.commandBus.execute(new CreateSubscriptionCheckoutCommand(payload.userId, payload.planId));
   }
 
