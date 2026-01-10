@@ -24,9 +24,9 @@ async function bootstrap() {
 
   await app.startAllMicroservices();
   const port = Number(process.env.PORT ?? 3002);
-  await app.listen(port);
+  //await app.listen(port);
 
-  console.log(`payment application started on port ${port}`);
+  //console.log(`payment application started on port ${port}`);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
 }
 bootstrap();
