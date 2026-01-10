@@ -10,7 +10,7 @@ async function bootstrap() {
   const microservicePort = isLocal ? process.env.PAYMENT_API_MICROSERVICE_PORT : Number(process.env.PAYMENT_TCP_PROD_PORT);
   console.log('[PAYMENT] TCP PORT:', microservicePort);
   const app = await NestFactory.create(PaymentApiModule);
-  app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
+  //app.use('/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
 
   app.connectMicroservice({
     transport: Transport.TCP,

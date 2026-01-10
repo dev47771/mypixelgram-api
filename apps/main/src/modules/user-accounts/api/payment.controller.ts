@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, Res, UseGuards, HttpStatus } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { PAYMENT_ROUTE } from '../domain/constants';
 import { TransportService } from '../../transport/transport.service';
 import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
@@ -45,5 +46,21 @@ export class PaymentController {
       page: parseInt(page),
       limit: parseInt(limit),
     });
+  }
+  @Post('stripe/webhook')
+  async stripeWebhook(@Req() req: Request, @Res() res: Response) {
+    console.log('[GATEWAY WEBHOOK] signature:', req.headers['stripe-signature']);
+    console.log('[GATEWAY WEBHOOK] raw body length:', req.body?.length || 0);
+
+    try {
+      await this.transport.handleStripeWebhook({
+        rawBody: req.body.toString(),
+        headers: req.headers as Record<string, string>,
+      });
+      return res.status(200).json({ received: true });
+    } catch (e) {
+      console.error('[GATEWAY WEBHOOK ERROR]', e);
+      return res.status(400).send('Error');
+    }
   }
 }

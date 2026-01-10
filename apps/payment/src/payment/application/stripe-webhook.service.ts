@@ -22,11 +22,12 @@ export class StripeWebhookService {
   ) {}
 
   async handle(req: Request) {
-    console.log('[SERVICE] Starting handle, event:', JSON.stringify(req.body));
     const sig = req.headers['stripe-signature'];
     if (!sig) throw new Error('Missing stripe-signature');
+    const rawBodyStr = req.body as string;
+    console.log('[SERVICE] raw length:', rawBodyStr.length);
 
-    const event = this.stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+    const event = this.stripe.webhooks.constructEvent(rawBodyStr, sig, process.env.STRIPE_WEBHOOK_SECRET!);
 
     switch (event.type) {
       case 'checkout.session.completed':

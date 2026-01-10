@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { appSetup } from './setup/app.setup';
 import { ConfigService } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(AppModule);
@@ -10,6 +11,7 @@ async function bootstrap() {
   console.log(`main application started on port ${process.env.PORT}`);
   const DynamicAppModule = await AppModule.forRoot(configService);
   const app = await NestFactory.create(DynamicAppModule);
+  app.use('/api/v1/payment/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
   await appContext.close();
 
   appSetup(app);
