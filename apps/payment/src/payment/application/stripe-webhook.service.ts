@@ -22,6 +22,7 @@ export class StripeWebhookService {
   ) {}
 
   async handle(req: Request) {
+    console.log('[SERVICE] Starting handle, event:', JSON.stringify(req.body));
     const sig = req.headers['stripe-signature'];
     if (!sig) throw new Error('Missing stripe-signature');
 
