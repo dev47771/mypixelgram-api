@@ -57,4 +57,11 @@ export class TransportService {
       throw new RpcException(e.message);
     }
   }
+  async handleStripeWebhook(payload: { rawBody: string; headers: Record<string, string> }) {
+    try {
+      return await firstValueFrom(this.paymentApiClient.send({ cmd: 'handleStripeWebhook' }, payload));
+    } catch (e) {
+      throw new RpcException(e.message);
+    }
+  }
 }
