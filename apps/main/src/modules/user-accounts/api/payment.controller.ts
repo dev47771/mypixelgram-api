@@ -49,12 +49,19 @@ export class PaymentController {
   }
   @Post('stripe/webhook')
   async stripeWebhook(@Req() req: Request, @Res() res: Response) {
-    console.log('[GATEWAY WEBHOOK] signature:', req.headers['stripe-signature']);
-    console.log('[GATEWAY WEBHOOK] raw body length:', req.body?.length || 0);
+    const signature = req.headers['stripe-signature'] as string;
+    const rawBody = (req as any).rawBody || req.body;
+
+    if (!signature || !rawBody) {
+      console.log('[GATEWAY WEBHOOK] Missing signature or body');
+      return res.status(400).send('Invalid webhook');
+    }
+
+    console.log('[GATEWAY WEBHOOK] OK, length:', rawBody.length);
 
     try {
       await this.transport.handleStripeWebhook({
-        rawBody: req.body.toString(),
+        rawBody: typeof rawBody === 'string' ? rawBody : rawBody.toString(),
         headers: req.headers as Record<string, string>,
       });
       return res.status(200).json({ received: true });
