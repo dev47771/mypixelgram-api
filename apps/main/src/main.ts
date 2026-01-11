@@ -11,7 +11,14 @@ async function bootstrap() {
   console.log(`main application started on port ${process.env.PORT}`);
   const DynamicAppModule = await AppModule.forRoot(configService);
   const app = await NestFactory.create(DynamicAppModule);
-  app.use('/api/v1/payment/stripe/webhook', bodyParser.raw({ type: 'application/json' }));
+  app.use(
+    bodyParser.raw({
+      type: 'application/json',
+      verify: (req, res, buf) => {
+        (req as any).rawBody = buf;
+      },
+    }),
+  );
   await appContext.close();
 
   appSetup(app);
