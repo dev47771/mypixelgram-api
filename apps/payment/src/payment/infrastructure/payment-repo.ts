@@ -56,6 +56,7 @@ export class PaymentRepo {
     });
 
     return payments.map((payment) => ({
+      id: payment.id.toString(),
       paymentDate: payment.createdAt.toISOString().split('T')[0],
       amount: `$${(payment.amountCents / 100).toFixed(2)}`,
       endDate: payment.subscription?.expiresAt ? payment.subscription.expiresAt.toISOString().split('T')[0] : 'N/A',

@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class PaymentHistoryItemDto {
+  @ApiProperty({ example: '122' })
+  id: string;
+
   @ApiProperty({ example: '2026-01-08' })
   paymentDate: string;
 
