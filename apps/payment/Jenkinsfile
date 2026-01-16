@@ -35,19 +35,14 @@ pipeline {
         }
         stage('Apply database migrations') {
             steps {
-                echo "Migration started"
-                withCredentials([string(credentialsId: 'DATABASE_URL', variable: 'DB_URL')]) {
-                    script {
-                        sh '''
-                            export NVM_DIR="$HOME/.nvm"
-                            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                            nvm use 20
-                            export DATABASE_URL="$DB_URL"
-                            yarn payment:migrate
-                        '''
-                    }
-                }
-                echo "Migration finished"
+                sh '''
+                    nvm use 20
+                    echo "=== DB URL test ==="
+                    echo $DATABASE_URL
+                    cd apps/payment && ls -la config/
+                    cat config/config.js | grep DATABASE
+                    sequelize-cli db:migrate:status --config config/config.js
+                '''
             }
         }
         stage('Unit tests') {
