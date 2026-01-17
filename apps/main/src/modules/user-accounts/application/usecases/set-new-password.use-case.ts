@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
 import { CryptoService } from '../crypto.service';
-import { BadRequestException } from '@nestjs/common';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class SetNewPasswordCommand {
   constructor(
@@ -26,14 +26,14 @@ export class SetNewPasswordUseCase
 
     if (!userWithRecoveryInfo)
       throw BadRequestDomainException.create(
-        'Recovery code is incorrect',
-        'code',
+        ErrorConstants.RECOVERY_CODE_INCORRECT,
+        'SetNewPasswordUseCase',
       );
 
     if (new Date() > userWithRecoveryInfo.passwordRecoveryInfo!.expirationDate)
       throw BadRequestDomainException.create(
-        'Recovery code is expired',
-        'recoveryCode',
+        ErrorConstants.RECOVERY_CODE_EXPIRED,
+        'SetNewPasswordUseCase',
       );
 
     await this.usersRepo.deletePasswordRecoveryByUserId(
