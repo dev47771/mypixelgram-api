@@ -92,3 +92,8 @@ export const DESCRIPT_SUCCESS_DELETE_AVATAR = 'Avatar was successfully deleted o
 export const DESCRIPT_UNAUTHORIZED_DELETE_AVATAR = 'JWT token is missing or invalid.';
 
 export const DESCRIPT_NOT_FOUND_DELETE_AVATAR = 'User or user profile was not found.';
+
+export const DESCRIPT_HEAD_CANCEL_SUBSCRIPTION = 'Cancel active subscription';
+export const DESCRIPT_DESC_CANCEL_SUBSCRIPTION = 'Clears User.planName, User.subscriptionExpiresAt, sets AccountType=PERSONAL';
+export const DESCRIPT_BAD_REQUEST_CANCEL_SUBSCRIPTION = 'No active subscription found';
+export const DESCRIPT_SUCCESS_CANCEL_SUBSCRIPTION = 'Subscription cancelled successfully';
