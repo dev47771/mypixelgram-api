@@ -47,6 +47,7 @@ import { GetUserSessionsHandler } from './application/queries/get-all-sessions.q
 import { TerminateSessionByDeviceIdHandler } from './application/usecases/terminate-session-deviceId.use-case';
 import { TerminateAllSessionsExceptCurrentHandler } from './application/usecases/terminate-all-sessions-except-current.use-case';
 import { PaymentController } from './api/payment.controller';
+import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
 const commandHandlers = [
@@ -68,6 +69,7 @@ const commandHandlers = [
   DeleteUserAvatarUseCase,
   TerminateSessionByDeviceIdHandler,
   TerminateAllSessionsExceptCurrentHandler,
+  CancelSubscriptionUseCase,
 ];
 const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo];
 

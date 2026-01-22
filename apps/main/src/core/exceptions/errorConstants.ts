@@ -37,4 +37,7 @@ export const ErrorConstants = {
   EMAIL_ALREADY_TAKEN: 'Email is already in use',
   POST_NOT_FOUND: 'Post not found',
   FILE_ID_NOT_FOUND: 'Field Id not found',
+
+  // PAYMENT ERRORS
+  PAYMENT_NOT_FOUND: 'Payment Not Found',
 };

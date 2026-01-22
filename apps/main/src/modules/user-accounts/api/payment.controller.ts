@@ -1,15 +1,20 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { PAYMENT_ROUTE } from '../domain/constants';
 import { TransportService } from '../../transport/transport.service';
 import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { CreateSubscriptionCheckoutDto } from './input-dto/create-subscription-checkout.input-dto';
-import { CreateSubscriptionCheckoutSwagger, GetPaymentsSwagger, PaymentErrorSwagger, PaymentSuccessSwagger } from './decorators/payment-swagger.decorators';
+import { CancelSubscriptionSwagger, CreateSubscriptionCheckoutSwagger, GetPaymentsSwagger, PaymentErrorSwagger, PaymentSuccessSwagger } from './decorators/payment-swagger.decorators';
+import { CancelSubscriptionCommand } from '../application/usecases/cancel-subscription.usecase';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller(PAYMENT_ROUTE)
 export class PaymentController {
-  constructor(private transport: TransportService) {}
+  constructor(
+    private transport: TransportService,
+    private commandBus: CommandBus,
+  ) {}
 
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
@@ -69,5 +74,12 @@ export class PaymentController {
       console.error('[GATEWAY WEBHOOK ERROR]', e);
       return res.status(400).send('Error');
     }
+  }
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Delete('subscription/cancel')
+  @CancelSubscriptionSwagger()
+  async cancelSubscription(@Req() req) {
+    return this.commandBus.execute(new CancelSubscriptionCommand(req.user.id));
   }
 }

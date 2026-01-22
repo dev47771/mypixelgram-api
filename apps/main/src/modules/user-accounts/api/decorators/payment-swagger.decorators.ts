@@ -17,6 +17,7 @@ import {
 } from '../../domain/decorator-constants';
 import { PaymentHistoryItemDto } from '../view-dto/payment-view.dto';
 import { CreateSubscriptionCheckoutDto } from '../input-dto/create-subscription-checkout.input-dto';
+import { DESCRIPT_BAD_REQUEST_CANCEL_SUBSCRIPTION, DESCRIPT_DESC_CANCEL_SUBSCRIPTION, DESCRIPT_HEAD_CANCEL_SUBSCRIPTION, DESCRIPT_SUCCESS_CANCEL_SUBSCRIPTION } from './constants';
 
 export function CreateSubscriptionCheckoutSwagger() {
   return applyDecorators(
@@ -125,4 +126,29 @@ export class PaymentsResponseDto {
     total: number;
     pages: number;
   };
+}
+
+export function CancelSubscriptionSwagger() {
+  return applyDecorators(
+    ApiBearerAuth('JWT-auth'),
+    ApiOperation({
+      summary: DESCRIPT_HEAD_CANCEL_SUBSCRIPTION,
+      description: DESCRIPT_DESC_CANCEL_SUBSCRIPTION,
+    }),
+    ApiOkResponse({
+      description: DESCRIPT_SUCCESS_CANCEL_SUBSCRIPTION,
+    }),
+    ApiBadRequestResponse({
+      description: DESCRIPT_BAD_REQUEST_CANCEL_SUBSCRIPTION,
+      schema: {
+        example: {
+          message: 'Payment Not Found',
+          meta: 'CancelSubscriptionCommand',
+        },
+      },
+    }),
+    ApiUnauthorizedResponse({
+      description: DESCRIPT_UNAUTHORIZED,
+    }),
+  );
 }
