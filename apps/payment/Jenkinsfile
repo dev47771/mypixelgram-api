@@ -38,7 +38,7 @@ pipeline {
                         export NVM_DIR="$HOME/.nvm"
                         [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
                         nvm use 20
-                        export DATABASE_URL="mysql://root:JuWJqYJiSORvyjqdIpHOhBrQFzVHLkYi@metro.proxy.rlwy.net:32616/railway"
+                        export DATABASE_URL="mysql://mysqluser:5uper%24tr0ngp%40ssw0rd@node-project-mysql-server.mysql.database.azure.com:3306/node_project"
                         yarn payment:migrate
                     '''
                 }
