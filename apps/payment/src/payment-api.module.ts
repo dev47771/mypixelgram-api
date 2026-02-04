@@ -45,14 +45,16 @@ export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymen
       useFactory: (config: ConfigService) => {
         // @ts-ignore
         const dbUrl = new URL(config.get<string>('DATABASE_URL'));
+        const username = decodeURIComponent(dbUrl.username);
+        const password = decodeURIComponent(dbUrl.password);
 
         return {
           dialect: 'mysql',
           host: dbUrl.hostname,
           port: Number(dbUrl.port),
           database: dbUrl.pathname.replace('/', ''),
-          username: dbUrl.username,
-          password: dbUrl.password,
+          username: username,
+          password: password,
 
           models: [PaymentModel, SubscriptionModel],
         };
