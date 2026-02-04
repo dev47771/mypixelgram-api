@@ -64,4 +64,11 @@ export class TransportService {
       throw new RpcException(e.message);
     }
   }
+  async cancelStripeSubscription(payload: { userId: string }) {
+    try {
+      return await firstValueFrom(this.paymentApiClient.send({ cmd: 'cancelStripeSubscription' }, payload));
+    } catch (e) {
+      throw new RpcException(e.message);
+    }
+  }
 }

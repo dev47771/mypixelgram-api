@@ -1,4 +1,4 @@
-export const CHECKOUT_MODE = 'payment';
+export const CHECKOUT_MODE = 'subscription';
 export const CURRENCY = 'USD';
 export const PRODUCT_NAME = 'Subscription';
 export const LINE_ITEM_QUANTITY = 1;

@@ -61,4 +61,48 @@ export class SubscriptionRepo {
 
     await subscription.update({ outboxEvents: events }, { transaction: tx });
   }
+  async findByStripeSubscriptionId(stripeSubscriptionId: string, tx?: Transaction) {
+    return this.subscriptionModel.findOne({
+      where: { stripeSubscriptionId },
+      transaction: tx,
+    });
+  }
+
+  async attachStripeRefs(subscriptionId: number, data: { stripeCustomerId?: string; stripeSubscriptionId?: string }, tx: Transaction) {
+    await this.subscriptionModel.update(data, { where: { id: subscriptionId }, transaction: tx });
+  }
+  async attachStripeData(
+    subscriptionId: number,
+    data: {
+      stripeCustomerId?: string;
+      stripeSubscriptionId?: string;
+    },
+    tx: Transaction,
+  ) {
+    await this.subscriptionModel.update(data, {
+      where: { id: subscriptionId },
+      transaction: tx,
+    });
+  }
+  async findActiveByUserId(userId: string, transaction?: Transaction) {
+    return this.subscriptionModel.findOne({
+      where: {
+        userId,
+        status: SubscriptionStatus.ACTIVE,
+      },
+      transaction,
+    });
+  }
+
+  async updateStatus(subscriptionId: number, status: SubscriptionStatus, transaction?: Transaction) {
+    return this.subscriptionModel.update(
+      {
+        status,
+      },
+      {
+        where: { id: subscriptionId },
+        transaction,
+      },
+    );
+  }
 }

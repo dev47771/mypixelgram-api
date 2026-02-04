@@ -73,4 +73,36 @@ export class PaymentRepo {
       },
     });
   }
+  async findByStripeInvoiceId(stripeInvoiceId: string, tx?: Transaction) {
+    return this.paymentModel.findOne({
+      where: { stripeInvoiceId },
+      transaction: tx,
+    });
+  }
+
+  async createFromInvoice(
+    data: {
+      userId: string;
+      subscriptionId: number;
+      amountCents: number;
+      currency: string;
+      status: PaymentStatus;
+      stripeInvoiceId: string;
+    },
+    tx: Transaction,
+  ) {
+    return (this.paymentModel as any).create(
+      {
+        userId: data.userId,
+        subscriptionId: data.subscriptionId,
+        provider: 'stripe',
+        amountCents: data.amountCents,
+        currency: data.currency,
+        status: data.status,
+        stripeInvoiceId: data.stripeInvoiceId,
+        createdAt: new Date(),
+      },
+      { transaction: tx },
+    );
+  }
 }
