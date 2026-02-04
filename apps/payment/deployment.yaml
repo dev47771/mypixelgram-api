@@ -56,6 +56,26 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-payment-api-production-config-secret
                    key: PAYMENT_TCP_PROD_PORT
+             - name: STRIPE_PRICE_DAY
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_DAY
+             - name: STRIPE_PRICE_WEEK
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_WEEK
+             - name: STRIPE_PRICE_MONTH
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_MONTH
+             - name: STRIPE_PRICE_YEAR
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_YEAR
              - name: DATABASE_URL
                valueFrom:
                  secretKeyRef:
