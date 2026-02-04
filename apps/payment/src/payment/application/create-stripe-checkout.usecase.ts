@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Sequelize } from 'sequelize-typescript';
-import { SUBSCRIPTION_PLANS } from '../domain/plans.config';
+import { PlanId, SubscriptionPlansService } from '../domain/plans.config';
 import { SubscriptionStatus } from '../../models/subscription.model';
 import { PaymentStatus } from '../../models/payment.model';
 import { SubscriptionRepo } from '../infrastructure/subscription-repo';
@@ -11,7 +11,7 @@ import { InjectConnection } from '@nestjs/sequelize';
 export class CreateSubscriptionCheckoutCommand {
   constructor(
     public readonly userId: string,
-    public readonly planId: keyof typeof SUBSCRIPTION_PLANS,
+    public readonly planId: PlanId,
   ) {}
 }
 
@@ -23,22 +23,20 @@ export class CreateSubscriptionCheckoutUseCase implements ICommandHandler<Create
     private readonly subscriptionRepo: SubscriptionRepo,
     private readonly paymentRepo: PaymentRepo,
     private readonly stripeService: StripeCheckoutService,
+    private readonly plansService: SubscriptionPlansService, // <-- инжектим
   ) {}
 
   async execute(command: CreateSubscriptionCheckoutCommand) {
     const { userId, planId } = command;
 
-    const plan = SUBSCRIPTION_PLANS[planId];
-    if (!plan) {
-      throw new Error('Invalid subscription plan');
-    }
+    const plan = this.plansService.getPlan(planId);
 
     return this.sequelize.transaction(async (tx) => {
       const subscription = await this.subscriptionRepo.create(
         {
           userId,
           planId,
-          planName: planId,
+          planName: plan.id,
           priceCents: plan.priceCents,
           status: SubscriptionStatus.PENDING,
           createdAt: new Date(),
@@ -59,10 +57,11 @@ export class CreateSubscriptionCheckoutUseCase implements ICommandHandler<Create
         },
         tx,
       );
-
+      console.log('stipe price id ', plan.stripePriceId);
       const session = await this.stripeService.createCheckoutSession({
         paymentId: payment.id,
-        amountCents: plan.priceCents,
+        userId,
+        stripePriceId: plan.stripePriceId,
       });
 
       return {

@@ -18,7 +18,9 @@ import { OutboxScheduler } from './payment/jobs/outbox.scheduler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GetUserPaymentsQueryHandler } from './payment/application/get-user-payments.query-handler';
-export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymentsQueryHandler];
+import { SubscriptionPlansService } from './payment/domain/plans.config';
+import { CancelStripeSubscriptionUseCase } from './payment/application/cancle-subscription.usecase';
+export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymentsQueryHandler, CancelStripeSubscriptionUseCase];
 
 @Module({
   imports: [
@@ -65,6 +67,6 @@ export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymen
     CqrsModule,
   ],
   controllers: [PaymentApiController, StripeWebhookController],
-  providers: [SubscriptionRepo, PaymentRepo, StripeCheckoutService, ...CommandHandlers, StripeWebhookService, OutboxScheduler],
+  providers: [SubscriptionRepo, PaymentRepo, StripeCheckoutService, ...CommandHandlers, StripeWebhookService, OutboxScheduler, SubscriptionPlansService],
 })
 export class PaymentApiModule {}
