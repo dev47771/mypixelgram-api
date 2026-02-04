@@ -34,8 +34,7 @@ export class StripeWebhookService {
       case 'checkout.session.completed':
         await this.onCheckoutCompleted(event.data.object);
         break;
-      case 'invoice.paid':
-      case 'invoice.payment_succeeded': // <- добавь сюда
+      case 'invoice.payment_succeeded':
         await this.onInvoicePaid(event.data.object as any);
         break;
 
@@ -182,6 +181,7 @@ export class StripeWebhookService {
       );
     });
   }
+
   private getInvoiceSubscriptionId(invoice: any): string | null {
     if (typeof invoice?.subscription === 'string') return invoice.subscription;
 
