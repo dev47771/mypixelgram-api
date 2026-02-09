@@ -20,7 +20,9 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { GetUserPaymentsQueryHandler } from './payment/application/get-user-payments.query-handler';
 import { SubscriptionPlansService } from './payment/domain/plans.config';
 import { CancelStripeSubscriptionUseCase } from './payment/application/cancle-subscription.usecase';
-export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymentsQueryHandler, CancelStripeSubscriptionUseCase];
+import { NotificationPublisherService } from './payment/jobs/subscription.jobs';
+import { SubscriptionReminderRecoveryJob } from './payment/jobs/subscription-reminder.recovery';
+export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymentsQueryHandler, CancelStripeSubscriptionUseCase, NotificationPublisherService];
 
 @Module({
   imports: [
@@ -67,6 +69,6 @@ export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymen
     CqrsModule,
   ],
   controllers: [PaymentApiController, StripeWebhookController],
-  providers: [SubscriptionRepo, PaymentRepo, StripeCheckoutService, ...CommandHandlers, StripeWebhookService, OutboxScheduler, SubscriptionPlansService],
+  providers: [SubscriptionRepo, PaymentRepo, StripeCheckoutService, ...CommandHandlers, StripeWebhookService, OutboxScheduler, SubscriptionReminderRecoveryJob, SubscriptionPlansService],
 })
 export class PaymentApiModule {}

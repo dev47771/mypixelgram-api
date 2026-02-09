@@ -9,6 +9,7 @@ import { PaymentStatus } from '../../models/payment.model';
 import { SubscriptionStatus } from '../../models/subscription.model';
 import { DEFAULT_PLAN_DAYS, MS_PER_DAY, SUBSCRIPTION_PURCHASED_EVENT } from '../domain/PAYMENT-CONSTANTS';
 import { PlanId, SubscriptionPlansService } from '../domain/plans.config';
+import { NotificationPublisherService } from '../jobs/subscription.jobs';
 
 @Injectable()
 export class StripeWebhookService {
@@ -20,6 +21,7 @@ export class StripeWebhookService {
     private readonly paymentRepo: PaymentRepo,
     private readonly subscriptionRepo: SubscriptionRepo,
     private readonly plansService: SubscriptionPlansService,
+    private readonly notificationPublisherService: NotificationPublisherService,
   ) {}
 
   async handle(req: Request) {
@@ -39,7 +41,8 @@ export class StripeWebhookService {
         break;
 
       case 'invoice.payment_failed':
-        await this.onInvoicePaymentFailed(event.data.object as any);
+      case 'payment_intent.payment_failed':
+        await this.onFailedAutoPayment(event.data.object as any);
         break;
     }
   }
@@ -121,6 +124,7 @@ export class StripeWebhookService {
       await this.subscriptionRepo.replaceActive(sub.userId, tx);
 
       await this.subscriptionRepo.activateById(sub.id, tx, planDays);
+      const expiresAt = new Date(Date.now() + planDays * MS_PER_DAY).toISOString();
 
       await this.subscriptionRepo.addOutboxEvent(
         sub.id,
@@ -129,33 +133,38 @@ export class StripeWebhookService {
           userId: sub.userId,
           subscriptionId: sub.id,
           planName: sub.planName,
-          expiresAt: new Date(Date.now() + planDays * MS_PER_DAY).toISOString(),
+          expiresAt: expiresAt,
           stripeInvoiceId,
         },
         tx,
       );
+      const delayMs = this.calculateDelayForReminder(expiresAt);
+      await this.notificationPublisherService.scheduleSubscriptionReminder(sub.userId, sub.id.toString(), sub.planName, expiresAt, delayMs);
+
+      console.log(`[MAIN] Notification job scheduled for user ${sub.userId}, subscription ${sub.id}, delay ${delayMs}ms`);
     });
   }
 
-  private async onInvoicePaymentFailed(invoice: any) {
-    const stripeInvoiceId: string = invoice?.id;
+  private async onFailedAutoPayment(invoice: any) {
+    const stripeInvoiceId: string | undefined = invoice?.id;
+    if (!stripeInvoiceId) return;
+
     const stripeSubscriptionId = this.getInvoiceSubscriptionId(invoice);
 
-    if (!stripeInvoiceId || !stripeSubscriptionId) return;
-
     await this.sequelize.transaction(async (tx) => {
-      const sub = await this.subscriptionRepo.findByStripeSubscriptionId(stripeSubscriptionId, tx);
-      if (!sub) return;
+      const sub = stripeSubscriptionId ? await this.subscriptionRepo.findByStripeSubscriptionId(stripeSubscriptionId, tx) : null;
 
-      const already = await this.paymentRepo.findByStripeInvoiceId(stripeInvoiceId, tx);
+      const userId: string = sub?.userId ?? invoice?.customer ?? 'unknown';
+      const subscriptionId: number = sub?.id ?? 0;
+      const planName: string = sub?.planName ?? 'unknown';
 
-      if (!already) {
-        const amountCents: number = invoice?.amount_due ?? 0;
-        const currency: string = (invoice?.currency ?? 'usd').toUpperCase();
+      const amountCents: number = invoice?.amount_due ?? 0;
+      const currency: string = (invoice?.currency ?? 'usd').toUpperCase();
 
+      if (sub) {
         await this.paymentRepo.createFromInvoice(
           {
-            userId: sub.userId,
+            userId,
             subscriptionId: sub.id,
             amountCents,
             currency,
@@ -164,21 +173,23 @@ export class StripeWebhookService {
           },
           tx,
         );
+
+        await sub.update({ status: SubscriptionStatus.CANCELED }, { transaction: tx });
       }
 
-      await sub.update({ status: SubscriptionStatus.CANCELED }, { transaction: tx });
-
       await this.subscriptionRepo.addOutboxEvent(
-        sub.id,
+        subscriptionId,
         'subscription.payment_failed',
         {
-          userId: sub.userId,
-          subscriptionId: sub.id,
-          planName: sub.planName,
+          userId,
+          subscriptionId,
+          planName,
           stripeInvoiceId,
         },
         tx,
       );
+
+      console.log('[DEBUG] Failed auto payment processed for', userId, subscriptionId);
     });
   }
 
@@ -192,5 +203,12 @@ export class StripeWebhookService {
     if (typeof parentSub === 'string') return parentSub;
 
     return null;
+  }
+  private calculateDelayForReminder(expiresAt: string, notifyBeforeMs = (23 * 60 + 59) * 60 * 1000): number {
+    const expiresAtDate = new Date(expiresAt);
+    const now = new Date();
+
+    const delayMs = expiresAtDate.getTime() - now.getTime() - notifyBeforeMs;
+    return Math.max(delayMs, 0);
   }
 }

@@ -14,6 +14,7 @@ import { PresentationalHttpExceptionFilter } from './core/exceptions/presentatio
 import { PostModule } from './modules/posts/posts.module';
 import { FileModule } from './modules/files/files.module';
 import { TransportModule } from './modules/transport/transport.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { TransportModule } from './modules/transport/transport.module';
     MailModule,
     FileModule,
     TransportModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [

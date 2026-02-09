@@ -7,7 +7,7 @@ import { CreateCheckoutPayload } from './input-dto';
 import { CreateSubscriptionCheckoutCommand } from '../application/create-stripe-checkout.usecase';
 import { GetUserPaymentsQuery } from '../application/get-user-payments.query-handler';
 import { StripeWebhookService } from '../application/stripe-webhook.service';
-import { CancelStripeSubscriptionCommand, CancelStripeSubscriptionUseCase } from '../application/cancle-subscription.usecase';
+import { CancelStripeSubscriptionCommand } from '../application/cancle-subscription.usecase';
 
 @Controller()
 export class PaymentApiController {
@@ -15,7 +15,6 @@ export class PaymentApiController {
     private commandBus: CommandBus,
     private queryBus: QueryBus,
     private readonly webhookService: StripeWebhookService,
-    private readonly cancelSubscriptionUseCase: CancelStripeSubscriptionUseCase, // ← ВАЖНО
   ) {}
 
   @MessagePattern({ cmd: 'createSubscriptionCheckout' })

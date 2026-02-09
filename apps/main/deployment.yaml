@@ -191,6 +191,31 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-main-api-production-config-secret
                    key: RABBITMQ_URL
+             - name: REDIS_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: REDIS_HOST
+             - name: REDIS_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: REDIS_PORT
+             - name: REDIS_USERNAME
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: REDIS_USERNAME
+             - name: REDIS_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: REDIS_PASSWORD
+             - name: REDIS_TLS_ENABLED
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: REDIS_TLS_ENABLED
              - name: EMAIL_CONFIRMATION_CODE_LIFETIME_SECS
                valueFrom:
                  secretKeyRef:

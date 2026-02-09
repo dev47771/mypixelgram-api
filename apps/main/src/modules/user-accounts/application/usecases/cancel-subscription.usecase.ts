@@ -3,6 +3,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
 import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 import { TransportService } from '../../../transport/transport.service';
+import { NotificationRepo } from '../../../notifications/infrastructure/notification.repo';
+import { NotificationsWsService } from '../../../notifications/application/notifications-ws.service';
 
 export class CancelSubscriptionCommand {
   constructor(public userId: string) {}
@@ -10,8 +12,10 @@ export class CancelSubscriptionCommand {
 @CommandHandler(CancelSubscriptionCommand)
 export class CancelSubscriptionUseCase implements ICommandHandler<CancelSubscriptionCommand> {
   constructor(
-    private usersRepo: UsersRepo,
-    private transportService: TransportService,
+    private readonly usersRepo: UsersRepo,
+    private readonly transportService: TransportService,
+    private readonly notificationRepo: NotificationRepo,
+    private readonly notificationsWsService: NotificationsWsService,
   ) {}
 
   async execute(command: CancelSubscriptionCommand) {
@@ -21,11 +25,29 @@ export class CancelSubscriptionUseCase implements ICommandHandler<CancelSubscrip
       throw BadRequestDomainException.create(ErrorConstants.PAYMENT_NOT_FOUND, 'CancelSubscriptionCommand');
     }
 
-    await this.transportService.cancelStripeSubscription({
+    try {
+      await this.transportService.cancelStripeSubscription({
+        userId: command.userId,
+      });
+
+      await this.usersRepo.updateSubscription(command.userId, null, null, 'PERSONAL');
+    } catch (error) {
+      console.error('[CancelSubscription] Failed:', error);
+      throw error;
+    }
+
+    const notification = await this.notificationRepo.create({
       userId: command.userId,
+      title: 'Subscription canceled',
+      description: 'Your subscription has been successfully canceled. You have been switched to the personal plan.',
     });
 
-    await this.usersRepo.updateSubscription(command.userId, null, null, 'PERSONAL');
+    this.notificationsWsService.notifyUser(command.userId, 'notifications:new', {
+      id: notification.id,
+      title: notification.title,
+      description: notification.description,
+      createdAt: notification.createdAt,
+    });
 
     return { success: true };
   }

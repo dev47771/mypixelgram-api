@@ -41,13 +41,14 @@ import { TransportModule } from '../transport/transport.module';
 import { GetCountriesWithCitiesHandler } from './application/queries/get-countries-with-cities.query';
 import { LocationsQueryRepo } from './infrastructure/query/locations-query.repo';
 import { CacheModule } from '@nestjs/cache-manager';
-import { GetUserProfileQuery, GetUserProfileUseCase } from './infrastructure/query/get-profile.query.handler';
+import { GetUserProfileUseCase } from './infrastructure/query/get-profile.query.handler';
 import { SecurityController } from './api/security.controller';
 import { GetUserSessionsHandler } from './application/queries/get-all-sessions.query';
 import { TerminateSessionByDeviceIdHandler } from './application/usecases/terminate-session-deviceId.use-case';
 import { TerminateAllSessionsExceptCurrentHandler } from './application/usecases/terminate-all-sessions-except-current.use-case';
 import { PaymentController } from './api/payment.controller';
 import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
 const commandHandlers = [
@@ -85,6 +86,7 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
       signOptions: { expiresIn: '20m' },
     }),
     TransportModule,
+    NotificationsModule,
   ],
   controllers: [UsersController, AuthController, PublicUsersController, SecurityController, PaymentController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],

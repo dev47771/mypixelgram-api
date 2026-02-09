@@ -4,6 +4,7 @@ import { appSetup } from './setup/app.setup';
 import { ConfigService } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
 import * as bodyParser from 'body-parser';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(AppModule);
@@ -24,6 +25,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   await app.listen(process.env.PORT!);
   console.log(`main application started on port ${process.env.PORT}`);
