@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { SubscriptionModel, SubscriptionStatus } from '../../models/subscription.model';
 
 @Injectable()
@@ -67,10 +67,6 @@ export class SubscriptionRepo {
       transaction: tx,
     });
   }
-
-  async attachStripeRefs(subscriptionId: number, data: { stripeCustomerId?: string; stripeSubscriptionId?: string }, tx: Transaction) {
-    await this.subscriptionModel.update(data, { where: { id: subscriptionId }, transaction: tx });
-  }
   async attachStripeData(
     subscriptionId: number,
     data: {
@@ -104,5 +100,15 @@ export class SubscriptionRepo {
         transaction,
       },
     );
+  }
+  async findActiveWithExpiresAt() {
+    return this.subscriptionModel.findAll({
+      where: {
+        status: SubscriptionStatus.ACTIVE,
+        expiresAt: {
+          [Op.gt]: new Date(),
+        },
+      },
+    });
   }
 }

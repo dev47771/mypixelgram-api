@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TransportService } from './transport.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { PaymentEventsController } from './payment-events.controller';
 import { UsersRepo } from '../user-accounts/infrastructure/users.repo';
+import { NotificationsModule } from '../notifications/notifications.module';
 @Module({
   imports: [
     ClientsModule.registerAsync([
@@ -45,6 +46,7 @@ import { UsersRepo } from '../user-accounts/infrastructure/users.repo';
         inject: [ConfigService],
       },
     ]),
+    forwardRef(() => NotificationsModule),
   ],
   providers: [TransportService, UsersRepo],
   controllers: [PaymentEventsController],

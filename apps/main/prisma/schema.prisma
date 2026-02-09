@@ -30,9 +30,10 @@ model User {
   Post                 Post[]
   profile              Profile?
 
-  accountType           AccountType @default(PERSONAL)
+  accountType           AccountType    @default(PERSONAL)
   planName              String?
-  subscriptionExpiresAt DateTime?   @db.Timestamptz()
+  subscriptionExpiresAt DateTime?      @db.Timestamptz()
+  Notification          Notification[]
 
   @@map("users")
 }
@@ -141,4 +142,26 @@ model City {
 
   @@index([countryId])
   @@map("cities")
+}
+
+enum NotificationStatus {
+  unreaded
+  readed
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String
+  title       String             @db.VarChar(255)
+  description String             @db.Text
+  status      NotificationStatus @default(unreaded)
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, status])
+  @@map("notifications")
 }
