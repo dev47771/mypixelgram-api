@@ -3,7 +3,7 @@ import { Worker } from 'bullmq';
 import { ConfigService } from '@nestjs/config';
 import { NotificationRepo } from '../infrastructure/notification.repo';
 import { NotificationsWsService } from '../application/notifications-ws.service';
-import { createRedisConnection } from '../../../../../../common/libs/redis';
+import { createRedisConnection } from './create-redis-connection';
 
 const NOTIFICATIONS_QUEUE = '{notifications}';
 
