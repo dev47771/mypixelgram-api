@@ -1,12 +1,12 @@
 import {
-  BadRequestException,
   INestApplication,
   ValidationError,
   ValidationPipe,
 } from '@nestjs/common';
-import { FieldError } from '../core/exceptions/field-error';
+import { FieldError } from '../core/exceptions/presentational/fieldError';
+import { BadRequestPresentationalException } from '../core/exceptions/presentational/presentationalException';
 
-const formatErrors = (errors: ValidationError[]): FieldError[] => {
+export const formatErrors = (errors: ValidationError[]): FieldError[] => {
   const errorsForResponse: FieldError[] = [];
   errors.forEach((error) => {
     const field = error.property;
@@ -18,7 +18,6 @@ const formatErrors = (errors: ValidationError[]): FieldError[] => {
       });
     }
   });
-  console.log('errorsForResponse ', errorsForResponse);
   return errorsForResponse;
 };
 
@@ -30,7 +29,7 @@ export function pipesSetup(app: INestApplication) {
       stopAtFirstError: true,
       exceptionFactory: (errors) => {
         const formattedErrors = formatErrors(errors);
-        throw new BadRequestException({ errors: formattedErrors });
+        throw BadRequestPresentationalException.create(formattedErrors);
       },
     }),
   );

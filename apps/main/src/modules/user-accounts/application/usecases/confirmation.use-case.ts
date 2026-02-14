@@ -1,7 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepo } from '../../infrastructure/users.repo';
-import { BadRequestDomainException } from '../../../../core/exceptions/domainException';
+import { BadRequestDomainException } from '../../../../core/exceptions/domain/domainException';
 import { CreateUserConfirmationRepoDto } from '../../infrastructure/dto/create-user-confirmation.repo-dto';
+import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
 export class ConfirmationUseCaseCommand {
   constructor(public code: string) {}
@@ -16,19 +17,15 @@ export class ConfirmationUseCase
   async execute(command: ConfirmationUseCaseCommand) {
     const userConfirmation = await this.usersRepo.findByCode(command.code);
     if (!userConfirmation) {
-      console.log(
-        'If the confirmation code is incorrect, expired or already been applied',
-      );
       throw BadRequestDomainException.create(
-        'If the confirmation code is incorrect, expired or already been applied',
-        'code',
+        ErrorConstants.CONFIRMATION_CODE_INVALID,
+        'ConfirmationUseCase',
       );
     }
     if (userConfirmation.isConfirmed) {
-      console.log('Such a user already exists');
       throw BadRequestDomainException.create(
-        'Such a user already exists',
-        'code',
+        ErrorConstants.USER_ALREADY_CONFIRMED_CODE,
+        'ConfirmationUseCase',
       );
     }
 
@@ -36,10 +33,9 @@ export class ConfirmationUseCase
       !userConfirmation.expirationDate ||
       userConfirmation.expirationDate < new Date()
     ) {
-      console.log('The link in the email has expired');
       throw BadRequestDomainException.create(
-        'The link in the email has expired',
-        'ExpirationDate',
+        ErrorConstants.CONFIRMATION_LINK_EXPIRED,
+        'ConfirmationUseCase',
       );
     }
 
@@ -47,6 +43,7 @@ export class ConfirmationUseCase
       isConfirmed: true,
       expirationDate: null,
       confirmationCode: null,
+      isAgreeWithPrivacy: true,
     };
     await this.usersRepo.updateConfirm(
       userConfirmation.userId,

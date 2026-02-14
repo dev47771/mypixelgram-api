@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-github2';
 import { ConfigService } from '@nestjs/config';
+import { VerifyCallback } from 'passport-oauth2';
 
 @Injectable()
 export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
@@ -13,7 +14,19 @@ export class GitHubStrategy extends PassportStrategy(Strategy, 'github') {
       scope: ['user:email'],
     });
   }
-  async validate(){
+  async validate(accessToken: string, refreshToken: string, profile, done: VerifyCallback): Promise<void> {
+    const { id, login, displayName, emails, photos } = profile;
 
+    const user = {
+      githubId: id,
+      login,
+      displayName,
+      email: emails?.[0]?.value,
+      avatar: photos?.[0]?.value, // Берем первую фотографию
+      accessToken,
+      refreshToken,
+    };
+
+    done(null, user);
   }
 }

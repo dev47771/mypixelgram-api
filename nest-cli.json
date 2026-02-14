@@ -26,8 +26,16 @@
       "sourceRoot": "apps/main/src",
       "compilerOptions": {
         "tsConfigPath": "apps/main/tsconfig.app.json",
-        "assets": ["core/mailModule/templates/**/*.hbs"],
+        "assets": ["core/mailModule/templates/**/*.hbs", "modules/posts/api/views/*.html"],
         "watchAssets": true
+      }
+    },   "payment": {
+      "type": "application",
+      "root": "apps/payment",
+      "entryFile": "main",
+      "sourceRoot": "apps/payment/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/payment/tsconfig.app.json"
       }
     }
   }
