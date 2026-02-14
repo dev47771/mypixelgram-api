@@ -48,6 +48,11 @@ export class CancelSubscriptionUseCase implements ICommandHandler<CancelSubscrip
       description: notification.description,
       createdAt: notification.createdAt,
     });
+    const unreadCount = await this.notificationRepo.countUnreadByUser(command.userId);
+
+    this.notificationsWsService.notifyUser(command.userId, 'notifications:unread-count', {
+      unreadCount,
+    });
 
     return { success: true };
   }
