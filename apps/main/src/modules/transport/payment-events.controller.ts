@@ -32,6 +32,8 @@ export class PaymentEventsController {
         description: notification.description,
         createdAt: notification.createdAt,
       });
+      const unreadCount = await this.notificationRepo.countUnreadByUser(userId);
+      this.notificationsWsService.notifyUser(userId, 'notifications:unread-count', { unreadCount });
 
       console.log('[MAIN] Notification создано и отправлено:', notification.id);
     } catch (error) {
@@ -59,6 +61,8 @@ export class PaymentEventsController {
         description: notification.description,
         createdAt: notification.createdAt,
       });
+      const unreadCount = await this.notificationRepo.countUnreadByUser(userId);
+      this.notificationsWsService.notifyUser(userId, 'notifications:unread-count', { unreadCount });
 
       console.log('[MAIN] Notification о failed payment создано и отправлено:', notification.id);
     } catch (error) {

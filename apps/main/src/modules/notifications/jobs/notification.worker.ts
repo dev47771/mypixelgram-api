@@ -37,6 +37,11 @@ export class NotificationWorkerService implements OnModuleInit, OnModuleDestroy 
           description: notification.description,
           createdAt: notification.createdAt,
         });
+        const unreadCount = await this.notificationRepo.countUnreadByUser(userId);
+
+        this.notificationsWsService.notifyUser(userId, 'notifications:unread-count', {
+          unreadCount,
+        });
 
         console.log(`[MAIN] Notification sent for user ${userId}, jobId: ${job.id}`);
       },
