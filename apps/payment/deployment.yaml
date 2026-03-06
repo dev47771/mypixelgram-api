@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: DEPLOYMENT_NAME
+  namespace: NAMESPACE
+  labels:
+    app: PROJECT
+spec:
+  selector:
+    matchLabels:
+      project: PROJECT
+  template:
+    metadata:
+      namespace: NAMESPACE
+      labels:
+        project: PROJECT
+    spec:
+      containers:
+         - name: PROJECT
+           image: REGISTRY_HOSTNAME/PROJECT:TAG_VERSION
+           ports:
+             - containerPort: PORT_CONTAINER
+           env:
+             - name: RABBITMQ_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: RABBITMQ_URL
+             - name: PAYMENT_API_MICROSERVICE_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_API_MICROSERVICE_PORT
+             - name: STRIPE_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_SECRET_KEY
+             - name: PAYMENT_SUCCESS_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_SUCCESS_URL
+             - name: PAYMENT_ERROR_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_ERROR_URL
+             - name: STRIPE_WEBHOOK_SECRET
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_WEBHOOK_SECRET
+             - name: PAYMENT_TCP_PROD_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: PAYMENT_TCP_PROD_PORT
+             - name: STRIPE_PRICE_DAY
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_DAY
+             - name: STRIPE_PRICE_WEEK
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_WEEK
+             - name: STRIPE_PRICE_MONTH
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_MONTH
+             - name: STRIPE_PRICE_YEAR
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: STRIPE_PRICE_YEAR
+             - name: REDIS_HOST
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: REDIS_HOST
+             - name: REDIS_PORT
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: REDIS_PORT
+             - name: REDIS_USERNAME
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: REDIS_USERNAME
+             - name: REDIS_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: REDIS_PASSWORD
+             - name: REDIS_TLS_ENABLED
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: REDIS_TLS_ENABLED
+             - name: NOTIFICATIONS_QUEUE
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: NOTIFICATIONS_QUEUE
+             - name: DATABASE_URL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-payment-api-production-config-secret
+                   key: DATABASE_URL
