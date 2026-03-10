@@ -27,4 +27,4 @@ ENV NODE_ENV=production
 
 EXPOSE ${PORT}
 
-CMD ["node", "dist/apps/files-api/main.js"]
+CMD ["node", "dist/apps/files/main.js"]

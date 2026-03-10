@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { FilesUploadUseCase } from '../application/use-cases/files-upload.use-case';
-import { PayloadTypeDto } from '../../files/api/dto/payloadTypeDto';
+import { PayloadTypeDto } from './dto/payloadTypeDto';
 import { FileType } from '../domain/file.schema';
 import { CheckFileIdOwnerUseCase } from '../application/use-cases/check-fileId-owner.use-case';
 import { ValidFileIdDto } from './dto/inputPayloadFileDto';
@@ -9,7 +9,7 @@ import { DeleteFilePostUseCase } from '../application/use-cases/delete-post.use-
 import { GetFilesUseCase } from '../application/use-cases/getFiles.use-case';
 
 @Controller()
-export class FilesApiController {
+export class FilesController {
   constructor(
     private filesUploadUseCase: FilesUploadUseCase,
     private checkIsUserOwner: CheckFileIdOwnerUseCase,

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { FilesApiModule } from './files-api.module';
+import { FilesModule } from './files.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as process from 'node:process';
 
@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const port = isLocal ? Number(process.env.FILES_API_MICROSERVICE_PORT) : Number(process.env.PORT_FILES_API);
 
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesApiModule, {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(FilesModule, {
     transport: Transport.TCP,
     options: {
       port,

@@ -8,7 +8,7 @@ import { S3StorageAdapter } from './core/s3storageAdapter';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FileSchema } from './files/domain/file.schema';
 import { FilesRepo } from './files/infrastructure/files.repo';
-import { FilesApiController } from './files/api/files-api.controller';
+import { FilesController } from './files/api/files.controller';
 import { CheckFileIdOwnerUseCase } from './files/application/use-cases/check-fileId-owner.use-case';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DeleteFilesScheduler } from './core/deleteFiles.sheduler';
@@ -36,7 +36,7 @@ const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, Check
     ScheduleModule.forRoot(),
     CqrsModule,
   ],
-  controllers: [FilesApiController],
+  controllers: [FilesController],
   providers: [
     FilesRepo,
     S3StorageAdapter,
@@ -51,4 +51,4 @@ const commandHandlers = [FilesUploadUseCase, CleanSoftDeletedFilesUseCase, Check
     },
   ],
 })
-export class FilesApiModule {}
+export class FilesModule {}

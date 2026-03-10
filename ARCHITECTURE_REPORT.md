@@ -10,10 +10,10 @@ Structured report for a new backend developer. All claims reference file paths; 
 
 | Folder | Purpose (from code/config) |
 |--------|----------------------------|
-| **apps/** | NestJS monorepo applications: `main`, `files-api`, `payment`. Defined in `nest-cli.json` (lines 12–40). |
+| **apps/** | NestJS monorepo applications: `main`, `files`, `payment`. Defined in `nest-cli.json` (lines 12–40). |
 | **node_modules/** | NPM dependencies. |
 | **package.json** | Root package: scripts for build/start/test, shared deps (NestJS, Prisma, Sequelize, BullMQ, Stripe, etc.). |
-| **nest-cli.json** | Nest CLI config: `monorepo: true`, `projects`: main, files-api, payment. Source roots and tsconfig paths per app. |
+| **nest-cli.json** | Nest CLI config: `monorepo: true`, `projects`: main, files, payment. Source roots and tsconfig paths per app. |
 | **eslint.config.mjs** | ESLint config. |
 | **tsconfig.build.json** | TypeScript build config. |
 | **.dockerignore** | Docker ignore rules. |
@@ -27,7 +27,7 @@ Structured report for a new backend developer. All claims reference file paths; 
 | App | Role |
 |-----|------|
 | **main** | HTTP API gateway: auth, users, posts, files proxy, payment proxy, notifications, WebSockets. Consumes RabbitMQ events. Uses PostgreSQL (Prisma) and Redis (BullMQ worker). |
-| **files-api** | TCP microservice: file upload to S3, ownership checks, soft delete, cleanup. Uses MongoDB (Mongoose) and S3. |
+| **files** | TCP microservice: file upload to S3, ownership checks, soft delete, cleanup. Uses MongoDB (Mongoose) and S3. |
 | **payment** | TCP microservice: Stripe checkout, webhook handling (via main proxy), subscriptions. Uses MySQL (Sequelize), RabbitMQ (publisher), Redis (BullMQ publisher). |
 
 ---
@@ -44,14 +44,14 @@ Structured report for a new backend developer. All claims reference file paths; 
   - Docker: `apps/main/Dockerfile` CMD runs `node dist/apps/main/main.js`.
 - **Port:** From env `PORT`. Example: `PORT=3000` in `apps/main/src/env/.env.development`. Used in `apps/main/src/main.ts` (lines 12, 30).
 
-### Files-api
+### Files
 
-- **Entrypoint:** `apps/files-api/src/main.ts`
+- **Entrypoint:** `apps/files/src/main.ts`
 - **Framework/runtime:** NestJS microservice only: `NestFactory.createMicroservice(..., Transport.TCP)`.
 - **Started by:**  
-  - Dev: `npm run start:dev:files-api` (package.json line 17).  
-  - Docker: `apps/files-api/Dockerfile` CMD `node dist/apps/files-api/main.js`.
-- **Port:** Local: `FILES_API_MICROSERVICE_PORT`; non-local: `PORT_FILES_API`. Example: `PORT_FILES_API=3001` in `apps/files-api/src/env/.env.development`. Set in `apps/files-api/src/main.ts` (lines 9, 14).
+  - Dev: `npm run start:dev:files` (package.json line 17).  
+  - Docker: `apps/files/Dockerfile` CMD `node dist/apps/files/main.js`.
+- **Port:** Local: `FILES_API_MICROSERVICE_PORT`; non-local: `PORT_FILES_API`. Example: `PORT_FILES_API=3001` in `apps/files/src/env/.env.development`. Set in `apps/files/src/main.ts` (lines 9, 14).
 
 ### Payment
 
@@ -96,14 +96,14 @@ Route constants: `apps/main/src/modules/user-accounts/domain/constants.ts`.
 
 - **Cron/schedulers:**  
   - **Main:** None in the files inspected for cron (only Bull worker).  
-  - **Files-api:** `DeleteFilesScheduler` in `apps/files-api/src/core/deleteFiles.sheduler.ts`: `@Cron(CronExpression.EVERY_HOUR)`, calls `CleanSoftDeletedFilesUseCase`.  
+  - **Files:** `DeleteFilesScheduler` in `apps/files/src/core/deleteFiles.sheduler.ts`: `@Cron(CronExpression.EVERY_HOUR)`, calls `CleanSoftDeletedFilesUseCase`.  
   - **Payment:** `OutboxScheduler` in `apps/payment/src/payment/jobs/outbox.scheduler.ts`: `@Cron(CronExpression.EVERY_10_SECONDS)`, processes subscription outbox and emits to RabbitMQ. `SubscriptionReminderRecoveryJob` (referenced in payment module) for reminder recovery.
 
 ### Shared libraries / modules
 
 - **No `libs/` package:** No shared npm package in repo; each app has its own `src/`.
-- **Main → files-api / payment:** Main calls files-api and payment via NestJS `ClientProxy` (TCP) in `apps/main/src/modules/transport/transport.service.ts` (injects `FILES_API`, `PAYMENT`). Client config in `apps/main/src/modules/transport/transport.module.ts` (host/port from `FILES_API_HOST`/`FILES_API_PORT`, `PAYMENT_API_HOST`/`PAYMENT_API_PORT` for non-local).
-- **Payment:** Uses its own modules only; no import from main or files-api.
+- **Main → files / payment:** Main calls files and payment via NestJS `ClientProxy` (TCP) in `apps/main/src/modules/transport/transport.service.ts` (injects `FILES_API`, `PAYMENT`). Client config in `apps/main/src/modules/transport/transport.module.ts` (host/port from `FILES_API_HOST`/`FILES_API_PORT`, `PAYMENT_API_HOST`/`PAYMENT_API_PORT` for non-local).
+- **Payment:** Uses its own modules only; no import from main or files.
 
 ---
 
@@ -162,9 +162,9 @@ Route constants: `apps/main/src/modules/user-accounts/domain/constants.ts`.
 3. **Handler:** `commandBus.execute(new CreatePostCommand(createPostDto, dto.userId))`.  
    - Use case: `apps/main/src/modules/posts/application/create-post.use-case.ts`.
 
-4. **Use case:** Calls `transportService.verifyFileOwnership({ filesId, userId })` (TCP to files-api `checkFileOwner`), then `postRepo.createPost(...)`.  
+4. **Use case:** Calls `transportService.verifyFileOwnership({ filesId, userId })` (TCP to files `checkFileOwner`), then `postRepo.createPost(...)`.  
    - Transport: `apps/main/src/modules/transport/transport.service.ts` (lines 24–31).  
-   - Files-api: `apps/files-api/src/files/api/files-api.controller.ts` `@MessagePattern({ cmd: 'checkFileOwner' })`.
+   - Files: `apps/files/src/files/api/files.controller.ts` `@MessagePattern({ cmd: 'checkFileOwner' })`.
 
 5. **Response:** Controller returns `await this.postQueryRepo.getPostViewById(postId)` (post view by id).
 
@@ -180,10 +180,10 @@ Route constants: `apps/main/src/modules/user-accounts/domain/constants.ts`.
   - Migrations: `apps/main/prisma/migrations/` (e.g. `20250916080723_first_migrate`, `20260205114910_add_notifications`).  
   - Commands: `main:prisma:migrate:dev`, `main:prisma:deploy`, etc. in `package.json` (lines 27–36).
 
-- **Files-api — MongoDB (Mongoose):**  
-  - Connection: `MongooseModule.forRootAsync` in `apps/files-api/src/files-api.module.ts` (uri: `MONGO_URL`/`DB_NAME`).  
-  - Schema: `FileSchema` in `apps/files-api/src/files/domain/file.schema.ts` (referenced in module).  
-  - Repo: `apps/files-api/src/files/infrastructure/files.repo.ts`.
+- **Files — MongoDB (Mongoose):**  
+  - Connection: `MongooseModule.forRootAsync` in `apps/files/src/files.module.ts` (uri: `MONGO_URL`/`DB_NAME`).  
+  - Schema: `FileSchema` in `apps/files/src/files/domain/file.schema.ts` (referenced in module).  
+  - Repo: `apps/files/src/files/infrastructure/files.repo.ts`.
 
 - **Payment — MySQL (Sequelize):**  
   - Config: `apps/payment/config/config.js` (dialect `mysql`, `process.env.DATABASE_URL`).  
@@ -201,7 +201,7 @@ Route constants: `apps/main/src/modules/user-accounts/domain/constants.ts`.
 ### External APIs
 
 - **Stripe:** Used in payment app: `apps/payment/src/payment/application/stripe-checkout.service.ts` (Stripe SDK, `STRIPE_SECRET_KEY`), `apps/payment/src/payment/application/stripe-webhook.service.ts` (webhook verify with `STRIPE_WEBHOOK_SECRET`).
-- **S3-compatible (Yandex):** Files-api: `apps/files-api/src/core/s3storageAdapter.ts` (BUCKET_NAME, BUCKET_ENDPOINT, BUCKET_REGION, BUCKET_ACCESS_KEY_ID, BUCKET_SECRET_ACCESS_KEY).
+- **S3-compatible (Yandex):** files: `apps/files/src/core/s3storageAdapter.ts` (BUCKET_NAME, BUCKET_ENDPOINT, BUCKET_REGION, BUCKET_ACCESS_KEY_ID, BUCKET_SECRET_ACCESS_KEY).
 - **reCAPTCHA:** Main: `apps/main/src/modules/user-accounts/application/recaptcha.service.ts` (RECAPTCHA_SECRET_KEY).
 - **SMTP (mail):** Main: `apps/main/src/core/mailModule/mail.module.ts` (MAIL_MODULE_HOST, USER, PASSWORD, FROM). Templates under `apps/main/src/core/mailModule/templates/` (e.g. `recoveryCode.hbs`).
 - **OAuth:** Main: Google and GitHub Passport strategies in `apps/main/src/modules/user-accounts/api/guards/` (GOOGLE_*, GITHUB_* env).
@@ -217,9 +217,9 @@ From `apps/main/src/core/env.validation.ts`: NODE_ENV, PORT, DATABASE_URL, EMAIL
 From usage and `apps/main/src/env/.env.development`, `apps/main/deployment.yaml`: RABBITMQ_URL, RECOVERY_URL, REGISTRATION_URL, PASSWORD_RECOVERY_CODE_LIFETIME_SECS, RECAPTCHA_SECRET_KEY, GITHUB_CLIENT_ID/SECRET/CALLBACK_URL, GOOGLE_CLIENT_ID/SECRET/CALLBACK_URL, URL_TOKEN_SUCCESS, URL_TOKEN_ERROR, FRONT_PROFILE_URL, FRONT_SIGNIN_ERROR_URL, JWT_EXPIRES_IN, FILES_API_HOST, FILES_API_PORT, PAYMENT_API_HOST, PAYMENT_API_PORT, MONGO_URL, BUCKET_*, REDIS_HOST, REDIS_PORT, REDIS_USERNAME, REDIS_PASSWORD, REDIS_TLS_ENABLED, SHADOW_DB_URL (or SHADOW_DATABASE_URL).  
 Testing: DATABASE_URL, HTTP_BASIC_USER, HTTP_BASIC_PASS (e.g. in `apps/main/test/e2e/features/auth/auth.e2e-spec.ts`).
 
-**Files-api:**  
-From `apps/files-api/src/core/env.validation.ts`: NODE_ENV, PORT_FILES_API (optional), BUCKET_NAME, BUCKET_SECRET_ACCESS_KEY, BUCKET_ACCESS_KEY_ID, BUCKET_ENDPOINT, BUCKET_REGION, DB_NAME (optional), MONGO_URL.  
-Local TCP port: FILES_API_MICROSERVICE_PORT (used in main.ts, not in files-api validation).
+**Files:**  
+From `apps/files/src/core/env.validation.ts`: NODE_ENV, PORT_FILES_API (optional), BUCKET_NAME, BUCKET_SECRET_ACCESS_KEY, BUCKET_ACCESS_KEY_ID, BUCKET_ENDPOINT, BUCKET_REGION, DB_NAME (optional), MONGO_URL.  
+Local TCP port: FILES_API_MICROSERVICE_PORT (used in main.ts, not in files validation).
 
 **Payment:**  
 From `apps/payment/src/core/env.validation.ts`: NODE_ENV, PAYMENT_API_MICROSERVICE_PORT, PORT.  
@@ -231,7 +231,7 @@ Main: `apps/main/src/env-file-paths.ts` (serviceRoot = `apps/main/src/env`), the
 ### Docker
 
 - **apps/main/Dockerfile:** Builds with `ARG service`, `ARG port`; runs `npm run build:${SERVICE}`, always runs `node dist/apps/main/main.js` (SERVICE/port not used in CMD). Also runs `npx prisma generate --schema=./apps/main/prisma/schema.prisma`.
-- **apps/files-api/Dockerfile:** Builds `files-api`, CMD `node dist/apps/files-api/main.js`.
+- **apps/files/Dockerfile:** Builds `files`, CMD `node dist/apps/files/main.js`.
 - **apps/payment/Dockerfile:** Builds `payment`, CMD `node dist/apps/payment/main.js`.
 - **apps/main/docker-compose.yml:** Postgres 15, DB `develop-db`, user/password, port 5432, volume, init scripts from `./init-scripts`. Healthcheck uses `pg_isready -U myuser -d myapp` (does not match POSTGRES_USER/POSTGRES_DB in same file — see gotchas).
 - **apps/payment/docker-compose.yml:** MySQL 8, root password, DB `payments_dev`, user `payments`, port 3307:3306.
@@ -239,12 +239,12 @@ Main: `apps/main/src/env-file-paths.ts` (serviceRoot = `apps/main/src/env`), the
 ### K8s
 
 - **apps/main/deployment.yaml:** Deployment template (DEPLOYMENT_NAME, NAMESPACE, PROJECT, REGISTRY_HOSTNAME, TAG_VERSION, PORT_CONTAINER). Env from secret `mypixelgram-main-api-production-config-secret` (long list including DB, mail, OAuth, FILES_API_*, PAYMENT_API_*, RABBITMQ_URL, REDIS_*, etc.).
-- **apps/files-api/deployment.yaml**, **apps/payment/deployment.yaml:** Present (not fully read; payment references PAYMENT_API_MICROSERVICE_PORT from secret).
+- **apps/files/deployment.yaml**, **apps/payment/deployment.yaml:** Present (not fully read; payment references PAYMENT_API_MICROSERVICE_PORT from secret).
 
 ### Commands to run locally (from package.json)
 
 - Main: `npm run start:dev` (NODE_ENV=development.local, main with watch).
-- Files-api: `npm run start:dev:files-api`.
+- Files: `npm run start:dev:files`.
 - Payment: `npm run start:dev:payment`.
 - E2E: `npm run test:e2e` (uses `./apps/main/src/env/.env.testing`, resets test DB, then jest e2e).
 - Main DB: `npm run main:prisma:reset`, `main:prisma:migrate:dev`, `main:prisma:generate` (with `.env.development.local`).
@@ -267,7 +267,7 @@ Main: `apps/main/src/env-file-paths.ts` (serviceRoot = `apps/main/src/env`), the
 - **Docker Compose healthcheck mismatch (main):** `apps/main/docker-compose.yml` healthcheck runs `pg_isready -U myuser -d myapp` but environment sets POSTGRES_USER=postgres, POSTGRES_DB=develop-db. Healthcheck may always fail.  
   - File: `apps/main/docker-compose.yml` (lines 18–22 vs 6–11).
 
-- **Main Dockerfile CMD ignores SERVICE:** CMD is hardcoded to `node dist/apps/main/main.js`. Building with `--build-arg service=files-api` still runs main.  
+- **Main Dockerfile CMD ignores SERVICE:** CMD is hardcoded to `node dist/apps/main/main.js`. Building with `--build-arg service=files` still runs main.  
   - File: `apps/main/Dockerfile` (line 29).
 
 - **Stripe webhook raw body:** Main must preserve raw body for signature verification. It does so only for `/api/v1/payment/stripe/webhook` via `bodyParser.raw(...)`. If order of middleware or path changes, verification can break.  

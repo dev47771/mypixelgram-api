@@ -1,6 +1,6 @@
 # MyPixelgram API — краткое README (handover)
 
-Этот репозиторий — **NestJS monorepo** с **3 приложениями**: `main`, `files-api`, `payment`.
+Этот репозиторий — **NestJS monorepo** с **3 приложениями**: `main`, `files`, `payment`.
 
 ---
 
@@ -8,7 +8,7 @@
 
 - `apps/` — приложения монорепо:
     - `apps/main` — основной **HTTP API** (gateway) + WebSocket + consumer RabbitMQ + worker BullMQ
-    - `apps/files-api` — **TCP microservice** для файлов (S3 + MongoDB) + hourly cleanup
+    - `apps/files` — **TCP microservice** для файлов (S3 + MongoDB) + hourly cleanup
     - `apps/payment` — **TCP microservice** для платежей Stripe (MySQL) + RabbitMQ outbox + BullMQ producer
 - `nest-cli.json` — конфиг Nest monorepo (3 проекта)
 - `package.json` — общие скрипты запуска/сборки/миграций
@@ -23,19 +23,19 @@
 ### main (HTTP API)
 - **Entrypoint:** `apps/main/src/main.ts`
 - **HTTP prefix:** `api/v1` (`apps/main/src/setup/global-prefix.setup.ts`)
-- **Функции:** auth/users/posts/notifications/WebSockets, проксирование в `files-api` и `payment` по TCP, consumer RabbitMQ, BullMQ worker.
+- **Функции:** auth/users/posts/notifications/WebSockets, проксирование в `files` и `payment` по TCP, consumer RabbitMQ, BullMQ worker.
 - **Порт:** из `PORT` (пример: `apps/main/src/env/.env.development`)
 - **Запуск:**
     - dev: `npm run start:dev` → `nest start main --watch`
     - prod: `npm run start:prod` → `node dist/apps/main/main`
 
-### files-api (TCP microservice)
-- **Entrypoint:** `apps/files-api/src/main.ts`
+### files (TCP microservice)
+- **Entrypoint:** `apps/files/src/main.ts`
 - **Функции:** загрузка файлов в S3, ownership checks, soft-delete + очистка.
 - **Порт:** `FILES_API_MICROSERVICE_PORT` (local) / `PORT_FILES_API` (env)
 - **Запуск:**
-    - dev: `npm run start:dev:files-api`
-    - prod: `node dist/apps/files-api/main.js`
+    - dev: `npm run start:dev:files`
+    - prod: `node dist/apps/files/main.js`
 
 ### payment (TCP microservice)
 - **Entrypoint:** `apps/payment/src/main.ts`
@@ -51,7 +51,7 @@
 ## 3) Взаимодействие между сервисами
 
 ### TCP (NestJS clients)
-- **main → files-api**: проверки ownership и операции с файлами
+- **main → files**: проверки ownership и операции с файлами
     - клиент/вызовы: `apps/main/src/modules/transport/transport.service.ts`
     - конфиг: `apps/main/src/modules/transport/transport.module.ts`
 - **main → payment**: checkout и обработка webhook
@@ -83,9 +83,9 @@
     - schema: `apps/main/prisma/schema.prisma`
     - prisma service: `apps/main/src/core/prisma/prisma.service.ts`
     - migrations: `apps/main/prisma/migrations/`
-- **files-api → MongoDB (Mongoose) + S3**
-    - mongo connect: `apps/files-api/src/files-api.module.ts`
-    - s3 adapter: `apps/files-api/src/core/s3storageAdapter.ts`
+- **files → MongoDB (Mongoose) + S3**
+    - mongo connect: `apps/files/src/files.module.ts`
+    - s3 adapter: `apps/files/src/core/s3storageAdapter.ts`
 - **payment → MySQL (Sequelize)**
     - sequelize config: `apps/payment/config/config.js`
     - migrations: `apps/payment/migrations/`
@@ -108,7 +108,7 @@ HTTP routes (под `api/v1`):
 
 ### Команды (из `package.json`)
 - main (dev): `npm run start:dev`
-- files-api (dev): `npm run start:dev:files-api`
+- files (dev): `npm run start:dev:files`
 - payment (dev): `npm run start:dev:payment`
 
 ### Миграции
@@ -122,14 +122,14 @@ HTTP routes (под `api/v1`):
 ### Docker / K8s
 - Dockerfiles:
     - `apps/main/Dockerfile`
-    - `apps/files-api/Dockerfile`
+    - `apps/files/Dockerfile`
     - `apps/payment/Dockerfile`
 - Compose:
     - `apps/main/docker-compose.yml` (Postgres)
     - `apps/payment/docker-compose.yml` (MySQL)
 - K8s manifests:
     - `apps/main/deployment.yaml`
-    - `apps/files-api/deployment.yaml`
+    - `apps/files/deployment.yaml`
     - `apps/payment/deployment.yaml`
 
 ---
@@ -140,7 +140,7 @@ HTTP routes (под `api/v1`):
 
 Базово по сервисам:
 - **main**: `PORT`, `DATABASE_URL` (+ shadow), `JWT_SECRET_KEY`, mail env, OAuth/reCAPTCHA, `RABBITMQ_URL`, `REDIS_*`, `FILES_API_*`, `PAYMENT_API_*`
-- **files-api**: `MONGO_URL`, `DB_NAME`, `BUCKET_*`, `PORT_FILES_API` / `FILES_API_MICROSERVICE_PORT`
+- **files**: `MONGO_URL`, `DB_NAME`, `BUCKET_*`, `PORT_FILES_API` / `FILES_API_MICROSERVICE_PORT`
 - **payment**: `DATABASE_URL`, `RABBITMQ_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `REDIS_*`, `NOTIFICATIONS_QUEUE`, `PAYMENT_API_MICROSERVICE_PORT`
 
 ---
