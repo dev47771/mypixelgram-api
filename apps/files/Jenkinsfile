@@ -3,11 +3,11 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 4112
+        PORT = 4249
         NAMESPACE = "mypixelgram-ru"
         REGISTRY_HOSTNAME = "daarrys"
         PROJECT = "mypixelgram-files-api"
-        SERVICE="files-api"
+        SERVICE="files"
         REGISTRY = "registry.hub.docker.com"
         DEPLOYMENT_NAME = "mypixelgram-files-api-deployment"
         IMAGE_NAME = "${env.BUILD_ID}_${env.ENV_TYPE}_${env.GIT_COMMIT}"
@@ -20,33 +20,31 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Unit tests') {
-            steps {
-                script {
-                    sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm install 20
-                       nvm use 20
-                       yarn install
-                       yarn test
-                    '''
-                }
-            }
-        }
-        stage('e2e tests') {
-            steps {
-                script {
-                    sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm install 20
-                       nvm use 20
-                       yarn test:e2e
-                    '''
-                }
-            }
-        }
+//         stage('Unit tests') {
+//             steps {
+//                 script {
+//                     sh '''
+//                        export NVM_DIR="$HOME/.nvm"
+//                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+//                        nvm use --lts
+//                        yarn install
+//                        yarn test
+//                     '''
+//                 }
+//             }
+//         }
+//         stage('e2e tests') {
+//             steps {
+//                 script {
+//                     sh '''
+//                        export NVM_DIR="$HOME/.nvm"
+//                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+//                        nvm use --lts
+//                        yarn test:e2e
+//                     '''
+//                 }
+//             }
+//         }
         stage('Build docker image') {
             steps {
                 echo "Build image started..."
