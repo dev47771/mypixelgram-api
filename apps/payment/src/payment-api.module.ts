@@ -47,8 +47,7 @@ export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymen
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        // @ts-ignore
-        const dbUrl = new URL(config.get<string>('DATABASE_URL'));
+        const dbUrl = new URL(config.getOrThrow<string>('DATABASE_URL'));
         const username = decodeURIComponent(dbUrl.username);
         const password = decodeURIComponent(dbUrl.password);
 
