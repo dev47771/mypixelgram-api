@@ -26,13 +26,13 @@ export class OutboxScheduler implements OnModuleInit {
 
   @Cron(CronExpression.EVERY_10_SECONDS)
   async processOutbox() {
-    console.log('[SCHEDULER] Проверяем outbox...');
+    //console.log('[SCHEDULER] Проверяем outbox...');
 
     const subscriptions = await this.subscriptionModel.findAll({
       where: this.sequelize.literal('outboxEvents IS NOT NULL AND JSON_LENGTH(outboxEvents) > 0'),
     });
 
-    console.log('[SCHEDULER] Найдено:', subscriptions.length);
+    //console.log('[SCHEDULER] Найдено:', subscriptions.length);
 
     for (const subscription of subscriptions) {
       const events = subscription.outboxEvents || [];

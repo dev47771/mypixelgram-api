@@ -59,6 +59,7 @@ export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymen
           database: dbUrl.pathname.replace('/', ''),
           username: username,
           password: password,
+          logging: false,
 
           models: [PaymentModel, SubscriptionModel],
         };
