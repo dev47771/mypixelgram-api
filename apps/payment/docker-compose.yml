@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-payments-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: payments_dev
+      MYSQL_USER: payments
+      MYSQL_PASSWORD: payments
+    ports:
+    - "3307:3306"
+    volumes:
+      - mysql_payments_dev:/var/lib/mysql
+
+volumes:
+  mysql_payments_dev:

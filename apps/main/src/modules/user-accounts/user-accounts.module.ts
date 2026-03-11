@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './api/users.controller';
-import { GetUserByIdOrInternalFailQueryHandler } from './application/queries/get-user-by-id-or-internal-fail.query';
-import { CreateUserUseCase } from './application/usecases/create-user.use-case';
 import { CryptoService } from './application/crypto.service';
 import { UsersRepo } from './infrastructure/users.repo';
 import { UsersQueryRepo } from './infrastructure/query/users.query-repo';
 import { RegisterUserUseCase } from './application/usecases/register-user.use-case';
 import { AuthController } from './api/auth.controller';
-import { GetUserOrNotFoundFailQueryHandler } from './application/queries/get-user-or-not-found-fail.query';
-import { BasicStrategy } from './api/guards/basic/basic.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { jwtConstraints } from './domain/user-constraints';
@@ -20,20 +16,42 @@ import { LogoutUserUseCase } from './application/usecases/logout-user.use-case';
 import { RecoverPasswordUseCase } from './application/usecases/recover-password.use-case';
 import { SetNewPasswordUseCase } from './application/usecases/set-new-password.use-case';
 import { JwtStrategy } from './api/guards/jwt-strategy/jwt.strategy';
-import {
-  GetMeUseCase,
-  GetMeUseCaseCommand,
-} from './application/queries/get-me.query';
+import { GetMeUseCase } from './application/queries/get-me.query';
 import { MailService } from '../../core/mailModule/mail.service';
 import { ConfirmationUseCase } from './application/usecases/confirmation.use-case';
+import { CheckRecoveryCodeUseCase } from './application/usecases/check-recovery-code.use-case';
+import { RegistrationEmailResendingUseCase } from './application/usecases/register-resending.use-case';
+import { RefreshTokenUseCase } from './application/usecases/create-new-tokens.use-case';
+import { RecaptchaService } from './application/recaptcha.service';
+import { RecaptchaGuard } from './api/guards/recaptcha-guard/recaptcha.guard';
+import { GetUserById } from './application/queries/get-user-by-id.query';
+import { GitHubStrategy } from './api/guards/github-strategy/github.strategy';
+import { GithubRegisterUseCase } from './application/usecases/github-authorization.use-case';
+import { LoginGenerateService } from './application/login.generate.service';
+import { GoogleStrategy } from './api/guards/google-strategy/google.strategy';
+import { GoogleRegistrationUseCase } from './application/usecases/google-authorization.use-case';
+import { GetTotalConfirmedUsersHandler } from './application/queries/get-total-confirmed-users.query';
+import { PublicUsersController } from './api/public-users.controller';
+import { GetProfileByLogin } from './application/queries/getProfileByLogin';
+import { GetLoginByRefreshTokenUseCase } from './application/queries/get-user-login.outh2';
+import { CreateOrUpdateUseCase } from './application/usecases/profiles/create-or-update-profile.use-case';
+import { DeleteAvatarFileUseCase } from './application/usecases/profiles/delete-avatar-file.use-case';
+import { DeleteUserAvatarUseCase } from './application/usecases/profiles/delete-user-avatar.use-case';
+import { TransportModule } from '../transport/transport.module';
+import { GetCountriesWithCitiesHandler } from './application/queries/get-countries-with-cities.query';
+import { LocationsQueryRepo } from './infrastructure/query/locations-query.repo';
+import { CacheModule } from '@nestjs/cache-manager';
+import { GetUserProfileUseCase } from './infrastructure/query/get-profile.query.handler';
+import { SecurityController } from './api/security.controller';
+import { GetUserSessionsHandler } from './application/queries/get-all-sessions.query';
+import { TerminateSessionByDeviceIdHandler } from './application/usecases/terminate-session-deviceId.use-case';
+import { TerminateAllSessionsExceptCurrentHandler } from './application/usecases/terminate-all-sessions-except-current.use-case';
+import { PaymentController } from './api/payment.controller';
+import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
+import { NotificationsModule } from '../notifications/notifications.module';
 
-const queryHandlers = [
-  GetUserByIdOrInternalFailQueryHandler,
-  GetUserOrNotFoundFailQueryHandler,
-  GetMeUseCase,
-];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
 const commandHandlers = [
-  CreateUserUseCase,
   RegisterUserUseCase,
   LoginUserUseCase,
   ValidateUserUseCase,
@@ -42,28 +60,36 @@ const commandHandlers = [
   RecoverPasswordUseCase,
   SetNewPasswordUseCase,
   ConfirmationUseCase,
+  CheckRecoveryCodeUseCase,
+  RegistrationEmailResendingUseCase,
+  RefreshTokenUseCase,
+  GithubRegisterUseCase,
+  GoogleRegistrationUseCase,
+  CreateOrUpdateUseCase,
+  DeleteAvatarFileUseCase,
+  DeleteUserAvatarUseCase,
+  TerminateSessionByDeviceIdHandler,
+  TerminateAllSessionsExceptCurrentHandler,
+  CancelSubscriptionUseCase,
 ];
-const commonProviders = [
-  CryptoService,
-  UsersRepo,
-  UsersQueryRepo,
-  BasicStrategy,
-  JwtStrategy,
-  LocalStrategy,
-  JwtService,
-  SessionRepo,
-  MailService,
-];
+const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo];
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 30000,
+      isGlobal: true,
+    }),
     PassportModule,
     JwtModule.register({
       secret: jwtConstraints.secret,
       signOptions: { expiresIn: '20m' },
     }),
+    TransportModule,
+    NotificationsModule,
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, PublicUsersController, SecurityController, PaymentController],
   providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
+  exports: [JwtService, JwtStrategy, GetProfileByLogin, UsersRepo],
 })
 export class UserAccountsModule {}
