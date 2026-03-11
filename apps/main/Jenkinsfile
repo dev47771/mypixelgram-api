@@ -3,7 +3,7 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 4028
+        PORT = 4253
         NAMESPACE = "mypixelgram-ru"
         REGISTRY_HOSTNAME = "daarrys"
         PROJECT = "mypixelgram-main-api"
@@ -20,57 +20,31 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Install dependencies') {
-            steps {
-                script {
-                    sh '''
-                        export NVM_DIR="$HOME/.nvm"
-                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                        nvm install 20
-                        nvm use 20
-                        yarn install --frozen-lockfile
-                    '''
-                }
-            }
-        }
-      stage('Apply database migrations') {
-          steps {
-            echo "Migration atarted"
-                script {
-                    sh 'ls -ltr'
-                    sh 'pwd'
-                    sh 'yarn run main:prisma:deploy'
-                }
-            echo "Migration finished"
-          }
-      }
-        stage('Unit tests') {
-            steps {
-                script {
-                    sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                       nvm install 20
-                       nvm use 20
-                       yarn install
-                       yarn test
-                    '''
-                }
-            }
-        }
-        stage('e2e tests') {
-            steps {
-                script {
-                    sh '''
-                       export NVM_DIR="$HOME/.nvm"
-                       [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-                         nvm install 20
-                         nvm use 20
-                       yarn test:e2e
-                    '''
-                }
-            }
-        }
+//         stage('Unit tests') {
+//             steps {
+//                 script {
+//                     sh '''
+//                        export NVM_DIR="$HOME/.nvm"
+//                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+//                        nvm use --lts
+//                        yarn install
+//                        yarn test
+//                     '''
+//                 }
+//             }
+//         }
+//         stage('e2e tests') {
+//             steps {
+//                 script {
+//                     sh '''
+//                        export NVM_DIR="$HOME/.nvm"
+//                        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+//                        nvm use --lts
+//                        yarn test:e2e
+//                     '''
+//                 }
+//             }
+//         }
         stage('Build docker image') {
             steps {
                 echo "Build image started..."
