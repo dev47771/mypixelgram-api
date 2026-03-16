@@ -6,16 +6,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { LoginUserDto } from '../../input-dto/login-user.input-dto';
 import { validateOrReject } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
-import {
-  BadRequestDomainException,
-  UnauthorizedDomainException,
-} from '../../../../../core/exceptions/domain/domainException';
-import { ErrorConstants } from '../../../../../core/exceptions/errorConstants';
-import {
-  BadRequestPresentationalException,
-  PresentationErrorExtension,
-  PresentationException,
-} from '../../../../../core/exceptions/presentational/presentationalException';
+
+import { BadRequestPresentationalException } from '../../../../../core/exceptions/presentational/presentationalException';
 import { formatErrors } from '../../../../../setup/pipes.setup';
 
 @Injectable()
@@ -32,9 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw BadRequestPresentationalException.create(formattedErrors);
     }
 
-    const user = await this.commandBus.execute(
-      new ValidateUserUseCaseCommand(dto),
-    );
+    const user = await this.commandBus.execute(new ValidateUserUseCaseCommand(dto));
     return user.userId;
   }
 }

@@ -89,7 +89,7 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
     NotificationsModule,
   ],
   controllers: [UsersController, AuthController, PublicUsersController, SecurityController, PaymentController],
-  providers: [...queryHandlers, ...commandHandlers, ...commonProviders],
+  providers: [...queryHandlers, ...commandHandlers, ...commonProviders, ],
   exports: [JwtService, JwtStrategy, GetProfileByLogin, UsersRepo],
 })
 export class UserAccountsModule {}
