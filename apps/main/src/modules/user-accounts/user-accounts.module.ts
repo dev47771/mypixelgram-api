@@ -49,6 +49,7 @@ import { TerminateAllSessionsExceptCurrentHandler } from './application/usecases
 import { PaymentController } from './api/payment.controller';
 import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { SuperAdminResolver } from './api/super-admin.resolver';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
 const commandHandlers = [
@@ -89,7 +90,7 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
     NotificationsModule,
   ],
   controllers: [UsersController, AuthController, PublicUsersController, SecurityController, PaymentController],
-  providers: [...queryHandlers, ...commandHandlers, ...commonProviders, ],
+  providers: [...queryHandlers, ...commandHandlers, ...commonProviders, SuperAdminResolver],
   exports: [JwtService, JwtStrategy, GetProfileByLogin, UsersRepo],
 })
 export class UserAccountsModule {}
