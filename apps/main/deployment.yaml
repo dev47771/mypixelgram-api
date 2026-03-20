@@ -220,6 +220,26 @@ spec:
                  secretKeyRef:
                    name: mypixelgram-main-api-production-config-secret
                    key: REDIS_TLS_ENABLED
+             - name: ADMIN_EMAIL
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: ADMIN_EMAIL
+             - name: ADMIN_PASSWORD
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: ADMIN_PASSWORD
+             - name: ADMIN_JWT_SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: ADMIN_JWT_SECRET_KEY
+             - name: ADMIN_JWT_EXPIRES_IN
+               valueFrom:
+                 secretKeyRef:
+                   name: mypixelgram-main-api-production-config-secret
+                   key: ADMIN_JWT_EXPIRES_IN
              - name: EMAIL_CONFIRMATION_CODE_LIFETIME_SECS
                valueFrom:
                  secretKeyRef:

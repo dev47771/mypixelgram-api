@@ -15,6 +15,8 @@ import { PostModule } from './modules/posts/posts.module';
 import { FileModule } from './modules/files/files.module';
 import { TransportModule } from './modules/transport/transport.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { GraphQlConfigModule } from './modules/graph-ql/graph-ql-config.module';
+import { GraphQLExceptionsFilter } from './core/exceptions/graphqlExceptionFilter';
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     FileModule,
     TransportModule,
     NotificationsModule,
+    GraphQlConfigModule,
   ],
   controllers: [],
   providers: [
@@ -45,6 +48,10 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     {
       provide: APP_FILTER,
       useClass: PresentationalHttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GraphQLExceptionsFilter,
     },
   ],
 })
