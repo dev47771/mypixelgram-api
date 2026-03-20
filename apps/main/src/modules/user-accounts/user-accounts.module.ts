@@ -49,7 +49,11 @@ import { TerminateAllSessionsExceptCurrentHandler } from './application/usecases
 import { PaymentController } from './api/payment.controller';
 import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { SuperAdminResolver } from './api/super-admin.resolver';
+import { AdminResolver } from './api/admin.resolver';
+import { AdminValidateUseCase } from './application/usecases/admin-validate.use-case';
+import { AdminJwtAuthGuard } from './api/guards/jwt-strategy/admin-jwt-auth.guard';
+import { AdminLoginUseCase } from './application/usecases/admin-login.use-case';
+import { AdminRefreshTokenUseCase } from './application/usecases/admin-refresh-token.use-case';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
 const commandHandlers = [
@@ -72,8 +76,11 @@ const commandHandlers = [
   TerminateSessionByDeviceIdHandler,
   TerminateAllSessionsExceptCurrentHandler,
   CancelSubscriptionUseCase,
+  AdminValidateUseCase,
+  AdminLoginUseCase,
+  AdminRefreshTokenUseCase,
 ];
-const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo];
+const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo, AdminJwtAuthGuard];
 
 @Module({
   imports: [
@@ -90,7 +97,7 @@ const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, 
     NotificationsModule,
   ],
   controllers: [UsersController, AuthController, PublicUsersController, SecurityController, PaymentController],
-  providers: [...queryHandlers, ...commandHandlers, ...commonProviders, SuperAdminResolver],
+  providers: [...queryHandlers, ...commandHandlers, ...commonProviders, AdminResolver],
   exports: [JwtService, JwtStrategy, GetProfileByLogin, UsersRepo],
 })
 export class UserAccountsModule {}

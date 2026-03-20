@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { ValidateUserUseCaseCommand } from '../../../application/usecases/validate-user.use-case';
+import { ValidateUserCommand } from '../../../application/usecases/validate-user.use-case';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginUserDto } from '../../input-dto/login-user.input-dto';
 import { validateOrReject } from 'class-validator';
@@ -11,7 +11,7 @@ import { BadRequestPresentationalException } from '../../../../../core/exception
 import { formatErrors } from '../../../../../setup/pipes.setup';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private commandBus: CommandBus) {
     super({ usernameField: 'email' });
   }
@@ -24,7 +24,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw BadRequestPresentationalException.create(formattedErrors);
     }
 
-    const user = await this.commandBus.execute(new ValidateUserUseCaseCommand(dto));
+    const user = await this.commandBus.execute(new ValidateUserCommand(dto));
     return user.userId;
   }
 }

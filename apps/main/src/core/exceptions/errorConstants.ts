@@ -8,6 +8,7 @@ export const ErrorConstants = {
   FIELD_TOO_SHORT: 'Field is too short',
   FIELD_TOO_LONG: 'Field is too long',
   INVALID_PASSWORD: 'Invalid password',
+  INVALID_LOGIN_OR_PASSWORD: 'Invalid login or password',
 
   // Service errors
   NO_REFRESH_COOKIE: 'Refresh token is missing in cookies',

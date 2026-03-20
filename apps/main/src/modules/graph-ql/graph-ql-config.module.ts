@@ -16,6 +16,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           autoSchemaFile: join(__dirname, 'schema.graphql'),
           graphiql: isDev,
           debug: isDev,
+          context: ({ req, res }) => ({ req, res }),
         };
       },
       inject: [ConfigService],

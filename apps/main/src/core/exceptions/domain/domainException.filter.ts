@@ -1,15 +1,16 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
+import { GqlContextType } from '@nestjs/graphql';
 import { DomainException, DomainExceptionCode } from './domainException';
 import { Response } from 'express';
 
 @Catch(DomainException)
 export class DomainHttpExceptionFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost) {
+    // Skip processing if this is a GraphQL context
+    if (host.getType<GqlContextType>() === 'graphql') {
+      return;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

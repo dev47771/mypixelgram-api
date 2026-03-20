@@ -6,28 +6,22 @@ import { LoginUserDto } from '../../api/input-dto/login-user.input-dto';
 import { UnauthorizedDomainException } from '../../../../core/exceptions/domain/domainException';
 import { ErrorConstants } from '../../../../core/exceptions/errorConstants';
 
-export class ValidateUserUseCaseCommand {
+export class ValidateUserCommand {
   constructor(public dto: LoginUserDto) {}
 }
 
-@CommandHandler(ValidateUserUseCaseCommand)
-export class ValidateUserUseCase
-  implements ICommandHandler<ValidateUserUseCaseCommand>
-{
+@CommandHandler(ValidateUserCommand)
+export class ValidateUserUseCase implements ICommandHandler<ValidateUserCommand> {
   constructor(
     private usersRepo: UsersRepo,
     private cryptoService: CryptoService,
   ) {}
 
-  async execute(command: ValidateUserUseCaseCommand) {
+  async execute(command: ValidateUserCommand) {
     const { email, password } = command.dto;
 
     const user: UserModel | null = await this.usersRepo.findByEmail(email);
-    if (!user)
-      throw UnauthorizedDomainException.create(
-        ErrorConstants.USER_NOT_FOUND,
-        'ValidateUserUseCase',
-      );
+    if (!user) throw UnauthorizedDomainException.create(ErrorConstants.USER_NOT_FOUND, 'ValidateUserUseCase');
 
     await this.usersRepo.checkConfirmed(user);
 
@@ -35,16 +29,10 @@ export class ValidateUserUseCase
       throw UnauthorizedDomainException.create('Create password', 'Password');
     }
 
-    const isPasswordValid = await this.cryptoService.comparePasswords(
-      password,
-      user.passwordHash!,
-    );
+    const isPasswordValid = await this.cryptoService.comparePasswords(password, user.passwordHash!);
 
     if (!isPasswordValid) {
-      throw UnauthorizedDomainException.create(
-        ErrorConstants.INVALID_PASSWORD,
-        'ValidateUserUseCase',
-      );
+      throw UnauthorizedDomainException.create(ErrorConstants.INVALID_PASSWORD, 'ValidateUserUseCase');
     }
 
     return { userId: user.id };
