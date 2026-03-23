@@ -8,7 +8,7 @@ import { AdminLoginCommand } from '../application/usecases/admin-login.use-case'
 import { AdminRefreshTokenCommand } from '../application/usecases/admin-refresh-token.use-case';
 import { Response } from 'express';
 import { ExtractEmailFromRequest } from '../../../core/decorators/extract-email-from-request';
-import { UserModel } from '../../graph-ql/models/user.model';
+import { UsersPageResponse } from '../../graph-ql/models/users-page.model';
 import { GetUsersArgs } from './args/get-users.args';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
@@ -79,8 +79,8 @@ export class AdminResolver {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Query(() => UserModel)
-  async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String }) userId?: string) {
+  @Query(() => UsersPageResponse)
+  async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, nullable: true }) userId?: string) {
     return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
 }

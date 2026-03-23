@@ -36,10 +36,10 @@ export class UserModel {
   @Field()
   createdAt: string;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   avatar: string | null;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   dateOfBirth: string | null;
 
   @Field(() => $Enums.AccountType)
