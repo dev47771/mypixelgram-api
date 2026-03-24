@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../core/prisma/prisma.service';
 import { GetUsersArgs, SortField, SortDirection } from '../../api/args/get-users.args';
-import { UserModel as GraphQLUserModel, UserModel } from '../../../graph-ql/models/user.model';
+import { UserModel } from '../../../graph-ql/models/user.model';
 import { UsersPage, USERS_PAGE_SIZE } from './dto/admin-query.dto';
 
 @Injectable()
@@ -15,7 +15,6 @@ export class AdminQueryRepository {
       deletedAt: null,
     };
 
-    // Поиск по логину (LIKE)
     if (searchLoginTerm) {
       where.login = {
         contains: searchLoginTerm,
@@ -23,12 +22,10 @@ export class AdminQueryRepository {
       };
     }
 
-    // Поиск по id (точное совпадение)
     if (searchIdTerm) {
       where.id = searchIdTerm;
     }
 
-    // Определение сортировки
     const orderBy: any = {};
     if (sortBy === SortField.LOGIN) {
       orderBy.login = sortDirection;
@@ -38,11 +35,11 @@ export class AdminQueryRepository {
       orderBy.createdAt = sortDirection;
     }
 
-    // Пагинация по курсору (infinity scroll) - берем на один элемент больше для определения hasMore
     const prismaUsers = await this.prismaService.user.findMany({
       where,
       include: {
         profile: true,
+        providers: true,
       },
       orderBy,
       take: USERS_PAGE_SIZE + 1,
@@ -54,34 +51,12 @@ export class AdminQueryRepository {
     const lastItem = items[items.length - 1] ?? null;
     const nextCursor: string | null = lastItem ? lastItem.id : null;
 
-    const users = items.map((user) => {
-      const userModel = new UserModel();
-      userModel.id = user.id;
-      userModel.userId = user.id;
-      userModel.login = user.login;
-      userModel.email = user.email;
-      userModel.createdAt = user.createdAt.toISOString();
-      userModel.avatar = user.profile?.avatarUrl ?? null;
-      userModel.dateOfBirth = user.profile?.dateOfBirth ? user.profile.dateOfBirth.toISOString() : null;
-      userModel.accountType = user.accountType;
-
-      if (user.planName && user.subscriptionExpiresAt) {
-        userModel.currentSubscription = {
-          planName: user.planName,
-          expiresAt: user.subscriptionExpiresAt.toISOString(),
-          nextPayment: user.subscriptionExpiresAt.toISOString(),
-        };
-      } else {
-        userModel.currentSubscription = null;
-      }
-
-      return userModel;
-    });
+    const users = items.map((user) => UserModel.mapToView(user));
 
     return { users, nextCursor, hasMore };
   }
 
-  async findByIdWithProfile(id: string): Promise<GraphQLUserModel | null> {
+  async findByIdWithProfile(id: string): Promise<UserModel | null> {
     const user = await this.prismaService.user.findFirst({
       where: { id, deletedAt: null },
       include: {
@@ -92,28 +67,7 @@ export class AdminQueryRepository {
     if (!user) {
       return null;
     }
-    console.log('user', user);
 
-    const userModel = new GraphQLUserModel();
-    userModel.id = user.id;
-    userModel.userId = user.id;
-    userModel.login = user.login;
-    userModel.email = user.email;
-    userModel.createdAt = user.createdAt.toISOString();
-    userModel.avatar = user.profile?.avatarUrl ?? null;
-    userModel.dateOfBirth = user.profile?.dateOfBirth ? user.profile.dateOfBirth.toISOString() : null;
-    userModel.accountType = user.accountType;
-
-    if (user.planName && user.subscriptionExpiresAt) {
-      userModel.currentSubscription = {
-        planName: user.planName,
-        expiresAt: user.subscriptionExpiresAt.toISOString(),
-        nextPayment: user.subscriptionExpiresAt.toISOString(),
-      };
-    } else {
-      userModel.currentSubscription = null;
-    }
-
-    return userModel;
+    return UserModel.mapToView(user);
   }
 }
