@@ -83,4 +83,8 @@ export class AdminResolver {
   async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, nullable: true }) userId?: string) {
     return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
+
+  @Mutation()
+  @UseGuards(AdminJwtAuthGuard)
+  async blockUser() {}
 }
