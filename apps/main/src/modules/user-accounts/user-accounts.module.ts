@@ -50,12 +50,13 @@ import { PaymentController } from './api/payment.controller';
 import { CancelSubscriptionUseCase } from './application/usecases/cancel-subscription.usecase';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { AdminResolver } from './api/admin.resolver';
-import { AdminValidateUseCase } from './application/usecases/admin-validate.use-case';
+import { AdminValidateUseCase } from './application/usecases/admin/admin-validate.use-case';
 import { AdminJwtAuthGuard } from './api/guards/jwt-strategy/admin-jwt-auth.guard';
-import { AdminLoginUseCase } from './application/usecases/admin-login.use-case';
-import { AdminRefreshTokenUseCase } from './application/usecases/admin-refresh-token.use-case';
+import { AdminLoginUseCase } from './application/usecases/admin/admin-login.use-case';
+import { AdminRefreshTokenUseCase } from './application/usecases/admin/admin-refresh-token.use-case';
 import { AdminGetUsersQueryHandler } from './application/queries/admin-get-users.query-handler';
 import { AdminQueryRepository } from './infrastructure/query/admin.query-repository';
+import { BlockUserCommand } from './application/usecases/admin/block-user.use-case';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler, AdminGetUsersQueryHandler];
 const commandHandlers = [

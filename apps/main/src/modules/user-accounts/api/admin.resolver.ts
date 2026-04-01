@@ -4,8 +4,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AdminLoginInput, AdminAuthResponse } from '../../graph-ql/models/admin.model';
 import { AdminLocalAuthGuard } from './guards/local-strategy/admin-local-auth.guard';
 import { AdminJwtAuthGuard } from './guards/jwt-strategy/admin-jwt-auth.guard';
-import { AdminLoginCommand } from '../application/usecases/admin-login.use-case';
-import { AdminRefreshTokenCommand } from '../application/usecases/admin-refresh-token.use-case';
+import { AdminLoginCommand } from '../application/usecases/admin/admin-login.use-case';
+import { AdminRefreshTokenCommand } from '../application/usecases/admin/admin-refresh-token.use-case';
 import { Response } from 'express';
 import { ExtractEmailFromRequest } from '../../../core/decorators/extract-email-from-request';
 import { UsersPageResponse } from '../../graph-ql/models/users-page.model';
@@ -86,5 +86,7 @@ export class AdminResolver {
 
   @Mutation()
   @UseGuards(AdminJwtAuthGuard)
-  async blockUser() {}
+  async blockUser(@Args('id') id: string) {
+    //return await this.commandBus.execute(new BlockUserCommand(id));
+  }
 }
