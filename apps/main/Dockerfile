@@ -14,7 +14,7 @@ WORKDIR /home/node/app
 
 
 COPY --chown=node package*.json ./
-RUN npm install --frozen-lockfile
+RUN npm install --frozen-lockfile --omit=dev
 
 COPY --chown=node . .
 
