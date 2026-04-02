@@ -18,6 +18,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           debug: true,
           context: ({ req, res }) => ({ req, res }),
           path: '/api/v1/graphql',
+          // cors: {
+          //   //origin: true, // или конкретный URL: 'http://localhost:3000'
+          //   credentials: true, // Разрешает отправку куки
+          // },
+          // playground: {
+          //   settings: {
+          //     'request.credentials': 'include', // Отправлять куки с запросом
+          //   },
+          // },
         };
       },
       inject: [ConfigService],

@@ -1,6 +1,6 @@
 import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AdminLoginInput, AdminAuthResponse } from '../../graph-ql/models/admin.model';
 import { AdminLocalAuthGuard } from './guards/local-strategy/admin-local-auth.guard';
 import { AdminJwtAuthGuard } from './guards/jwt-strategy/admin-jwt-auth.guard';
@@ -8,10 +8,17 @@ import { AdminLoginCommand } from '../application/usecases/admin-login.use-case'
 import { AdminRefreshTokenCommand } from '../application/usecases/admin-refresh-token.use-case';
 import { Response } from 'express';
 import { ExtractEmailFromRequest } from '../../../core/decorators/extract-email-from-request';
+import { UsersPageResponse } from '../../graph-ql/models/users-page.model';
+import { GetUsersArgs } from './args/get-users.args';
+import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
+import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
 
 @Resolver()
 export class AdminResolver {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private commandBus: CommandBus,
+    private queryBus: QueryBus,
+  ) {}
 
   @Mutation(() => AdminAuthResponse)
   @UseGuards(AdminLocalAuthGuard)
@@ -52,7 +59,7 @@ export class AdminResolver {
     const currentToken = request.cookies?.adminAccessToken;
 
     if (!currentToken) {
-      throw new Error('No admin access token found');
+      throw UnauthorizedDomainException.create('No admin access token found', 'adminRefreshToken');
     }
 
     const result = await this.commandBus.execute(new AdminRefreshTokenCommand(currentToken));
@@ -71,8 +78,9 @@ export class AdminResolver {
     };
   }
 
-  @Query(() => String)
-  health(): string {
-    return 'OK';
+  @UseGuards(AdminJwtAuthGuard)
+  @Query(() => UsersPageResponse)
+  async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, nullable: true }) userId?: string) {
+    return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
 }

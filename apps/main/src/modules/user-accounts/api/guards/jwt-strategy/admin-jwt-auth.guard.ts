@@ -16,36 +16,32 @@ export class AdminJwtAuthGuard implements CanActivate {
     const gqlContext = GqlExecutionContext.create(context);
     const request = gqlContext.getContext().req;
 
-    // Извлекаем токен из куки
     const token = request.cookies?.adminAccessToken;
     if (!token) {
-      throw UnauthorizedDomainException.create('Access token not found', 'AdminJwtAuthGuard');
+      throw UnauthorizedDomainException.create('Access token not found', 'Token is not found');
     }
 
     // Валидируем токен
     const secret = this.configService.get<string>('ADMIN_JWT_SECRET_KEY');
     if (!secret) {
-      throw UnauthorizedDomainException.create('ADMIN_JWT_SECRET_KEY is not configured', 'AdminJwtAuthGuard');
+      throw UnauthorizedDomainException.create('ADMIN_JWT_SECRET_KEY is not configured', 'Secret not found');
     }
 
     let payload: any;
 
     try {
-      const payload = jwt.verify(token, secret);
-
-      // Проверяем наличие email в payload
+      payload = jwt.verify(token, secret);
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw UnauthorizedDomainException.create('Invalid or expired admin token', 'AdminJwtAuthGuard');
+      throw UnauthorizedDomainException.create('Invalid or expired admin token', 'Payload is not valid');
     }
 
     if (!payload || typeof payload !== 'object' || !('email' in payload)) {
-      throw UnauthorizedDomainException.create('Invalid admin token payload', 'AdminJwtAuthGuard');
+      throw UnauthorizedDomainException.create('Invalid admin token payload', 'Invalid token');
     }
 
-    // Устанавливаем пользователя в request
     request.user = { email: payload.email };
     return true;
   }

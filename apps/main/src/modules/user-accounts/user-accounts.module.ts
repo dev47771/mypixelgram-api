@@ -54,8 +54,10 @@ import { AdminValidateUseCase } from './application/usecases/admin-validate.use-
 import { AdminJwtAuthGuard } from './api/guards/jwt-strategy/admin-jwt-auth.guard';
 import { AdminLoginUseCase } from './application/usecases/admin-login.use-case';
 import { AdminRefreshTokenUseCase } from './application/usecases/admin-refresh-token.use-case';
+import { AdminGetUsersQueryHandler } from './application/queries/admin-get-users.query-handler';
+import { AdminQueryRepository } from './infrastructure/query/admin.query-repository';
 
-const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler];
+const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler, AdminGetUsersQueryHandler];
 const commandHandlers = [
   RegisterUserUseCase,
   LoginUserUseCase,
@@ -80,7 +82,7 @@ const commandHandlers = [
   AdminLoginUseCase,
   AdminRefreshTokenUseCase,
 ];
-const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo, AdminJwtAuthGuard];
+const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo, AdminJwtAuthGuard, AdminQueryRepository];
 
 @Module({
   imports: [
