@@ -1,4 +1,3 @@
-//import { configModule } from './dynamic-config-module';
 import { DynamicModule, Module } from '@nestjs/common';
 import { CoreModule } from './core/core.module';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -6,11 +5,18 @@ import { UserAccountsModule } from './modules/user-accounts/user-accounts.module
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TestingModule } from './modules/testing/testing.module';
-import { AllHttpExceptionsFilter } from './core/exceptions/all-sxception.filter';
-import { DomainHttpExceptionFilter } from './core/exceptions/exception.filter';
+import { AllHttpExceptionsFilter } from './core/exceptions/allExceptionFilter';
+import { DomainHttpExceptionFilter } from './core/exceptions/domain/domainException.filter';
 import { MailModule } from './core/mailModule/mail.module';
 import { validate } from './core/env.validation';
 import { envFilePaths } from './env-file-paths';
+import { PresentationalHttpExceptionFilter } from './core/exceptions/presentational/presentationalExceptionFilter';
+import { PostModule } from './modules/posts/posts.module';
+import { FileModule } from './modules/files/files.module';
+import { TransportModule } from './modules/transport/transport.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { GraphQlConfigModule } from './modules/graph-ql/graph-ql-config.module';
+import { GraphQLExceptionsFilter } from './core/exceptions/graphqlExceptionFilter';
 
 @Module({
   imports: [
@@ -22,8 +28,14 @@ import { envFilePaths } from './env-file-paths';
     CoreModule,
     CqrsModule.forRoot(),
     UserAccountsModule,
+    PostModule,
     MailModule,
+    FileModule,
+    TransportModule,
+    NotificationsModule,
+    GraphQlConfigModule,
   ],
+  controllers: [],
   providers: [
     {
       provide: APP_FILTER,
@@ -32,6 +44,14 @@ import { envFilePaths } from './env-file-paths';
     {
       provide: APP_FILTER,
       useClass: DomainHttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: PresentationalHttpExceptionFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GraphQLExceptionsFilter,
     },
   ],
 })
