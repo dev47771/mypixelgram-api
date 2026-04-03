@@ -84,9 +84,9 @@ export class AdminResolver {
     return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
 
-  @Mutation()
-  @UseGuards(AdminJwtAuthGuard)
-  async blockUser(@Args('id') id: string) {
-    //return await this.commandBus.execute(new BlockUserCommand(id));
-  }
+  // @Mutation()
+  // @UseGuards(AdminJwtAuthGuard)
+  // async blockUser(@Args('id') id: string) {
+  //   //return await this.commandBus.execute(new BlockUserCommand(id));
+  // }
 }
