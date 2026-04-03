@@ -20,7 +20,7 @@ export class AdminResolver {
     private queryBus: QueryBus,
   ) {}
 
-  @Mutation(() => AdminAuthResponse)
+  @Mutation(() => AdminAuthResponse, { description: 'Авторизация администратора' })
   @UseGuards(AdminLocalAuthGuard)
   async adminLogin(@Args('input') input: AdminLoginInput, @ExtractEmailFromRequest() email: string, @Context() { res }: { res: Response }): Promise<AdminAuthResponse> {
     // Аутентификация проходит через AdminLocalAuthGuard
@@ -39,7 +39,7 @@ export class AdminResolver {
     };
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Boolean, { description: 'Выход из учётной записи администратора' })
   @UseGuards(AdminJwtAuthGuard)
   async adminLogout(@Context() { res }: { res: Response }): Promise<boolean> {
     res.clearCookie('adminAccessToken', {
@@ -52,7 +52,7 @@ export class AdminResolver {
     return true;
   }
 
-  @Mutation(() => AdminAuthResponse)
+  @Mutation(() => AdminAuthResponse, { description: 'Обновление токена администратора' })
   @UseGuards(AdminJwtAuthGuard)
   async adminRefreshToken(@Context() context: any): Promise<AdminAuthResponse> {
     const request = context.req;
@@ -79,8 +79,8 @@ export class AdminResolver {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Query(() => UsersPageResponse)
-  async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, nullable: true }) userId?: string) {
+  @Query(() => UsersPageResponse, { description: 'Запрос списка пользователей с фильтрацией и пагинацией или одного пользователя' })
+  async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, description: 'ID конкретного пользователя для получения одного результата', nullable: true }) userId?: string) {
     return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
 
