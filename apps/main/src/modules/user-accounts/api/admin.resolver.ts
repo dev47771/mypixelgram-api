@@ -12,6 +12,7 @@ import { UsersPageResponse } from '../../graph-ql/models/users-page.model';
 import { GetUsersArgs } from './args/get-users.args';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
+import { BlockUserCommand } from '../application/usecases/admin/block-user.use-case';
 
 @Resolver()
 export class AdminResolver {
@@ -22,7 +23,7 @@ export class AdminResolver {
 
   @Mutation(() => AdminAuthResponse, { description: 'Авторизация администратора' })
   @UseGuards(AdminLocalAuthGuard)
-  async adminLogin(@Args('input') input: AdminLoginInput, @ExtractEmailFromRequest() email: string, @Context() { res }: { res: Response }): Promise<AdminAuthResponse> {
+  async adminLogin(@Args('input') input: AdminLoginInput, @ExtractEmailFromRequest() email: string, @Context() { res }: { res: Response }) {
     // Аутентификация проходит через AdminLocalAuthGuard
     // После успешной аутентификации получаем email из request.user
     const result = await this.commandBus.execute(new AdminLoginCommand(email));
@@ -34,9 +35,7 @@ export class AdminResolver {
       domain: '.mypixelgram.ru',
     });
 
-    return {
-      accessToken: result.accessToken,
-    };
+    return true;
   }
 
   @Mutation(() => Boolean, { description: 'Выход из учётной записи администратора' })
@@ -54,7 +53,7 @@ export class AdminResolver {
 
   @Mutation(() => AdminAuthResponse, { description: 'Обновление токена администратора' })
   @UseGuards(AdminJwtAuthGuard)
-  async adminRefreshToken(@Context() context: any): Promise<AdminAuthResponse> {
+  async adminRefreshToken(@Context() context: any) {
     const request = context.req;
     const currentToken = request.cookies?.adminAccessToken;
 
@@ -73,9 +72,7 @@ export class AdminResolver {
       domain: '.mypixelgram.ru',
     });
 
-    return {
-      accessToken: result.accessToken,
-    };
+    return true;
   }
 
   @UseGuards(AdminJwtAuthGuard)
@@ -84,9 +81,15 @@ export class AdminResolver {
     return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
   }
 
+  @UseGuards(AdminJwtAuthGuard)
+  @Query(() => Boolean, { description: 'Запрос на проверку прав администратора' })
+  async AdminChecker() {
+    return true;
+  }
+
   // @Mutation()
   // @UseGuards(AdminJwtAuthGuard)
   // async blockUser(@Args('id') id: string) {
-  //   //return await this.commandBus.execute(new BlockUserCommand(id));
+  //   return await this.commandBus.execute(new BlockUserCommand());
   // }
 }

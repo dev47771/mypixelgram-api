@@ -1,5 +1,5 @@
 import { ArgsType, Field, registerEnumType } from '@nestjs/graphql';
-import { IsOptional, IsString, IsUUID, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsNumber } from 'class-validator';
 
 export enum SortDirection {
   ASC = 'asc',
@@ -24,10 +24,15 @@ registerEnumType(SortField, {
 
 @ArgsType()
 export class GetUsersArgs {
-  @Field(() => String, { nullable: true, description: 'Курсор для пагинации (ID последнего пользователя)' })
+  @Field(() => Number, { nullable: true, defaultValue: 1, description: 'Номер страницы' })
   @IsOptional()
-  @IsUUID()
-  cursor?: string;
+  @IsNumber()
+  pageNumber?: number;
+
+  @Field(() => Number, { nullable: true, defaultValue: 8, description: 'Размер страницы' })
+  @IsOptional()
+  @IsNumber()
+  pageSize?: number;
 
   @Field(() => String, { nullable: true, description: 'Поиск по логину или полному имени (частичное совпадение)' })
   @IsString()

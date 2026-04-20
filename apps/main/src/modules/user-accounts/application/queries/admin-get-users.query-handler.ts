@@ -24,8 +24,10 @@ export class AdminGetUsersQueryHandler implements IQueryHandler<AdminGetUsersQue
       }
       // Для запроса конкретного пользователя возвращаем пагинированный ответ с одним пользователем
       const pageInfo: PageInfo = {
-        nextCursor: null,
-        hasMore: false,
+        pageNumber: 1,
+        pageSize: 1,
+        totalPages: 1,
+        totalItems: 1,
       };
       return {
         users: [user],
@@ -36,8 +38,10 @@ export class AdminGetUsersQueryHandler implements IQueryHandler<AdminGetUsersQue
     // поиск всех пользователей с фильтрацией, сортировкой и пагинацией
     const page: UsersPage = await this.adminQueryRepo.findUsersWithPagination(query.query);
     const pageInfo: PageInfo = {
-      nextCursor: page.nextCursor,
-      hasMore: page.hasMore,
+      pageNumber: page.pageNumber,
+      pageSize: page.pageSize,
+      totalPages: page.totalPages,
+      totalItems: page.totalItems,
     };
     return {
       users: page.users,

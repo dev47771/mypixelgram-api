@@ -17,9 +17,7 @@ export class GetLoginByRefreshTokenUseCase implements IQueryHandler<GetLoginByRe
   ) {}
 
   async execute(command: GetLoginByRefreshTokenQueryCommand) {
-    console.log('hereeeeeee111');
     const payload = jwt.verify(command.refreshToken, this.configService.get<string>('JWT_SECRET_KEY')!) as { userId: string; deviceId: string; iat: number; exp: number };
-    console.log('hereeeee');
     const user = await this.queryRepo.findById(payload.userId);
     if (!user) {
       throw NotFoundDomainException.create(ErrorConstants.USER_NOT_FOUND, 'GetLoginByRefreshTokenQueryCommand');

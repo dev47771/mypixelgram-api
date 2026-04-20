@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../core/prisma/prisma.service';
 import { GetUsersArgs, SortField, SortDirection } from '../../api/args/get-users.args';
 import { UserModel } from '../../../graph-ql/models/user.model';
-import { UsersPage, USERS_PAGE_SIZE } from './dto/admin-query.dto';
+import { UsersPage } from './dto/admin-query.dto';
 
 @Injectable()
 export class AdminQueryRepository {
   constructor(private prismaService: PrismaService) {}
 
   async findUsersWithPagination(query: GetUsersArgs): Promise<UsersPage> {
-    const { cursor, searchLoginTerm, searchIdTerm, sortBy = SortField.CREATED_AT, sortDirection = SortDirection.DESC } = query;
+    const { pageNumber = 1, pageSize = 8, searchLoginTerm, searchIdTerm, sortBy = SortField.CREATED_AT, sortDirection = SortDirection.DESC } = query;
 
     const where: any = {
       deletedAt: null,
@@ -35,6 +35,13 @@ export class AdminQueryRepository {
       orderBy.createdAt = sortDirection;
     }
 
+    // Calculate offset
+    const skip = (pageNumber - 1) * pageSize;
+
+    // Get total count
+    const totalItems = await this.prismaService.user.count({ where });
+
+    // Get paginated users
     const prismaUsers = await this.prismaService.user.findMany({
       where,
       include: {
@@ -42,18 +49,21 @@ export class AdminQueryRepository {
         providers: true,
       },
       orderBy,
-      take: USERS_PAGE_SIZE + 1,
-      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      take: pageSize,
+      skip,
     });
 
-    const hasMore: boolean = prismaUsers.length > USERS_PAGE_SIZE;
-    const items = hasMore ? prismaUsers.slice(0, USERS_PAGE_SIZE) : prismaUsers;
-    const lastItem = items[items.length - 1] ?? null;
-    const nextCursor: string | null = lastItem ? lastItem.id : null;
+    const totalPages = Math.ceil(totalItems / pageSize);
 
-    const users = items.map((user) => UserModel.mapToView(user));
+    const users = prismaUsers.map((user) => UserModel.mapToView(user));
 
-    return { users, nextCursor, hasMore };
+    return {
+      users,
+      pageNumber,
+      pageSize,
+      totalPages,
+      totalItems,
+    };
   }
 
   async findByIdWithProfile(id: string): Promise<UserModel | null> {

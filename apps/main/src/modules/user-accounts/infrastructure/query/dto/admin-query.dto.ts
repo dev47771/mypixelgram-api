@@ -2,8 +2,8 @@ import { UserModel } from '../../../../graph-ql/models/user.model';
 
 export type UsersPage = {
   users: UserModel[];
-  nextCursor: string | null;
-  hasMore: boolean;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  totalItems: number;
 };
-
-export const USERS_PAGE_SIZE = 8;
