@@ -1,7 +1,7 @@
 import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { AdminLoginInput, AdminAuthResponse } from '../../graph-ql/models/admin.model';
+import { AdminLoginInput } from '../../graph-ql/models/admin.model';
 import { AdminLocalAuthGuard } from './guards/local-strategy/admin-local-auth.guard';
 import { AdminJwtAuthGuard } from './guards/jwt-strategy/admin-jwt-auth.guard';
 import { AdminLoginCommand } from '../application/usecases/admin/admin-login.use-case';
@@ -21,7 +21,7 @@ export class AdminResolver {
     private queryBus: QueryBus,
   ) {}
 
-  @Mutation(() => AdminAuthResponse, { description: 'Авторизация администратора' })
+  @Mutation(() => Boolean, { description: 'Авторизация администратора' })
   @UseGuards(AdminLocalAuthGuard)
   async adminLogin(@Args('input') input: AdminLoginInput, @ExtractEmailFromRequest() email: string, @Context() { res }: { res: Response }) {
     // Аутентификация проходит через AdminLocalAuthGuard
@@ -51,7 +51,7 @@ export class AdminResolver {
     return true;
   }
 
-  @Mutation(() => AdminAuthResponse, { description: 'Обновление токена администратора' })
+  @Mutation(() => Boolean, { description: 'Обновление токена администратора' })
   @UseGuards(AdminJwtAuthGuard)
   async adminRefreshToken(@Context() context: any) {
     const request = context.req;
