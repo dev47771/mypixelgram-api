@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class AdminLoginInput {
@@ -7,19 +7,4 @@ export class AdminLoginInput {
 
   @Field()
   password: string;
-}
-
-@ObjectType()
-export class AdminAuthResponse {
-  @Field()
-  accessToken: string;
-}
-
-@ObjectType()
-export class AdminLogoutResponse {
-  @Field()
-  success: boolean;
-
-  @Field()
-  message: string;
 }

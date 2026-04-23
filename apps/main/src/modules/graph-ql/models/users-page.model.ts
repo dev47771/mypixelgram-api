@@ -1,13 +1,19 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType, Int } from '@nestjs/graphql';
 import { UserModel } from './user.model';
 
 @ObjectType()
 export class PageInfo {
-  @Field(() => String, { nullable: true })
-  nextCursor: string | null;
+  @Field(() => Int)
+  pageNumber: number;
 
-  @Field()
-  hasMore: boolean;
+  @Field(() => Int)
+  pageSize: number;
+
+  @Field(() => Int)
+  totalPages: number;
+
+  @Field(() => Int)
+  totalItems: number;
 }
 
 @ObjectType()

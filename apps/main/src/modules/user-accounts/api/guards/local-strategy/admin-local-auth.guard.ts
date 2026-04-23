@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { AdminValidateCommand } from '../../../application/usecases/admin-validate.use-case';
+import { AdminValidateCommand } from '../../../application/usecases/admin/admin-validate.use-case';
 import { UnauthorizedDomainException } from '../../../../../core/exceptions/domain/domainException';
 
 @Injectable()

@@ -29,6 +29,7 @@ model User {
   Session              Session[]
   Post                 Post[]
   profile              Profile?
+  blockInfo            UserBlockInfo?
 
   accountType           AccountType    @default(PERSONAL)
   planName              String?
@@ -142,6 +143,25 @@ model City {
 
   @@index([countryId])
   @@map("cities")
+}
+
+model UserBlockInfo {
+  userId       String  @id
+  reasonId     Int?
+  reasonDetail String?
+
+  user        User         @relation(fields: [userId], references: [id])
+  blockReason BlockReason? @relation(fields: [reasonId], references: [id])
+
+  @@map("block_info")
+}
+
+model BlockReason {
+  id             Int             @id @default(autoincrement())
+  reason         String          @unique @db.Text
+  userBlockInfos UserBlockInfo[]
+
+  @@map("block_reason")
 }
 
 enum NotificationStatus {

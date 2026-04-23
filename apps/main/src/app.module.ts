@@ -43,15 +43,15 @@ import { GraphQLExceptionsFilter } from './core/exceptions/graphqlExceptionFilte
     },
     {
       provide: APP_FILTER,
+      useClass: GraphQLExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
       useClass: DomainHttpExceptionFilter,
     },
     {
       provide: APP_FILTER,
       useClass: PresentationalHttpExceptionFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: GraphQLExceptionsFilter,
     },
   ],
 })

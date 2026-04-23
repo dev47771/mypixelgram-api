@@ -43,13 +43,22 @@ export class Profile {
   city: string | null;
 
   @Field(() => String, { nullable: true })
-  apoutMe: string | null;
+  aboutMe: string | null;
 
   @Field(() => String, { nullable: true })
   avatarUrl: string | null;
 
   @Field(() => String, { nullable: true })
   fileId: string | null;
+}
+
+@ObjectType()
+export class BlockInfo {
+  @Field(() => Number, { nullable: true })
+  reasonId: number;
+
+  @Field(() => String, { nullable: true })
+  reasonDetail: string;
 }
 
 @ObjectType()
@@ -64,7 +73,7 @@ export class UserModel {
   email: string;
 
   @Field(() => String, { nullable: true })
-  provider: string;
+  provider: string | null;
 
   @Field()
   createdAt: string;
@@ -77,6 +86,9 @@ export class UserModel {
 
   @Field(() => Profile, { nullable: true })
   profile: Profile | null;
+
+  @Field(() => BlockInfo, { nullable: true })
+  blockInfo: BlockInfo | null;
 
   static mapToView(user: any) {
     const dto = new UserModel();
@@ -106,12 +118,21 @@ export class UserModel {
         dateOfBirth: user.profile.dateOfBirth?.toISOString() ?? null,
         country: user.profile.country ?? null,
         city: user.profile.city ?? null,
-        apoutMe: user.profile.apoutMe ?? null,
+        aboutMe: user.profile.aboutMe ?? null,
         avatarUrl: user.profile.avatarUrl ?? null,
         fileId: user.profile.fileId ?? null,
       };
     } else {
       dto.profile = null;
+    }
+
+    if (user.blockInfo) {
+      dto.blockInfo = {
+        reasonId: user.blockInfo.reasonId,
+        reasonDetail: user.blockInfo.reasonDetail,
+      };
+    } else {
+      dto.blockInfo = null;
     }
 
     return dto;
