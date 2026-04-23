@@ -24,12 +24,12 @@ registerEnumType(SortField, {
 
 @ArgsType()
 export class GetUsersArgs {
-  @Field(() => Number, { nullable: true, defaultValue: 1, description: 'Номер страницы' })
+  @Field(() => Number, { nullable: true, defaultValue: 1, description: 'Номер страницы (по умолчанию 1)' })
   @IsOptional()
   @IsNumber()
   pageNumber?: number;
 
-  @Field(() => Number, { nullable: true, defaultValue: 8, description: 'Размер страницы' })
+  @Field(() => Number, { nullable: true, defaultValue: 8, description: 'Размер страницы (по умолчанию 8)' })
   @IsOptional()
   @IsNumber()
   pageSize?: number;

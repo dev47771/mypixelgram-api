@@ -12,7 +12,7 @@ import { UsersPageResponse } from '../../graph-ql/models/users-page.model';
 import { GetUsersArgs } from './args/get-users.args';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
-import { BlockUserCommand } from '../application/usecases/admin/block-user.use-case';
+import { BlockOrUnblockUserCommand } from '../application/usecases/admin/block-or-unblock-user.use-case';
 
 @Resolver()
 export class AdminResolver {
@@ -87,9 +87,13 @@ export class AdminResolver {
     return true;
   }
 
-  // @Mutation()
-  // @UseGuards(AdminJwtAuthGuard)
-  // async blockUser(@Args('id') id: string) {
-  //   return await this.commandBus.execute(new BlockUserCommand());
-  // }
+  @Mutation(() => Boolean, { description: 'Блокировка/разблокировка пользователя. При блокировке обязательно должны присутствовать userId, reasonId. при разблокировке передавать только userId ' })
+  @UseGuards(AdminJwtAuthGuard)
+  async blockUser(
+    @Args('id') id: string,
+    @Args('reasonId', { nullable: true, description: 'Причина блокировки: 1 - bad behavior, 2 - Advertising placement, 3 - Another reason' }) reasonId?: number,
+    @Args('reasonDetail', { nullable: true, description: 'Обязательно указывать если причина блокировки Another reason' }) reasonDetail?: string,
+  ) {
+    return await this.commandBus.execute(new BlockOrUnblockUserCommand({ id, reasonId, reasonDetail }));
+  }
 }

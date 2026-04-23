@@ -47,6 +47,7 @@ export class AdminQueryRepository {
       include: {
         profile: true,
         providers: true,
+        blockInfo: true,
       },
       orderBy,
       take: pageSize,
@@ -71,6 +72,8 @@ export class AdminQueryRepository {
       where: { id, deletedAt: null },
       include: {
         profile: true,
+        providers: true,
+        blockInfo: true,
       },
     });
 

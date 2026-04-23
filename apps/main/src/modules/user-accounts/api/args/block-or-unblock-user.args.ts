@@ -1,6 +1,6 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { ArgsType, Field } from '@nestjs/graphql';
 
-@InputType()
+@ArgsType()
 export class BlockOrUnblockUserArgs {
   @Field({ description: 'ID пользователя которого надо заблокировать или разблокировать' })
   id: string;

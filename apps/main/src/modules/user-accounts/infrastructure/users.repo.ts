@@ -7,7 +7,6 @@ import { ErrorConstants } from '../../../core/exceptions/errorConstants';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { UserProviderInputDto } from '../api/input-dto/user.provider.dto';
 import { CreateOrUpdateProfileDto } from '../api/input-dto/create-or-update-profile.input-dto';
-import { Profile } from 'passport';
 
 @Injectable()
 export class UsersRepo {
@@ -168,6 +167,14 @@ export class UsersRepo {
       where: { id: userId },
     });
   }
+
+  async findUserByIdWithBlockInfo(userId: string) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { blockInfo: true },
+    });
+  }
+
   async findByIdWithProfile(userId: string) {
     return this.prisma.user.findUnique({
       where: { id: userId },
@@ -234,6 +241,22 @@ export class UsersRepo {
         planName,
         subscriptionExpiresAt: expiresAt,
       },
+    });
+  }
+
+  async blockUser(userId: string, reasonId: number, reasonDetail?: string) {
+    return this.prisma.userBlockInfo.create({
+      data: {
+        userId,
+        reasonId,
+        ...(reasonDetail !== undefined && { reasonDetail }),
+      },
+    });
+  }
+
+  async unblockUser(userId: string) {
+    return this.prisma.userBlockInfo.delete({
+      where: { userId },
     });
   }
 }
