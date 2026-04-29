@@ -73,6 +73,42 @@ export class PaymentRepo {
       },
     });
   }
+
+  async findAllWithPagination(limit: number, offset: number) {
+    const payments = await this.paymentModel.findAll({
+      where: {
+        status: PaymentStatus.SUCCEEDED,
+      },
+      include: [
+        {
+          model: SubscriptionModel,
+          as: 'subscription',
+          attributes: ['planName', 'expiresAt'],
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+    });
+
+    return payments.map((payment) => ({
+      id: payment.id.toString(),
+      userId: payment.userId,
+      paymentDate: payment.createdAt.toISOString().split('T')[0],
+      amount: `$${(payment.amountCents / 100).toFixed(2)}`,
+      subscriptionType: payment.subscription?.planName || 'One-time',
+      paymentType: payment.provider === 'stripe' ? 'Stripe' : 'PayPal',
+    }));
+  }
+
+  async countAll() {
+    return this.paymentModel.count({
+      where: {
+        status: PaymentStatus.SUCCEEDED,
+      },
+    });
+  }
   async findByStripeInvoiceId(stripeInvoiceId: string, tx?: Transaction) {
     return this.paymentModel.findOne({
       where: { stripeInvoiceId },
