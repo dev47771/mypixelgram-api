@@ -50,6 +50,14 @@ export class TransportService {
     }
   }
 
+  async getAllPayments(params: { page: number; limit: number }) {
+    try {
+      return await firstValueFrom(this.paymentApiClient.send({ cmd: 'getAllPayments' }, params));
+    } catch (e) {
+      throw new RpcException(e.message);
+    }
+  }
+
   async getUserPayments(params: { userId: string; page: number; limit: number }) {
     try {
       return await firstValueFrom(this.paymentApiClient.send({ cmd: 'getUserPayments' }, params));
