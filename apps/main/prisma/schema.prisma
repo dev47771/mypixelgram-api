@@ -51,7 +51,7 @@ model UserConfirmation {
   userId             String    @id
   isAgreeWithPrivacy Boolean?
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_confirmations")
 }
@@ -61,7 +61,7 @@ model PasswordRecovery {
   expirationDate   DateTime @db.Timestamptz()
   userId           String   @id
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_recoveries")
 }
@@ -73,7 +73,7 @@ model UserProvider {
   email          String
   userId         String
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_providers")
 }
@@ -87,7 +87,7 @@ model Session {
   deviceName String
   deviceId   String
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session_user")
 }
@@ -102,14 +102,14 @@ model Post {
   createdAt DateTime @default(now()) @db.Timestamptz()
   updatedAt DateTime @updatedAt @db.Timestamptz()
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
 
 model Profile {
   id          String   @id @default(uuid())
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String   @unique
   firstName   String
   lastName    String
@@ -150,7 +150,7 @@ model UserBlockInfo {
   reasonId     Int?
   reasonDetail String?
 
-  user        User         @relation(fields: [userId], references: [id])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   blockReason BlockReason? @relation(fields: [reasonId], references: [id])
 
   @@map("block_info")

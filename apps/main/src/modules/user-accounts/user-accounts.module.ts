@@ -57,6 +57,7 @@ import { AdminRefreshTokenUseCase } from './application/usecases/admin/admin-ref
 import { AdminGetUsersQueryHandler } from './application/queries/admin-get-users.query-handler';
 import { AdminQueryRepository } from './infrastructure/query/admin.query-repository';
 import { BlockOrUnblockUserUseCase } from './application/usecases/admin/block-or-unblock-user.use-case';
+import { AdminDeleteUserUseCase } from './application/usecases/admin/admin-delete-user.use-case';
 
 const queryHandlers = [GetUserById, GetMeUseCase, GetTotalConfirmedUsersHandler, GetProfileByLogin, GetLoginByRefreshTokenUseCase, GetCountriesWithCitiesHandler, GetUserProfileUseCase, GetUserSessionsHandler, AdminGetUsersQueryHandler];
 const commandHandlers = [
@@ -83,6 +84,7 @@ const commandHandlers = [
   AdminLoginUseCase,
   AdminRefreshTokenUseCase,
   BlockOrUnblockUserUseCase,
+  AdminDeleteUserUseCase,
 ];
 const commonProviders = [CryptoService, UsersRepo, UsersQueryRepo, JwtStrategy, LocalStrategy, JwtService, SessionRepo, MailService, RecaptchaService, RecaptchaGuard, GitHubStrategy, LoginGenerateService, GoogleStrategy, LocationsQueryRepo, AdminJwtAuthGuard, AdminQueryRepository];
 

@@ -14,6 +14,8 @@ import { UnauthorizedDomainException } from '../../../core/exceptions/domain/dom
 import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
 import { BlockOrUnblockUserCommand } from '../application/usecases/admin/block-or-unblock-user.use-case';
 import { TransportService } from '../../transport/transport.service';
+import { DeleteUserArgs } from './args/delete-user.args';
+import { AdminDeleteUserCommand } from '../application/usecases/admin/admin-delete-user.use-case';
 
 @Resolver()
 export class AdminResolver {
@@ -124,5 +126,12 @@ export class AdminResolver {
     @Args('reasonDetail', { nullable: true, description: 'Обязательно указывать если причина блокировки Another reason' }) reasonDetail?: string,
   ) {
     return await this.commandBus.execute(new BlockOrUnblockUserCommand({ id, reasonId, reasonDetail }));
+  }
+
+  @Mutation(() => Boolean, { description: 'хард удаление польхователя' })
+  @UseGuards(AdminJwtAuthGuard)
+  async adminDeleteUser(@Args('id') id: DeleteUserArgs) {
+    await this.commandBus.execute<AdminDeleteUserCommand>(new AdminDeleteUserCommand(id.userId));
+    return true;
   }
 }
