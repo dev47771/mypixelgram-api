@@ -13,12 +13,14 @@ import { GetUsersArgs } from './args/get-users.args';
 import { UnauthorizedDomainException } from '../../../core/exceptions/domain/domainException';
 import { AdminGetUsersQuery } from '../application/queries/admin-get-users.query-handler';
 import { BlockOrUnblockUserCommand } from '../application/usecases/admin/block-or-unblock-user.use-case';
+import { TransportService } from '../../transport/transport.service';
 
 @Resolver()
 export class AdminResolver {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private transport: TransportService,
   ) {}
 
   @Mutation(() => Boolean, { description: 'Авторизация администратора' })
@@ -76,9 +78,36 @@ export class AdminResolver {
   }
 
   @UseGuards(AdminJwtAuthGuard)
-  @Query(() => UsersPageResponse, { description: 'Запрос списка пользователей с фильтрацией и пагинацией или одного пользователя' })
+  @Query(() => UsersPageResponse, { description: 'Запрос списка пользователей с фильтрацией и пагинацией или одного пользователя. Если указан userId — возвращает пользователя + его платежи. Если userId не указан — возвращает всех пользователей + все платежи.' })
   async getUsers(@Args() query: GetUsersArgs, @Args('userId', { type: () => String, description: 'ID конкретного пользователя для получения одного результата', nullable: true }) userId?: string) {
-    return await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
+    const page = query.pageNumber || 1;
+    const limit = query.pageSize || 8;
+
+    // Получаем пользователей
+    const usersResult = await this.queryBus.execute(new AdminGetUsersQuery(query, userId));
+
+    // Получаем платежи
+    let paymentsResult;
+    if (userId) {
+      paymentsResult = await this.transport.getUserPayments({ userId, page, limit });
+    } else {
+      paymentsResult = await this.transport.getAllPayments({ page, limit });
+    }
+
+    const hasPayments = paymentsResult.payments && paymentsResult.payments.length > 0;
+
+    return {
+      ...usersResult,
+      payments: hasPayments ? paymentsResult.payments : null,
+      paymentsPagination: hasPayments
+        ? {
+            pageNumber: paymentsResult.pagination.page,
+            pageSize: paymentsResult.pagination.limit,
+            totalPages: paymentsResult.pagination.pages,
+            totalItems: paymentsResult.pagination.total,
+          }
+        : null,
+    };
   }
 
   @UseGuards(AdminJwtAuthGuard)
