@@ -3,6 +3,8 @@ import { CreateUserRepoDto } from '../../../infrastructure/dto/create-user.repo-
 import { BadRequestException } from '@nestjs/common';
 import { CryptoService } from '../../crypto.service';
 import { UsersRepo } from '../../../infrastructure/users.repo';
+import { BadRequestDomainException } from '../../../../../core/exceptions/domain/domainException';
+import { ErrorConstants } from '../../../../../core/exceptions/errorConstants';
 
 export abstract class BaseCreateUser {
   protected constructor(
@@ -10,29 +12,29 @@ export abstract class BaseCreateUser {
     protected usersRepo: UsersRepo,
   ) {}
 
-  async createUser(dto: CreateUserDto): Promise<CreateUserRepoDto> {
+  async createUserDto(dto: CreateUserDto): Promise<CreateUserRepoDto> {
     const userWithSameLogin = await this.usersRepo.findByLogin(dto.login);
     if (userWithSameLogin) {
-      throw new BadRequestException({
-        errors: [
-          {
-            field: 'login',
-            message: 'Login is already taken',
-          },
-        ],
-      });
+      throw BadRequestDomainException.create(
+        ErrorConstants.LOGIN_ALREADY_TAKEN,
+        'BaseCreateUser',
+      );
     }
 
     const userWithSameEmail = await this.usersRepo.findByEmail(dto.email);
     if (userWithSameEmail) {
-      throw new BadRequestException({
-        errors: [
-          {
-            field: 'email',
-            message: 'Email is already taken',
-          },
-        ],
-      });
+      throw BadRequestDomainException.create(
+        ErrorConstants.EMAIL_ALREADY_TAKEN,
+        'BaseCreateUser',
+      );
+    }
+
+    if (!dto.password) {
+      return {
+        login: dto.login,
+        email: dto.email,
+        passwordHash: null,
+      };
     }
 
     const passwordHash = await this.cryptoService.createPasswordHash(
@@ -42,7 +44,7 @@ export abstract class BaseCreateUser {
     return {
       login: dto.login,
       email: dto.email,
-      passwordHash,
+      passwordHash: passwordHash,
     };
   }
 }

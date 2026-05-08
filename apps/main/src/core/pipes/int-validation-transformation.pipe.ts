@@ -11,7 +11,7 @@ export class IntValidationTransformationPipe implements PipeTransform {
     }
 
     if (!Number.isInteger(parseInt(value))) {
-      throw new NotFoundException('Invalid integer: ' + value);
+      throw new Error('Invalid integer: ' + value);
     }
 
     return Number(value);

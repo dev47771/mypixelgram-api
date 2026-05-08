@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../../core/prisma/prisma.service';
 import { CreateSessionDto } from '../../api/input-dto/create-session.input-dto';
-import { Session } from '@prisma/client'
+import { Session } from '@prisma/client';
 
 @Injectable()
 export class SessionRepo {
@@ -17,5 +17,25 @@ export class SessionRepo {
 
   async deleteSession(id: string) {
     return this.prisma.session.delete({ where: { id } });
+  }
+  async deleteByDeviceId(deviceId: string): Promise<void> {
+    await this.prisma.session.deleteMany({
+      where: { deviceId },
+    });
+  }
+
+  async updateSessionByDeviceId(deviceId: string, updateData: Partial<Session>) {
+    return this.prisma.session.updateMany({
+      where: { deviceId },
+      data: { ...updateData },
+    });
+  }
+  async deleteAllExceptDevice(userId: string, currentDeviceId: string): Promise<void> {
+    await this.prisma.session.deleteMany({
+      where: {
+        userId,
+        deviceId: { not: currentDeviceId },
+      },
+    });
   }
 }

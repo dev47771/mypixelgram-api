@@ -1,14 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { CreateUserInputDto } from './input-dto/create-user.input-dto';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { RegistrationUserDto } from './input-dto/register-user.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.use-case';
 import { ExtractDeviceAndIpFromReq } from '../../../core/decorators/extractDeviceAndIp';
@@ -30,23 +21,92 @@ import { JwtAuthGuard } from './guards/jwt-strategy/jwt-auth.guard';
 import { GetMeUseCaseCommand } from '../application/queries/get-me.query';
 import { CodeDto } from './input-dto/code.dto';
 import { ConfirmationUseCaseCommand } from '../application/usecases/confirmation.use-case';
+import { CheckRecoveryCodeCommand } from '../application/usecases/check-recovery-code.use-case';
+import { EmailDto } from './input-dto/email.resending.dto';
+import { RegistrationEmailResendingUseCaseCommand } from '../application/usecases/register-resending.use-case';
+import { AccessToken } from './view-dto/access.token.dto';
+import { RegisterEmailResending, Registration, RegistrationConfirmation, Login, RecoverPassword, CheckRecoveryCode, SetNewPassword, Logout, GetUserAccounts, RefreshToken, GithubAuthSwagger, GithubCallbackSwagger, GoogleAuthSwagger, GoogleCallbackSwagger } from './decorators/auth.swagger.decorators';
+import { RefreshTokenCommand } from '../application/usecases/create-new-tokens.use-case';
+import { ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
+import { Recaptcha } from './decorators/recaptcha.decorators';
+import { RecaptchaTokenDto } from './input-dto/recapctcha.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { GithubRegisterUseCaseCommand } from '../application/usecases/github-authorization.use-case';
+import { GithubInputDto } from './input-dto/githubInputDto';
+import { GoogleRegistrationUseCaseCommand } from '../application/usecases/google-authorization.use-case';
+import { ConfigService } from '@nestjs/config';
+import { GetLoginByRefreshTokenQueryCommand } from '../application/queries/get-user-login.outh2';
 
 @Controller(AUTH_ROUTE)
 export class AuthController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
+    private configService: ConfigService,
   ) {}
 
   @Post('register')
+  //@UseGuards(RecaptchaGuard)
+  @Registration()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registerUser(@Body() body: CreateUserInputDto): Promise<string> {
-    return await this.commandBus.execute<RegisterUserCommand, string>(
-      new RegisterUserCommand(body),
-    );
+  async registerUser(@Body() body: RegistrationUserDto): Promise<string> {
+    return await this.commandBus.execute<RegisterUserCommand, string>(new RegisterUserCommand(body));
+  }
+
+  @Get('github')
+  @GithubAuthSwagger()
+  @UseGuards(AuthGuard('github'))
+  async githubAuth() {}
+
+  @Get('github/callback')
+  @GithubCallbackSwagger()
+  @UseGuards(AuthGuard('github'))
+  async githubAuthCallback(@Req() req: any, @Res() res: Response) {
+    const dto: GithubInputDto = {
+      ip: req.ip,
+      device: req.headers['user-agent'],
+      githubId: req.user.githubId,
+      login: req.user.login,
+      email: req.user.email,
+    };
+    try {
+      const tokens = await this.commandBus.execute(new GithubRegisterUseCaseCommand(dto));
+      const login: string = await this.queryBus.execute(new GetLoginByRefreshTokenQueryCommand(tokens.refreshToken));
+
+      res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+        domain: '.mypixelgram.ru',
+      });
+      const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
+
+      return res.redirect(redirectUrl);
+    } catch (e) {
+      console.error(e);
+      res.redirect(this.configService.get<string>('URL_TOKEN_ERROR')!);
+    }
+  }
+
+  @Post('recaptcha')
+  @Recaptcha()
+  @HttpCode(HttpStatus.OK)
+  async recaptcha(@Body() body: RecaptchaTokenDto) {
+    return;
+  }
+
+  @Post('registration-email-resending')
+  @RegisterEmailResending()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationEmailResending(@Body() email: EmailDto) {
+    await this.commandBus.execute(new RegistrationEmailResendingUseCaseCommand(email.email));
+    return;
   }
 
   @Post('registration-confirmation')
+  @RegistrationConfirmation()
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmation(@Body() code: CodeDto) {
     await this.commandBus.execute(new ConfirmationUseCaseCommand(code.code));
@@ -54,44 +114,121 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
+  @Login()
   @HttpCode(HttpStatus.OK)
-  async loginUser(
-    @ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  async loginUser(@ExtractDeviceAndIpFromReq() dto: ExtractDeviceAndIpDto, @Res({ passthrough: true }) response: Response) {
     const tokens = await this.commandBus.execute(new LoginUserCommand(dto));
 
     response.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
       secure: true,
+      sameSite: 'none',
+      maxAge: 3600_000,
+      domain: '.mypixelgram.ru',
     });
-    return { accessToken: tokens.accessToken };
+    return { accessToken: tokens.accessToken } as AccessToken;
+  }
+
+  @ApiCookieAuth('refreshToken')
+  @UseGuards(RefreshAuthGuard)
+  @Post('refresh-token')
+  @RefreshToken()
+  @HttpCode(HttpStatus.OK)
+  async createNewTokensPair(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto, @Res({ passthrough: true }) response: Response): Promise<{ accessToken: string }> {
+    const tokenPair = await this.commandBus.execute(new RefreshTokenCommand(payload));
+    response.cookie('refreshToken', tokenPair.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 3600_000,
+      domain: '.mypixelgram.ru',
+    });
+    return {
+      accessToken: tokenPair.accessToken,
+    };
   }
 
   @Post('recover-password')
+  @RecoverPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async recoverPassword(@Body() body: PasswordRecoveryInputDto): Promise<void> {
     await this.commandBus.execute(new RecoverPasswordCommand(body.email));
   }
 
+  @Post('check-recovery-code')
+  @CheckRecoveryCode()
+  @HttpCode(HttpStatus.OK)
+  async checkRecoveryCode(@Body() body: CodeDto): Promise<void> {
+    await this.commandBus.execute(new CheckRecoveryCodeCommand(body.code));
+  }
+
   @Post('new-password')
+  @SetNewPassword()
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() body: NewPasswordInputDto): Promise<void> {
-    await this.commandBus.execute(
-      new SetNewPasswordCommand(body.newPassword, body.recoveryCode),
-    );
+    await this.commandBus.execute(new SetNewPasswordCommand(body.newPassword, body.recoveryCode));
   }
 
+  @ApiCookieAuth('refreshToken')
   @UseGuards(RefreshAuthGuard)
   @Post('logout')
+  @Logout()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto) {
+  async logout(@ExtractRefreshFromCookie() payload: RefreshTokenPayloadDto, @Res({ passthrough: true }) res: Response) {
     await this.commandBus.execute(new LogoutUseCaseCommand(payload));
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.mypixelgram.ru',
+    });
   }
 
+  @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('me')
+  @GetUserAccounts()
   async getMe(@ExtractUserFromRequest() dto: ExtractDeviceAndIpDto) {
     return this.queryBus.execute(new GetMeUseCaseCommand(dto.userId));
+  }
+  @Get('google')
+  @GoogleAuthSwagger()
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('google/callback')
+  @GoogleCallbackSwagger()
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() req: any, @Res() res: Response) {
+    if (!req.user) {
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
+
+    const dto = {
+      googleId: req.user.googleId,
+      email: req.user.email,
+      login: req.user.username,
+      ip: req.ip,
+      device: req.headers['user-agent'],
+    };
+
+    try {
+      const { refreshToken } = await this.commandBus.execute(new GoogleRegistrationUseCaseCommand(dto));
+      const login: string = await this.queryBus.execute(new GetLoginByRefreshTokenQueryCommand(refreshToken));
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 3600_000,
+        domain: '.mypixelgram.ru',
+      });
+      const baseProfileUrl = this.configService.get<string>('FRONT_PROFILE_URL');
+      const redirectUrl = `${baseProfileUrl}/${encodeURIComponent(login)}?oauth_success=true`;
+
+      return res.redirect(redirectUrl);
+    } catch (error) {
+      return res.redirect(<string>this.configService.get<string>('FRONT_SIGNIN_ERROR_URL'));
+    }
   }
 }

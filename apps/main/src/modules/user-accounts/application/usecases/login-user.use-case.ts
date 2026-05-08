@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { ExtractDeviceAndIpDto } from '../../api/input-dto/extract-device-ip.input-dto';
-import { UsersRepo } from '../../infrastructure/users.repo';
 import { v4 as uuidv4 } from 'uuid';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -44,6 +43,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       refreshToken,
       this.configService.get<string>('JWT_SECRET_KEY')!,
     ) as { userId: string; deviceId: string; iat: number; exp: number };
+
     const iat_Date: string = new Date(payload.iat * 1000).toISOString();
     const exp_Date: string = new Date(payload.exp * 1000).toISOString();
 

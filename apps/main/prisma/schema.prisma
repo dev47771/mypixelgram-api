@@ -9,15 +9,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
   id           String    @id @default(uuid())
-  login        String    @db.VarChar(100)
+  login        String    @unique @db.VarChar(100)
   email        String    @db.VarChar(100)
-  passwordHash String
+  passwordHash String?
   createdAt    DateTime  @default(now()) @db.Timestamptz()
   updatedAt    DateTime  @updatedAt @db.Timestamptz()
   deletedAt    DateTime? @db.Timestamptz()
@@ -26,17 +27,31 @@ model User {
   passwordRecoveryInfo PasswordRecovery?
   providers            UserProvider[]
   Session              Session[]
+  Post                 Post[]
+  profile              Profile?
+  blockInfo            UserBlockInfo?
+
+  accountType           AccountType    @default(PERSONAL)
+  planName              String?
+  subscriptionExpiresAt DateTime?      @db.Timestamptz()
+  Notification          Notification[]
 
   @@map("users")
 }
 
-model UserConfirmation {
-  confirmationCode String?
-  expirationDate   DateTime? @db.Timestamptz()
-  isConfirmed      Boolean
-  userId           String    @id
+enum AccountType {
+  PERSONAL
+  BUSINESS
+}
 
-  user User @relation(fields: [userId], references: [id])
+model UserConfirmation {
+  confirmationCode   String?
+  expirationDate     DateTime? @db.Timestamptz()
+  isConfirmed        Boolean
+  userId             String    @id
+  isAgreeWithPrivacy Boolean?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_confirmations")
 }
@@ -46,7 +61,7 @@ model PasswordRecovery {
   expirationDate   DateTime @db.Timestamptz()
   userId           String   @id
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("password_recoveries")
 }
@@ -54,11 +69,11 @@ model PasswordRecovery {
 model UserProvider {
   id             String @id @default(uuid())
   provider       String
-  providerUserId String
-  profile        Json?
+  providerUserId String @unique
+  email          String
   userId         String
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_providers")
 }
@@ -72,8 +87,101 @@ model Session {
   deviceName String
   deviceId   String
 
-
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session_user")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  location    String?
+  description String?
+  fileIds     String[]
+  userId      String
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("posts")
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String   @unique
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime @db.Timestamptz()
+  country     String?  @db.VarChar(100)
+  city        String?  @db.VarChar(100)
+  aboutMe     String?  @db.VarChar(1000)
+  avatarUrl   String?  @db.VarChar(500)
+  fileId      String?  @db.VarChar(500)
+
+  @@map("profiles")
+}
+
+model Country {
+  id   Int    @id @default(autoincrement())
+  code String @unique @db.VarChar(2)
+  name String @db.VarChar(150)
+
+  cities City[]
+
+  @@map("countries")
+}
+
+model City {
+  id         Int    @id @default(autoincrement())
+  name       String @db.VarChar(200)
+  population Int?
+
+  countryId Int
+  country   Country @relation(fields: [countryId], references: [id])
+
+  @@index([countryId])
+  @@map("cities")
+}
+
+model UserBlockInfo {
+  userId       String  @id
+  reasonId     Int?
+  reasonDetail String?
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blockReason BlockReason? @relation(fields: [reasonId], references: [id])
+
+  @@map("block_info")
+}
+
+model BlockReason {
+  id             Int             @id @default(autoincrement())
+  reason         String          @unique @db.Text
+  userBlockInfos UserBlockInfo[]
+
+  @@map("block_reason")
+}
+
+enum NotificationStatus {
+  unreaded
+  readed
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  userId      String
+  title       String             @db.VarChar(255)
+  description String             @db.Text
+  status      NotificationStatus @default(unreaded)
+
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @updatedAt @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, status])
+  @@map("notifications")
 }
