@@ -3,6 +3,7 @@ import { IsBoolean, IsEnum, IsNumber, IsString, Max, Min, validateSync } from 'c
 
 enum Environment {
   Development = 'development',
+  Staging = 'staging',
   Production = 'production',
   Test = 'testing',
   Provision = 'provision',

@@ -9,6 +9,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       //   log: configService.get('DB_LOGGING')
       //     ? ['query', 'info', 'warn', 'error']
       //     : [],
+      log: ['query', 'info', 'warn', 'error'],
     });
   }
 

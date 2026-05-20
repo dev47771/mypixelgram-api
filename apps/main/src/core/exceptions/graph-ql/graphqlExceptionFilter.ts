@@ -1,66 +1,67 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { GqlArgumentsHost, GqlContextType, GqlExceptionFilter } from '@nestjs/graphql';
+import { ArgumentsHost, Catch, HttpException, HttpStatus } from '@nestjs/common';
+import { GqlExceptionFilter, GqlContextType } from '@nestjs/graphql';
 import { GraphQLError } from 'graphql';
-import { DomainException, DomainExceptionCode } from './domain/domainException';
-import { PresentationException, PresentationalExceptionCode } from './presentational/presentationalException';
+import { DomainException, DomainExceptionCode } from '../domain/domainException';
+import { PresentationException, PresentationalExceptionCode } from '../presentational/presentationalException';
 
 @Catch()
-export class GraphQLExceptionsFilter implements ExceptionFilter, GqlExceptionFilter {
+export class GraphQLExceptionsFilter implements GqlExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
-    // Check if this is a GraphQL context
-    if (host.getType<GqlContextType>() === 'graphql') {
-      return this.handleGraphQLException(exception, host);
+    // Проверяем, что это GraphQL контекст
+    if (host.getType<GqlContextType>() !== 'graphql') {
+      throw exception; // Пропускаем для HTTP
     }
 
-    // If not GraphQL, let other filters handle it
-    return;
+    return this.handleGraphQLException(exception);
   }
 
-  private handleGraphQLException(exception: unknown, host: ArgumentsHost): GraphQLError {
-    const gqlHost = GqlArgumentsHost.create(host);
-    const context = gqlHost.getContext();
-
-    // Handle different types of exceptions
+  private handleGraphQLException(exception: unknown): GraphQLError {
+    // Domain exceptions
     if (exception instanceof DomainException) {
       return this.formatDomainException(exception);
     }
 
+    // Presentation exceptions
     if (exception instanceof PresentationException) {
-      return this.formatPresentationalException(exception);
+      return this.formatPresentationException(exception);
     }
 
+    // HTTP exceptions (могут прийти из REST клиентов)
     if (exception instanceof HttpException) {
       return this.formatHttpException(exception);
     }
 
+    // GraphQL errors (пробрасываем как есть)
     if (exception instanceof GraphQLError) {
       return exception;
     }
 
-    // Handle generic errors
+    // Generic errors
     return this.formatGenericError(exception);
   }
 
   private formatDomainException(exception: DomainException): GraphQLError {
     const codeName = DomainExceptionCode[exception.code] || 'UNKNOWN';
+
     return new GraphQLError(exception.message, {
       extensions: {
         code: `DOMAIN_${codeName}`,
         statusCode: this.getHttpStatusCodeFromDomainCode(exception.code),
-        meta: exception.extensions.meta,
         timestamp: new Date().toISOString(),
+        ...(exception.extensions?.meta && { meta: exception.extensions.meta }),
       },
     });
   }
 
-  private formatPresentationalException(exception: PresentationException): GraphQLError {
+  private formatPresentationException(exception: PresentationException): GraphQLError {
     const codeName = PresentationalExceptionCode[exception.code] || 'UNKNOWN';
+
     return new GraphQLError(exception.message, {
       extensions: {
-        code: `PRESENTATIONAL_${codeName}`,
-        statusCode: this.getHttpStatusCodeFromPresentationalCode(exception.code),
-        errors: exception.extensions,
+        code: `PRESENTATION_${codeName}`,
+        statusCode: this.getHttpStatusCodeFromPresentationCode(exception.code),
         timestamp: new Date().toISOString(),
+        ...(exception.extensions && { errors: exception.extensions }),
       },
     });
   }
@@ -82,13 +83,16 @@ export class GraphQLExceptionsFilter implements ExceptionFilter, GqlExceptionFil
       extensions: {
         code: `HTTP_${status}`,
         statusCode: status,
-        errors,
         timestamp: new Date().toISOString(),
+        ...(errors && { errors }),
       },
     });
   }
 
   private formatGenericError(exception: unknown): GraphQLError {
+    // Логируем неожиданные ошибки
+    console.error('Unhandled GraphQL error:', exception);
+
     const message = exception instanceof Error ? exception.message : 'Internal server error';
 
     return new GraphQLError(message, {
@@ -102,25 +106,24 @@ export class GraphQLExceptionsFilter implements ExceptionFilter, GqlExceptionFil
 
   private getHttpStatusCodeFromDomainCode(code: number): number {
     switch (code) {
-      case 1: // NotFound
+      case 1:
         return HttpStatus.NOT_FOUND;
-      case 2: // BadRequest
+      case 2:
         return HttpStatus.BAD_REQUEST;
-      case 3: // Forbidden
+      case 3:
         return HttpStatus.FORBIDDEN;
-      case 4: // Unauthorized
+      case 4:
         return HttpStatus.UNAUTHORIZED;
       default:
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
-  private getHttpStatusCodeFromPresentationalCode(code: number): number {
-    // Assuming PresentationalExceptionCode follows similar pattern
-    // You might need to import and use the actual enum
+  private getHttpStatusCodeFromPresentationCode(code: number): number {
     switch (code) {
-      case 1: // BadRequest
+      case 1:
         return HttpStatus.BAD_REQUEST;
+      // Добавьте другие коды по необходимости
       default:
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }

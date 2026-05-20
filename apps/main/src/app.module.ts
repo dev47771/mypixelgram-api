@@ -16,7 +16,7 @@ import { FileModule } from './modules/files/files.module';
 import { TransportModule } from './modules/transport/transport.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { GraphQlConfigModule } from './modules/graph-ql/graph-ql-config.module';
-import { GraphQLExceptionsFilter } from './core/exceptions/graphqlExceptionFilter';
+import { GraphQLExceptionsFilter } from './core/exceptions/graph-ql/graphqlExceptionFilter';
 
 @Module({
   imports: [
@@ -40,10 +40,6 @@ import { GraphQLExceptionsFilter } from './core/exceptions/graphqlExceptionFilte
     {
       provide: APP_FILTER,
       useClass: AllHttpExceptionsFilter,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: GraphQLExceptionsFilter,
     },
     {
       provide: APP_FILTER,

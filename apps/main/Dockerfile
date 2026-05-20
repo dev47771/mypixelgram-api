@@ -25,4 +25,4 @@ ENV NODE_ENV=production
 
 EXPOSE ${PORT}
 
-CMD ["sh", "-c", "set -x; node dist/apps/main/main.js; echo EXIT_CODE=$?; sleep 30"]
+CMD ["node", "dist/apps/main/main.js"]

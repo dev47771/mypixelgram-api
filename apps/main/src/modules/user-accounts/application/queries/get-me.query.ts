@@ -13,11 +13,7 @@ export class GetMeUseCase implements IQueryHandler<GetMeUseCaseCommand> {
 
   async execute(command: GetMeUseCaseCommand) {
     const user = await this.queryRepo.findById(command.userId);
-    if (!user)
-      throw NotFoundDomainException.create(
-        ErrorConstants.USER_NOT_FOUND,
-        'GetMeUseCaseCommand',
-      );
+    if (!user) throw NotFoundDomainException.create(ErrorConstants.USER_NOT_FOUND, 'GetMeUseCaseCommand');
     return user;
   }
 }

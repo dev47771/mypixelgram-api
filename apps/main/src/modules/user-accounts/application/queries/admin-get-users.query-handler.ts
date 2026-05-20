@@ -3,6 +3,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { AdminQueryRepository } from '../../infrastructure/query/admin.query-repository';
 import { UsersPageResponse, PageInfo } from '../../../graph-ql/models/users-page.model';
 import { UsersPage } from '../../infrastructure/query/dto/admin-query.dto';
+import { NotFoundDomainException } from '../../../../core/exceptions/domain/domainException';
 
 export class AdminGetUsersQuery {
   constructor(
@@ -20,7 +21,7 @@ export class AdminGetUsersQueryHandler implements IQueryHandler<AdminGetUsersQue
       // поиск пользователя по id с профилем
       const user = await this.adminQueryRepo.findByIdWithProfile(query.userId);
       if (!user) {
-        throw new Error('User not found');
+        throw NotFoundDomainException.create('User not found', 'AdminGetUsersQueryHandler');
       }
       // Для запроса конкретного пользователя возвращаем пагинированный ответ с одним пользователем
       const pageInfo: PageInfo = {

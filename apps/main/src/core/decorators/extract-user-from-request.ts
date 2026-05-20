@@ -4,7 +4,6 @@ import { ExtractDeviceAndIpDto } from '../../modules/user-accounts/api/input-dto
 export const ExtractUserFromRequest = createParamDecorator(
   (data: unknown, context: ExecutionContext): ExtractDeviceAndIpDto => {
     const request = context.switchToHttp().getRequest();
-
     const userId = request.user.id;
     const ip = request.ip;
     const device = request.headers['user-agent'];

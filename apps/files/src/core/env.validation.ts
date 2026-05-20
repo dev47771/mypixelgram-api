@@ -4,6 +4,7 @@ import { plainToInstance } from 'class-transformer';
 enum Environment {
   Development = 'development',
   Production = 'production',
+  Staging = 'staging',
   Test = 'testing',
   Provision = 'provision',
   DevelopmentHome = 'development.local',

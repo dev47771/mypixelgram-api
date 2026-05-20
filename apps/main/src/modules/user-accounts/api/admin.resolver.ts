@@ -1,5 +1,5 @@
 import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import { UseFilters, UseGuards } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AdminLoginInput } from '../../graph-ql/models/admin.model';
 import { AdminLocalAuthGuard } from './guards/local-strategy/admin-local-auth.guard';
@@ -16,8 +16,11 @@ import { BlockOrUnblockUserCommand } from '../application/usecases/admin/block-o
 import { TransportService } from '../../transport/transport.service';
 import { DeleteUserArgs } from './args/delete-user.args';
 import { AdminDeleteUserCommand } from '../application/usecases/admin/admin-delete-user.use-case';
+import { cookieOptions } from '../../../common/constants/cookie-options.constant';
+import { GraphQLExceptionsFilter } from '../../../core/exceptions/graph-ql/graphqlExceptionFilter';
 
 @Resolver()
+@UseFilters(GraphQLExceptionsFilter)
 export class AdminResolver {
   constructor(
     private commandBus: CommandBus,
@@ -31,13 +34,7 @@ export class AdminResolver {
     // Аутентификация проходит через AdminLocalAuthGuard
     // После успешной аутентификации получаем email из request.user
     const result = await this.commandBus.execute(new AdminLoginCommand(email));
-    res.cookie('adminAccessToken', result.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: result.expiresIn * 1000,
-      domain: '.mypixelgram.ru',
-    });
+    res.cookie('adminAccessToken', result.accessToken, cookieOptions);
 
     return true;
   }
@@ -45,12 +42,7 @@ export class AdminResolver {
   @Mutation(() => Boolean, { description: 'Выход из учётной записи администратора' })
   @UseGuards(AdminJwtAuthGuard)
   async adminLogout(@Context() { res }: { res: Response }): Promise<boolean> {
-    res.clearCookie('adminAccessToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      domain: '.mypixelgram.ru',
-    });
+    res.clearCookie('adminAccessToken', cookieOptions);
 
     return true;
   }
@@ -68,13 +60,7 @@ export class AdminResolver {
     const result = await this.commandBus.execute(new AdminRefreshTokenCommand(currentToken));
 
     const response: Response = context.res;
-    response.cookie('adminAccessToken', result.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge: result.expiresIn * 1000,
-      domain: '.mypixelgram.ru',
-    });
+    response.cookie('adminAccessToken', result.accessToken, cookieOptions);
 
     return true;
   }

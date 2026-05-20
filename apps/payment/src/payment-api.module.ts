@@ -25,6 +25,8 @@ import { NotificationPublisherService } from './payment/jobs/subscription.jobs';
 import { SubscriptionReminderRecoveryJob } from './payment/jobs/subscription-reminder.recovery';
 export const CommandHandlers = [CreateSubscriptionCheckoutUseCase, GetUserPaymentsQueryHandler, CancelStripeSubscriptionUseCase, NotificationPublisherService];
 
+console.log('рЭБИТ', process.env.RABBITMQ_URL!);
+
 @Module({
   imports: [
     ScheduleModule.forRoot(),

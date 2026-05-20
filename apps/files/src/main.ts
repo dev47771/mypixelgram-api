@@ -21,6 +21,7 @@ async function bootstrap() {
 
   console.log(`Files API application started on port ${port} (env=${process.env.NODE_ENV})`);
 
+  console.log('Энвы', process.env);
   await app.listen();
 }
 
