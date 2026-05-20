@@ -1,4 +1,14 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mypixelgram-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: unless-stopped
+    networks:
+      - mypixelgram-network
+
   main:
     build:
       context: .
@@ -10,11 +20,17 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: staging
+      PORT: 3000
       FILES_API_HOST: files
       FILES_API_PORT: 4250
       PAYMENT_API_HOST: payment
-      PAYMENT_API_PORT: 4001
+      PAYMENT_API_PORT: 4252
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       GITHUB_CALLBACK_URL: http://localhost:3000/api/v1/auth/github/callback
+    depends_on:
+      - rabbitmq
+      - files
+      - payment
     restart: unless-stopped
     networks:
       - mypixelgram-network
@@ -26,11 +42,11 @@ services:
       args:
         service: files
         port: 4250
-    expose:
+    ports:
       - "4250"
-      - "4112"
     environment:
       NODE_ENV: staging
+      PORT_FILES_API: 4250
     restart: unless-stopped
     networks:
       - mypixelgram-network
@@ -42,14 +58,17 @@ services:
       args:
         service: payment
         port: 3003
-    expose:
-      - "3003"
-      - "4001"
+    ports:
+      - "3003:3003"
+      - "4252:4252"
     environment:
       NODE_ENV: staging
-      PAYMENT_API_MICROSERVICE_PORT: 4001
-      RABBITMQ_URL: amqps://wgiqdwlp:tcJvdrAUwlBr6nrkDvuigkgTvEktUn-6@cow.rmq2.cloudamqp.com/wgiqdwlp
-      DATABASE_URL: mysql://payments:payments@localhost:3307/payments_dev
+      PORT: 3003
+      PAYMENT_TCP_PROD_PORT: 4252
+      PAYMENT_API_MICROSERVICE_PORT: 4252
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - rabbitmq
     restart: unless-stopped
     networks:
       - mypixelgram-network
