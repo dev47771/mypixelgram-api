@@ -1,0 +1,59 @@
+services:
+  main:
+    build:
+      context: .
+      dockerfile: apps/main/Dockerfile
+      args:
+        service: main
+        port: 3000
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: staging
+      FILES_API_HOST: files
+      FILES_API_PORT: 4250
+      PAYMENT_API_HOST: payment
+      PAYMENT_API_PORT: 4001
+      GITHUB_CALLBACK_URL: http://localhost:3000/api/v1/auth/github/callback
+    restart: unless-stopped
+    networks:
+      - mypixelgram-network
+
+  files:
+    build:
+      context: .
+      dockerfile: apps/files/Dockerfile
+      args:
+        service: files
+        port: 4250
+    expose:
+      - "4250"
+      - "4112"
+    environment:
+      NODE_ENV: staging
+    restart: unless-stopped
+    networks:
+      - mypixelgram-network
+
+  payment:
+    build:
+      context: .
+      dockerfile: apps/payment/Dockerfile
+      args:
+        service: payment
+        port: 3003
+    expose:
+      - "3003"
+      - "4001"
+    environment:
+      NODE_ENV: staging
+      PAYMENT_API_MICROSERVICE_PORT: 4001
+      RABBITMQ_URL: amqps://wgiqdwlp:tcJvdrAUwlBr6nrkDvuigkgTvEktUn-6@cow.rmq2.cloudamqp.com/wgiqdwlp
+      DATABASE_URL: mysql://payments:payments@localhost:3307/payments_dev
+    restart: unless-stopped
+    networks:
+      - mypixelgram-network
+
+networks:
+  mypixelgram-network:
+    driver: bridge
